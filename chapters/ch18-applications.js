@@ -41,6 +41,8 @@ window.CHAPTERS.push({
           <p><strong>Remark (Non-Retraction Theorem):</strong> The key ingredient is really the <em>No-Retraction Theorem</em>: there is no retraction \\(r: D^n \\to S^{n-1}\\). Equivalently, \\(S^{n-1}\\) is not a retract of \\(D^n\\). This is a purely topological obstruction detected by homology.</p>
         </div>
 
+        <div class="viz-placeholder" data-viz="brouwer-fixed-point-viz"></div>
+
         <div class="env-block remark">
           <p><strong>Remark (Sharpness):</strong> The Brouwer theorem fails for:</p>
           <ul>
@@ -55,65 +57,60 @@ window.CHAPTERS.push({
           id: 'brouwer-fixed-point-viz',
           title: 'Brouwer Fixed Point Theorem',
           description: 'Visualize continuous maps from the disk to itself and their fixed points. Observe the retraction construction that leads to contradiction.',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                mode: 'map',
-                mapType: 'rotation',
-                animPhase: 0,
-                gridPoints: [],
-                fixedPoint: null,
-                showRetraction: false,
-                showGrid: true
-              };
-              const pts = [];
-              for (let i = -8; i <= 8; i++) {
-                for (let j = -8; j <= 8; j++) {
-                  const x = i / 8;
-                  const y = j / 8;
-                  if (x * x + y * y <= 1.0) {
-                    pts.push({ x, y });
-                  }
-                }
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = 580; canvas.height = 380;
+            canvas.style.cssText = 'width:100%;border-radius:12px;background:#181c24;display:block;margin:0 auto;';
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              mode: 'map',
+              mapType: 'rotation',
+              animPhase: 0,
+              gridPoints: [],
+              fixedPoint: null,
+              showRetraction: false,
+              showGrid: true
+            };
+            var pts = [];
+            for (var i = -8; i <= 8; i++) {
+              for (var j = -8; j <= 8; j++) {
+                var gx = i / 8, gy = j / 8;
+                if (gx * gx + gy * gy <= 1.0) pts.push({ x: gx, y: gy });
               }
-              viz.state.gridPoints = pts;
-            },
-            draw: (viz, ctx, width, height) => {
+            }
+            state.gridPoints = pts;
+
+            function draw() {
+              var width = canvas.width, height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const cx = width / 2;
-              const cy = height / 2 + 15;
-              const R = Math.min(width, height) * 0.32;
+              var cx = width / 2, cy = height / 2 + 15;
+              var R = Math.min(width, height) * 0.32;
 
-              viz.state.animPhase += 0.008;
-              const t = viz.state.animPhase;
-              const anim = Math.min(t % 3, 1);
+              state.animPhase += 0.008;
+              var t = state.animPhase;
+              var anim = Math.min(t % 3, 1);
 
-              ctx.fillStyle = '#2c3e50';
+              ctx.fillStyle = '#c9d1d9';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
-              const titles = {
-                rotation: 'Partial Rotation of D\u00B2',
-                contraction: 'Contraction Map',
-                swirl: 'Swirl Deformation'
-              };
-              ctx.fillText(titles[viz.state.mapType] || 'Map f: D\u00B2 \u2192 D\u00B2', cx, 28);
+              var titles = { rotation: 'Partial Rotation of D\u00B2', contraction: 'Contraction Map', swirl: 'Swirl Deformation' };
+              ctx.fillText(titles[state.mapType] || 'Map f: D\u00B2 \u2192 D\u00B2', cx, 28);
               ctx.textAlign = 'left';
 
-              const mapPoint = (px, py) => {
-                if (viz.state.mapType === 'rotation') {
-                  const angle = 0.8 * (1 - (px * px + py * py));
-                  const c = Math.cos(angle), s = Math.sin(angle);
+              var mapPoint = function(px, py) {
+                if (state.mapType === 'rotation') {
+                  var angle = 0.8 * (1 - (px * px + py * py));
+                  var c = Math.cos(angle), s = Math.sin(angle);
                   return { x: c * px - s * py, y: s * px + c * py };
-                } else if (viz.state.mapType === 'contraction') {
-                  const k = 0.5;
-                  return { x: k * px + 0.3, y: k * py + 0.2 };
+                } else if (state.mapType === 'contraction') {
+                  return { x: 0.5 * px + 0.3, y: 0.5 * py + 0.2 };
                 } else {
-                  const r = Math.sqrt(px * px + py * py);
-                  const angle = 1.5 * (1 - r);
-                  const c = Math.cos(angle), s = Math.sin(angle);
-                  const nx = c * px - s * py;
-                  const ny = s * px + c * py;
-                  return { x: 0.7 * nx, y: 0.7 * ny };
+                  var r = Math.sqrt(px * px + py * py);
+                  var angle2 = 1.5 * (1 - r);
+                  var c2 = Math.cos(angle2), s2 = Math.sin(angle2);
+                  return { x: 0.7 * (c2 * px - s2 * py), y: 0.7 * (s2 * px + c2 * py) };
                 }
               };
 
@@ -128,13 +125,13 @@ window.CHAPTERS.push({
               ctx.arc(cx, cy, R, 0, Math.PI * 2);
               ctx.fill();
 
-              if (viz.state.showGrid) {
-                for (const pt of viz.state.gridPoints) {
-                  const fp = mapPoint(pt.x, pt.y);
-                  const sx = cx + pt.x * R;
-                  const sy = cy + pt.y * R;
-                  const ex = cx + (pt.x + anim * (fp.x - pt.x)) * R;
-                  const ey = cy + (pt.y + anim * (fp.y - pt.y)) * R;
+              if (state.showGrid) {
+                for (var pi = 0; pi < state.gridPoints.length; pi++) {
+                  var pt = state.gridPoints[pi];
+                  var fp = mapPoint(pt.x, pt.y);
+                  var sx = cx + pt.x * R, sy = cy + pt.y * R;
+                  var ex = cx + (pt.x + anim * (fp.x - pt.x)) * R;
+                  var ey = cy + (pt.y + anim * (fp.y - pt.y)) * R;
 
                   ctx.strokeStyle = 'rgba(231,76,60,0.35)';
                   ctx.lineWidth = 1;
@@ -150,24 +147,18 @@ window.CHAPTERS.push({
                 }
               }
 
-              let bestDist = Infinity;
-              let bestPt = { x: 0, y: 0 };
-              for (let i = -30; i <= 30; i++) {
-                for (let j = -30; j <= 30; j++) {
-                  const x = i / 30;
-                  const y = j / 30;
-                  if (x * x + y * y > 1) continue;
-                  const fp = mapPoint(x, y);
-                  const d = (fp.x - x) ** 2 + (fp.y - y) ** 2;
-                  if (d < bestDist) {
-                    bestDist = d;
-                    bestPt = { x, y };
-                  }
+              var bestDist = Infinity, bestPt = { x: 0, y: 0 };
+              for (var bi = -30; bi <= 30; bi++) {
+                for (var bj = -30; bj <= 30; bj++) {
+                  var bx = bi / 30, by = bj / 30;
+                  if (bx * bx + by * by > 1) continue;
+                  var fp2 = mapPoint(bx, by);
+                  var dd = (fp2.x - bx) * (fp2.x - bx) + (fp2.y - by) * (fp2.y - by);
+                  if (dd < bestDist) { bestDist = dd; bestPt = { x: bx, y: by }; }
                 }
               }
 
-              const fpx = cx + bestPt.x * R;
-              const fpy = cy + bestPt.y * R;
+              var fpx = cx + bestPt.x * R, fpy = cy + bestPt.y * R;
               ctx.strokeStyle = '#27ae60';
               ctx.lineWidth = 3;
               ctx.beginPath();
@@ -183,34 +174,32 @@ window.CHAPTERS.push({
               ctx.textAlign = 'left';
               ctx.fillText('Fixed point: f(x) = x', fpx + 15, fpy - 5);
 
-              ctx.fillStyle = '#2c3e50';
+              ctx.fillStyle = '#8b949e';
               ctx.font = '14px serif';
               ctx.textAlign = 'center';
               ctx.fillText('Every continuous f: D\u00B2 \u2192 D\u00B2 must have at least one fixed point', cx, height - 15);
               ctx.textAlign = 'left';
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Map Type',
-                options: [
-                  { value: 'rotation', label: 'Partial Rotation' },
-                  { value: 'contraction', label: 'Contraction' },
-                  { value: 'swirl', label: 'Swirl' }
-                ],
-                action: (viz, value) => {
-                  viz.state.mapType = value;
-                  viz.state.animPhase = 0;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Grid',
-                action: (viz) => {
-                  viz.state.showGrid = !viz.state.showGrid;
-                }
-              }
-            ]
+              requestAnimationFrame(draw);
+            }
+
+            // Controls
+            var sel = document.createElement('select');
+            sel.style.cssText = 'background:#161b22;color:#c9d1d9;border:1px solid #30363d;padding:6px 10px;border-radius:6px;font-size:14px;';
+            [{v:'rotation',l:'Partial Rotation'},{v:'contraction',l:'Contraction'},{v:'swirl',l:'Swirl'}].forEach(function(o) {
+              var opt = document.createElement('option');
+              opt.value = o.v; opt.textContent = o.l;
+              sel.appendChild(opt);
+            });
+            sel.onchange = function() { state.mapType = sel.value; state.animPhase = 0; };
+            controls.appendChild(sel);
+
+            var btn = document.createElement('button');
+            btn.textContent = 'Toggle Grid';
+            btn.style.cssText = 'background:#238636;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:14px;margin-left:8px;';
+            btn.onclick = function() { state.showGrid = !state.showGrid; };
+            controls.appendChild(btn);
+
+            draw();
           }
         }
       ],
@@ -315,6 +304,8 @@ This is equivalent to the Brouwer Fixed Point Theorem for \\(n = 2\\) -- in fact
           <p>where \\(\\operatorname{index}_p(f) = \\mathrm{sign}\\, \\det(I - Df_p)\\) is the local fixed-point index.</p>
         </div>
 
+        <div class="viz-placeholder" data-viz="lefschetz-number-viz"></div>
+
         <div class="env-block remark">
           <p><strong>Remark (Converse Fails):</strong> \\(\\Lambda(f) = 0\\) does <em>not</em> mean \\(f\\) has no fixed points. For example, the identity map on \\(S^1\\) has \\(\\Lambda(\\mathrm{id}) = 0\\) but every point is fixed.</p>
         </div>
@@ -324,39 +315,44 @@ This is equivalent to the Brouwer Fixed Point Theorem for \\(n = 2\\) -- in fact
           id: 'lefschetz-number-viz',
           title: 'Lefschetz Number Calculator',
           description: 'Compute the Lefschetz number for various maps on different spaces and see whether fixed points are guaranteed.',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                space: 'torus',
-                matA: 2, matB: 1, matC: 1, matD: 1,
-                animPhase: 0
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = 580; canvas.height = 380;
+            canvas.style.cssText = 'width:100%;border-radius:12px;background:#181c24;display:block;margin:0 auto;';
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              space: 'torus',
+              matA: 2, matB: 1, matC: 1, matD: 1,
+              animPhase: 0
+            };
+
+            function draw() {
+              var width = canvas.width, height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              ctx.fillStyle = '#2c3e50';
+              ctx.fillStyle = '#c9d1d9';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
               ctx.fillText('Lefschetz Number Computation', width / 2, 28);
 
-              const st = viz.state;
-              const cx = width / 2;
-              let y = 55;
+              var st = state;
+              var cx = width / 2;
+              var y = 55;
               st.animPhase += 0.01;
 
               ctx.textAlign = 'left';
               ctx.font = '16px serif';
 
               if (st.space === 'torus') {
-                const a = st.matA, b = st.matB, c = st.matC, d = st.matD;
-                const tr = a + d;
-                const det = a * d - b * c;
-                const lambda = 1 - tr + det;
+                var a = st.matA, b = st.matB, c = st.matC, d = st.matD;
+                var tr = a + d;
+                var det = a * d - b * c;
+                var lambda = 1 - tr + det;
 
-                const tcx = width * 0.25;
-                const tcy = 130;
-                const rM = 45, rm = 18;
+                var tcx = width * 0.25, tcy = 130;
+                var rM = 45, rm = 18;
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
@@ -370,15 +366,15 @@ This is equivalent to the Brouwer Fixed Point Theorem for \\(n = 2\\) -- in fact
                 ctx.arc(tcx, tcy, rM + rm, 0, Math.PI * 2);
                 ctx.arc(tcx, tcy, rM - rm, Math.PI * 2, 0, true);
                 ctx.fill();
-                ctx.fillStyle = '#2c3e50';
+                ctx.fillStyle = '#c9d1d9';
                 ctx.font = 'bold 14px serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('T\u00B2', tcx, tcy + 5);
 
-                const rx = width * 0.45;
+                var rx = width * 0.45;
                 ctx.textAlign = 'left';
                 ctx.font = '15px serif';
-                ctx.fillStyle = '#2c3e50';
+                ctx.fillStyle = '#c9d1d9';
                 ctx.fillText('f induced by A = [' + a + ' ' + b + ' ; ' + c + ' ' + d + ']', rx, 75);
 
                 y = 100;
@@ -393,7 +389,6 @@ This is equivalent to the Brouwer Fixed Point Theorem for \\(n = 2\\) -- in fact
                   ctx.fillStyle = '#27ae60';
                   ctx.font = 'bold 16px serif';
                   ctx.fillText('\u039B(f) \u2260 0  \u21d2  f has a fixed point!', rx, y);
-
                   ctx.strokeStyle = '#27ae60';
                   ctx.lineWidth = 4;
                   ctx.beginPath();
@@ -408,135 +403,139 @@ This is equivalent to the Brouwer Fixed Point Theorem for \\(n = 2\\) -- in fact
                 }
 
                 y += 30;
-                const detAI = Math.abs((a - 1) * (d - 1) - b * c);
-                ctx.fillStyle = '#7f8c8d';
+                var detAI = Math.abs((a - 1) * (d - 1) - b * c);
+                ctx.fillStyle = '#8b949e';
                 ctx.font = '14px serif';
                 ctx.fillText('|det(A - I)| = ' + detAI + ' fixed point' + (detAI !== 1 ? 's' : '') + ' (when non-degenerate)', rx, y);
 
               } else if (st.space === 'sphere') {
-                const deg = st.matA;
-                const n = st.matB;
+                var deg = st.matA;
+                var n = st.matB;
 
-                const tcx = width * 0.25;
-                const tcy = 130;
-                const rr = 50;
-                const grad = ctx.createRadialGradient(tcx - rr * 0.3, tcy - rr * 0.3, rr * 0.1, tcx, tcy, rr);
+                var tcx2 = width * 0.25, tcy2 = 130, rr = 50;
+                var grad = ctx.createRadialGradient(tcx2 - rr * 0.3, tcy2 - rr * 0.3, rr * 0.1, tcx2, tcy2, rr);
                 grad.addColorStop(0, 'rgba(155,89,182,0.3)');
                 grad.addColorStop(1, 'rgba(155,89,182,0.08)');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.arc(tcx, tcy, rr, 0, Math.PI * 2);
+                ctx.arc(tcx2, tcy2, rr, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = '#9b59b6';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(tcx, tcy, rr, 0, Math.PI * 2);
+                ctx.arc(tcx2, tcy2, rr, 0, Math.PI * 2);
                 ctx.stroke();
-                ctx.fillStyle = '#2c3e50';
+                ctx.fillStyle = '#c9d1d9';
                 ctx.font = 'bold 14px serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('S' + (n < 10 ? '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079'[n] || n : n), tcx, tcy + 5);
+                ctx.fillText('S' + (n < 10 ? '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079'[n] || n : n), tcx2, tcy2 + 5);
 
-                const rx = width * 0.45;
+                var rx2 = width * 0.45;
                 ctx.textAlign = 'left';
                 ctx.font = '15px serif';
-                ctx.fillStyle = '#2c3e50';
+                ctx.fillStyle = '#c9d1d9';
 
                 y = 85;
-                ctx.fillText('f: S' + n + ' \u2192 S' + n + ' of degree ' + deg, rx, y); y += 25;
-                ctx.fillText('H\u2080(S' + n + ') = \u211A: trace = 1', rx, y); y += 22;
-                ctx.fillText('H' + n + '(S' + n + ') = \u211A: f* = \u00D7' + deg + ', trace = ' + deg, rx, y); y += 30;
+                ctx.fillText('f: S' + n + ' \u2192 S' + n + ' of degree ' + deg, rx2, y); y += 25;
+                ctx.fillText('H\u2080(S' + n + ') = \u211A: trace = 1', rx2, y); y += 22;
+                ctx.fillText('H' + n + '(S' + n + ') = \u211A: f* = \u00D7' + deg + ', trace = ' + deg, rx2, y); y += 30;
 
-                const lambda = 1 + (n % 2 === 0 ? 1 : -1) * deg;
+                var lambda2 = 1 + (n % 2 === 0 ? 1 : -1) * deg;
                 ctx.font = 'bold 16px serif';
-                ctx.fillText('\u039B(f) = 1 + (-1)' + n + '\u00B7' + deg + ' = ' + lambda, rx, y); y += 30;
+                ctx.fillText('\u039B(f) = 1 + (-1)' + n + '\u00B7' + deg + ' = ' + lambda2, rx2, y); y += 30;
 
-                if (lambda !== 0) {
+                if (lambda2 !== 0) {
                   ctx.fillStyle = '#27ae60';
                   ctx.font = 'bold 16px serif';
-                  ctx.fillText('\u039B(f) \u2260 0  \u21d2  f has a fixed point!', rx, y);
+                  ctx.fillText('\u039B(f) \u2260 0  \u21d2  f has a fixed point!', rx2, y);
                 } else {
                   ctx.fillStyle = '#e74c3c';
                   ctx.font = 'bold 16px serif';
-                  ctx.fillText('\u039B(f) = 0  \u21d2  no conclusion', rx, y);
+                  ctx.fillText('\u039B(f) = 0  \u21d2  no conclusion', rx2, y);
                 }
 
               } else if (st.space === 'disk') {
-                const tcx = width * 0.25;
-                const tcy = 130;
-                const rr = 55;
+                var tcx3 = width * 0.25, tcy3 = 130, rr3 = 55;
                 ctx.fillStyle = 'rgba(39,174,96,0.12)';
                 ctx.beginPath();
-                ctx.arc(tcx, tcy, rr, 0, Math.PI * 2);
+                ctx.arc(tcx3, tcy3, rr3, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = '#27ae60';
                 ctx.lineWidth = 2.5;
                 ctx.beginPath();
-                ctx.arc(tcx, tcy, rr, 0, Math.PI * 2);
+                ctx.arc(tcx3, tcy3, rr3, 0, Math.PI * 2);
                 ctx.stroke();
-                ctx.fillStyle = '#2c3e50';
+                ctx.fillStyle = '#c9d1d9';
                 ctx.font = 'bold 14px serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('D\u00B2', tcx, tcy + 5);
+                ctx.fillText('D\u00B2', tcx3, tcy3 + 5);
 
-                const rx = width * 0.45;
+                var rx3 = width * 0.45;
                 ctx.textAlign = 'left';
                 ctx.font = '15px serif';
-                ctx.fillStyle = '#2c3e50';
+                ctx.fillStyle = '#c9d1d9';
                 y = 85;
-                ctx.fillText('f: D\u00B2 \u2192 D\u00B2 (any continuous map)', rx, y); y += 25;
-                ctx.fillText('D\u00B2 is contractible:', rx, y); y += 22;
-                ctx.fillText('  H\u2080 = \u211A, H\u2081 = H\u2082 = 0', rx, y); y += 22;
-                ctx.fillText('  f* on H\u2080 is identity, trace = 1', rx, y); y += 30;
+                ctx.fillText('f: D\u00B2 \u2192 D\u00B2 (any continuous map)', rx3, y); y += 25;
+                ctx.fillText('D\u00B2 is contractible:', rx3, y); y += 22;
+                ctx.fillText('  H\u2080 = \u211A, H\u2081 = H\u2082 = 0', rx3, y); y += 22;
+                ctx.fillText('  f* on H\u2080 is identity, trace = 1', rx3, y); y += 30;
 
                 ctx.font = 'bold 16px serif';
-                ctx.fillText('\u039B(f) = 1 \u2260 0  always!', rx, y); y += 30;
+                ctx.fillText('\u039B(f) = 1 \u2260 0  always!', rx3, y); y += 30;
 
                 ctx.fillStyle = '#27ae60';
                 ctx.font = 'bold 16px serif';
-                ctx.fillText('\u21d2  Brouwer: every f has a fixed point', rx, y);
+                ctx.fillText('\u21d2  Brouwer: every f has a fixed point', rx3, y);
               }
 
-              ctx.fillStyle = '#7f8c8d';
+              ctx.fillStyle = '#8b949e';
               ctx.font = '13px serif';
               ctx.textAlign = 'center';
               ctx.fillText('\u039B(f) = \u03A3 (-1)\u1D4F tr(f*\u2096) -- the alternating sum of traces on homology', cx, height - 15);
               ctx.textAlign = 'left';
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Space',
-                options: [
-                  { value: 'torus', label: 'Torus T\u00B2' },
-                  { value: 'sphere', label: 'Sphere S\u207F' },
-                  { value: 'disk', label: 'Disk D\u00B2 (Brouwer)' }
-                ],
-                action: (viz, value) => {
-                  viz.state.space = value;
-                  if (value === 'torus') {
-                    viz.state.matA = 2; viz.state.matB = 1; viz.state.matC = 1; viz.state.matD = 1;
-                  } else if (value === 'sphere') {
-                    viz.state.matA = 2; viz.state.matB = 2;
-                  }
-                }
-              },
-              {
-                type: 'range',
-                label: 'Parameter a / degree',
-                min: -3, max: 5, step: 1,
-                action: (viz, value) => { viz.state.matA = parseInt(value); }
-              },
-              {
-                type: 'range',
-                label: 'Parameter d / dimension',
-                min: 1, max: 5, step: 1,
-                action: (viz, value) => {
-                  if (viz.state.space === 'torus') viz.state.matD = parseInt(value);
-                  else viz.state.matB = parseInt(value);
-                }
-              }
-            ]
+            }
+
+            // Controls
+            var sel = document.createElement('select');
+            sel.style.cssText = 'background:#161b22;color:#c9d1d9;border:1px solid #30363d;padding:6px 10px;border-radius:6px;font-size:14px;';
+            [{v:'torus',l:'Torus T\u00B2'},{v:'sphere',l:'Sphere S\u207F'},{v:'disk',l:'Disk D\u00B2 (Brouwer)'}].forEach(function(o) {
+              var opt = document.createElement('option');
+              opt.value = o.v; opt.textContent = o.l;
+              sel.appendChild(opt);
+            });
+            sel.onchange = function() {
+              state.space = sel.value;
+              if (sel.value === 'torus') { state.matA = 2; state.matB = 1; state.matC = 1; state.matD = 1; rangeA.value = 2; rangeD.value = 1; }
+              else if (sel.value === 'sphere') { state.matA = 2; state.matB = 2; rangeA.value = 2; rangeD.value = 2; }
+              draw();
+            };
+            controls.appendChild(sel);
+
+            var lblA = document.createElement('label');
+            lblA.textContent = ' Param a/deg: ';
+            lblA.style.cssText = 'color:#c9d1d9;font-size:13px;margin-left:10px;';
+            controls.appendChild(lblA);
+            var rangeA = document.createElement('input');
+            rangeA.type = 'range'; rangeA.min = -3; rangeA.max = 5; rangeA.step = 1; rangeA.value = 2;
+            rangeA.style.cssText = 'vertical-align:middle;';
+            rangeA.oninput = function() { state.matA = parseInt(rangeA.value); draw(); };
+            controls.appendChild(rangeA);
+
+            var lblD = document.createElement('label');
+            lblD.textContent = ' Param d/dim: ';
+            lblD.style.cssText = 'color:#c9d1d9;font-size:13px;margin-left:10px;';
+            controls.appendChild(lblD);
+            var rangeD = document.createElement('input');
+            rangeD.type = 'range'; rangeD.min = 1; rangeD.max = 5; rangeD.step = 1; rangeD.value = 1;
+            rangeD.style.cssText = 'vertical-align:middle;';
+            rangeD.oninput = function() {
+              if (state.space === 'torus') state.matD = parseInt(rangeD.value);
+              else state.matB = parseInt(rangeD.value);
+              draw();
+            };
+            controls.appendChild(rangeD);
+
+            draw();
           }
         }
       ],
@@ -613,6 +612,8 @@ In fact, the fixed points satisfy \\(Ax = x \\pmod{\\mathbb{Z}^2}\\), i.e., \\((
           <p><strong>Application (Ham Sandwich Theorem):</strong> Given \\(n\\) measurable sets in \\(\\mathbb{R}^n\\), there exists a hyperplane that simultaneously bisects all \\(n\\) sets. This follows from Borsuk-Ulam applied to the function \\(f: S^n \\to \\mathbb{R}^n\\) where \\(f(v)\\) measures the volume imbalance of each set relative to the hyperplane with normal \\(v\\).</p>
         </div>
 
+        <div class="viz-placeholder" data-viz="degree-winding-viz"></div>
+
         <div class="env-block theorem">
           <p><strong>Theorem (Fundamental Theorem of Algebra):</strong> Every non-constant polynomial \\(p(z) \\in \\mathbb{C}[z]\\) has a root.</p>
         </div>
@@ -627,36 +628,39 @@ In fact, the fixed points satisfy \\(Ax = x \\pmod{\\mathbb{Z}^2}\\), i.e., \\((
           id: 'degree-winding-viz',
           title: 'Degree and Winding Number',
           description: 'Visualize maps from S\u00B9 to S\u00B9 and their winding numbers. See how the image wraps around the target circle.',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                degree: 2,
-                animPhase: 0,
-                showDomain: true,
-                showImage: true,
-                traceProgress: 0
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = 580; canvas.height = 380;
+            canvas.style.cssText = 'width:100%;border-radius:12px;background:#181c24;display:block;margin:0 auto;';
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              degree: 2,
+              animPhase: 0,
+              showDomain: true,
+              showImage: true,
+              traceProgress: 0
+            };
+
+            function draw() {
+              var width = canvas.width, height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const st = viz.state;
+              var st = state;
               st.animPhase += 0.005;
               st.traceProgress = (st.traceProgress + 0.003) % 1;
 
-              ctx.fillStyle = '#2c3e50';
+              ctx.fillStyle = '#c9d1d9';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
               ctx.fillText('Degree ' + st.degree + ' Map: S\u00B9 \u2192 S\u00B9', width / 2, 28);
 
-              const lcx = width * 0.28;
-              const lcy = height * 0.52;
-              const Rl = Math.min(width * 0.2, height * 0.3);
+              var lcx = width * 0.28, lcy = height * 0.52;
+              var Rl = Math.min(width * 0.2, height * 0.3);
+              var rcx = width * 0.72, rcy = height * 0.52;
+              var Rr = Math.min(width * 0.2, height * 0.3);
 
-              const rcx = width * 0.72;
-              const rcy = height * 0.52;
-              const Rr = Math.min(width * 0.2, height * 0.3);
-
-              ctx.fillStyle = '#7f8c8d';
+              ctx.fillStyle = '#8b949e';
               ctx.font = '14px serif';
               ctx.fillText('Domain S\u00B9', lcx, lcy + Rl + 25);
               ctx.fillText('Codomain S\u00B9', rcx, rcy + Rr + 25);
@@ -675,29 +679,29 @@ In fact, the fixed points satisfy \\(Ax = x \\pmod{\\mathbb{Z}^2}\\), i.e., \\((
               ctx.arc(rcx, rcy, Rr, 0, Math.PI * 2);
               ctx.stroke();
 
-              const d = st.degree;
-              const N = 200;
+              var d = st.degree;
+              var N = 200;
               if (st.showImage) {
                 ctx.strokeStyle = '#e74c3c';
                 ctx.lineWidth = 2.5;
                 ctx.beginPath();
-                for (let i = 0; i <= N; i++) {
-                  const theta = (i / N) * Math.PI * 2;
-                  const imgTheta = d * theta;
-                  const x = rcx + Rr * Math.cos(imgTheta);
-                  const y = rcy + Rr * Math.sin(imgTheta);
+                for (var i = 0; i <= N; i++) {
+                  var theta = (i / N) * Math.PI * 2;
+                  var imgTheta = d * theta;
+                  var x = rcx + Rr * Math.cos(imgTheta);
+                  var y = rcy + Rr * Math.sin(imgTheta);
                   if (i === 0) ctx.moveTo(x, y);
                   else ctx.lineTo(x, y);
                 }
                 ctx.stroke();
               }
 
-              const traceTheta = st.traceProgress * Math.PI * 2;
-              const domX = lcx + Rl * Math.cos(traceTheta);
-              const domY = lcy + Rl * Math.sin(traceTheta);
-              const imgTheta = d * traceTheta;
-              const imgX = rcx + Rr * Math.cos(imgTheta);
-              const imgY = rcy + Rr * Math.sin(imgTheta);
+              var traceTheta = st.traceProgress * Math.PI * 2;
+              var domX = lcx + Rl * Math.cos(traceTheta);
+              var domY = lcy + Rl * Math.sin(traceTheta);
+              var imgTheta2 = d * traceTheta;
+              var imgX = rcx + Rr * Math.cos(imgTheta2);
+              var imgY = rcy + Rr * Math.sin(imgTheta2);
 
               ctx.fillStyle = '#e67e22';
               ctx.beginPath();
@@ -718,34 +722,36 @@ In fact, the fixed points satisfy \\(Ax = x \\pmod{\\mathbb{Z}^2}\\), i.e., \\((
               ctx.stroke();
               ctx.setLineDash([]);
 
-              ctx.fillStyle = '#2c3e50';
+              ctx.fillStyle = '#c9d1d9';
               ctx.font = 'bold 15px serif';
               ctx.textAlign = 'center';
               ctx.fillText('f(\u03B8) = ' + d + '\u03B8', width / 2, lcy - Rl - 5);
 
-              ctx.fillStyle = '#2c3e50';
+              ctx.fillStyle = '#c9d1d9';
               ctx.font = '14px serif';
               ctx.fillText('Image wraps around ' + Math.abs(d) + ' time' + (Math.abs(d) !== 1 ? 's' : '') + (d < 0 ? ' (reversed)' : ''), width / 2, height - 15);
               ctx.textAlign = 'left';
-            },
-            controls: [
-              {
-                type: 'range',
-                label: 'Degree',
-                min: -4, max: 5, step: 1,
-                action: (viz, value) => {
-                  viz.state.degree = parseInt(value);
-                }
-              },
-              {
-                type: 'button',
-                label: 'Reset Animation',
-                action: (viz) => {
-                  viz.state.traceProgress = 0;
-                  viz.state.animPhase = 0;
-                }
-              }
-            ]
+              requestAnimationFrame(draw);
+            }
+
+            // Controls
+            var lbl = document.createElement('label');
+            lbl.textContent = 'Degree: ';
+            lbl.style.cssText = 'color:#c9d1d9;font-size:14px;';
+            controls.appendChild(lbl);
+            var range = document.createElement('input');
+            range.type = 'range'; range.min = -4; range.max = 5; range.step = 1; range.value = 2;
+            range.style.cssText = 'vertical-align:middle;';
+            range.oninput = function() { state.degree = parseInt(range.value); };
+            controls.appendChild(range);
+
+            var btn = document.createElement('button');
+            btn.textContent = 'Reset Animation';
+            btn.style.cssText = 'background:#238636;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:14px;margin-left:10px;';
+            btn.onclick = function() { state.traceProgress = 0; state.animPhase = 0; };
+            controls.appendChild(btn);
+
+            draw();
           }
         }
       ],

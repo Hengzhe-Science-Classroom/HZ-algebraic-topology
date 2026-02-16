@@ -60,6 +60,7 @@ window.CHAPTERS.push({
           <p><strong>Definition (Section):</strong> A <em>section</em> of a fiber bundle \\(\\pi: E \\to B\\) is a continuous map \\(s: B \\to E\\) such that \\(\\pi \\circ s = \\text{id}_B\\). A section picks a point in each fiber continuously.</p>
           <p>Not every bundle admits a global section. A vector bundle always has the zero section, but a <em>nowhere-vanishing</em> section may not exist (cf. the hairy ball theorem).</p>
         </div>
+        <div class="viz-placeholder" data-viz="fiber-bundle-visualizer"></div>
 
         <div class="env-block definition">
           <p><strong>Definition (Fibration):</strong> A map \\(p: E \\to B\\) is a <em>fibration</em> (or <em>Hurewicz fibration</em>) if it satisfies the <em>homotopy lifting property</em> (HLP) for all spaces: given any homotopy \\(H: X \\times I \\to B\\) and a lift \\(\\widetilde{h}_0: X \\to E\\) of \\(H(-, 0)\\), there exists a homotopy \\(\\widetilde{H}: X \\times I \\to E\\) lifting \\(H\\) with \\(\\widetilde{H}(-, 0) = \\widetilde{h}_0\\).</p>
@@ -86,30 +87,29 @@ window.CHAPTERS.push({
           id: 'fiber-bundle-visualizer',
           title: 'Fiber Bundle Visualizer',
           description: 'See how fibers sit over base points: trivial bundles vs. twisted bundles like the Mobius band.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                bundleType: 'cylinder',
-                animAngle: 0,
-                showFibers: true,
-                fiberCount: 12,
-                highlightFiber: -1
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = { bundleType: 'cylinder', animAngle: 0, showFibers: true, fiberCount: 12, highlightFiber: -1 };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
               const cx = width / 2;
               const cy = height / 2 + 15;
-              viz.state.animAngle += 0.008;
-              const t = viz.state.animAngle;
+              state.animAngle += 0.008;
+              const t = state.animAngle;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px KaTeX_Main, serif';
               ctx.textAlign = 'center';
 
-              const type = viz.state.bundleType;
+              const type = state.bundleType;
 
               if (type === 'cylinder') {
                 ctx.fillText('Trivial Bundle: S\u00B9 \u00D7 I (Cylinder)', cx, 28);
@@ -145,8 +145,8 @@ window.CHAPTERS.push({
                 ctx.lineTo(cx + R, cy + halfH);
                 ctx.stroke();
 
-                if (viz.state.showFibers) {
-                  const N = viz.state.fiberCount;
+                if (state.showFibers) {
+                  const N = state.fiberCount;
                   for (let i = 0; i < N; i++) {
                     const angle = (i / N) * Math.PI * 2 + t;
                     const bx = cx + R * Math.cos(angle);
@@ -239,8 +239,8 @@ window.CHAPTERS.push({
                 }
                 ctx.stroke();
 
-                if (viz.state.showFibers) {
-                  const N = viz.state.fiberCount;
+                if (state.showFibers) {
+                  const N = state.fiberCount;
                   for (let i = 0; i < N; i++) {
                     const frac = i / N;
                     const twist = Math.PI * frac;
@@ -374,28 +374,28 @@ window.CHAPTERS.push({
               }
 
               ctx.textAlign = 'start';
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Bundle Type',
-                options: [
-                  { value: 'cylinder', label: 'Cylinder (Trivial)' },
-                  { value: 'mobius', label: 'Mobius Band (Twisted)' },
-                  { value: 'covering', label: 'Covering Space' }
-                ],
-                action: (viz, value) => {
-                  viz.state.bundleType = value;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Fibers',
-                action: (viz) => {
-                  viz.state.showFibers = !viz.state.showFibers;
-                }
-              }
-            ]
+            }
+
+            // Select: Bundle Type
+            var btLabel = document.createElement('label');
+            btLabel.style.color = '#c9d1d9'; btLabel.style.marginRight = '8px';
+            btLabel.textContent = 'Bundle Type: ';
+            controls.appendChild(btLabel);
+            var btSelect = document.createElement('select');
+            btSelect.style.background = '#161b22'; btSelect.style.color = '#c9d1d9'; btSelect.style.border = '1px solid #30363d'; btSelect.style.padding = '4px 8px'; btSelect.style.borderRadius = '4px';
+            [{value:'cylinder',label:'Cylinder (Trivial)'},{value:'mobius',label:'Mobius Band (Twisted)'},{value:'covering',label:'Covering Space'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; btSelect.appendChild(o); });
+            btSelect.value = 'cylinder';
+            btSelect.onchange = function() { state.bundleType = btSelect.value; draw(); };
+            controls.appendChild(btSelect);
+
+            // Button: Toggle Fibers
+            var tfBtn = document.createElement('button');
+            tfBtn.textContent = 'Toggle Fibers';
+            tfBtn.style.background = '#238636'; tfBtn.style.color = '#fff'; tfBtn.style.border = 'none'; tfBtn.style.padding = '4px 12px'; tfBtn.style.borderRadius = '4px'; tfBtn.style.cursor = 'pointer'; tfBtn.style.marginLeft = '15px';
+            tfBtn.onclick = function() { state.showFibers = !state.showFibers; draw(); };
+            controls.appendChild(tfBtn);
+
+            draw();
           }
         }
       ],
@@ -485,23 +485,33 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
         <div class="env-block remark">
           <p><strong>Classification of Principal Bundles:</strong> Principal \\(G\\)-bundles over a space \\(B\\) are classified (up to isomorphism) by homotopy classes of maps \\(B \\to BG\\), where \\(BG\\) is the <em>classifying space</em> of \\(G\\). For \\(G = U(1)\\), \\(BU(1) = \\mathbb{C}P^\\infty\\), and bundles are classified by \\([B, \\mathbb{C}P^\\infty] \\cong H^2(B; \\mathbb{Z})\\) via the first Chern class.</p>
         </div>
+
+        <div class="viz-placeholder" data-viz="hopf-fibration-viz"></div>
+        <div class="viz-placeholder" data-viz="les-fibration"></div>
       `,
       visualizations: [
         {
           id: 'hopf-fibration-viz',
           title: 'Hopf Fibration Visualization',
           description: 'Visualize the Hopf fibration: circles in S\u00B3 mapped to points on S\u00B2',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = {
                 viewAngle: 0,
                 numFibers: 8,
                 selectedFiber: -1,
                 animating: true,
                 showBase: true
               };
-            },
-            draw: (viz, ctx, width, height) => {
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
               ctx.fillStyle = '#2c3e50';
@@ -512,13 +522,13 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
               const cy = height / 2 + 10;
               const R = Math.min(width, height) * 0.3;
 
-              if (viz.state.animating) {
-                viz.state.viewAngle += 0.008;
+              if (state.animating) {
+                state.viewAngle += 0.008;
               }
-              const angle = viz.state.viewAngle;
+              const angle = state.viewAngle;
 
               // Draw the base sphere S^2
-              if (viz.state.showBase) {
+              if (state.showBase) {
                 ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
@@ -532,7 +542,7 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
               }
 
               // Draw Hopf fibers as linked circles
-              const nFib = viz.state.numFibers;
+              const nFib = state.numFibers;
               const colors = [
                 '#e74c3c', '#3498db', '#27ae60', '#f39c12',
                 '#9b59b6', '#1abc9c', '#e67e22', '#2ecc71',
@@ -541,7 +551,7 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
 
               for (let i = 0; i < nFib; i++) {
                 const phi = (2 * Math.PI * i) / nFib;
-                const selected = viz.state.selectedFiber === i;
+                const selected = state.selectedFiber === i;
 
                 const theta0 = Math.PI * 0.3;
                 const bx = Math.cos(phi + angle) * Math.sin(theta0);
@@ -551,7 +561,7 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
                 const basePx = cx + bx * R;
                 const basePy = cy - bz * R * 0.8 + by * R * 0.3;
 
-                if (viz.state.showBase) {
+                if (state.showBase) {
                   ctx.fillStyle = colors[i % colors.length];
                   ctx.globalAlpha = selected ? 1.0 : 0.6;
                   ctx.beginPath();
@@ -585,7 +595,7 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
                 const basePx = cx + bx * R;
                 const basePy = cy - bz * R * 0.8 + by * R * 0.3;
 
-                if (viz.state.showBase) {
+                if (state.showBase) {
                   ctx.fillStyle = colors[(i + 4) % colors.length];
                   ctx.globalAlpha = 0.4;
                   ctx.beginPath();
@@ -615,49 +625,59 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
               ctx.fillText('Every two fibers are linked (Hopf linking number = 1)', 20, height - 50);
               ctx.fillText('\u03C0\u2083(S\u00B2) = Z, generated by this fibration', 20, height - 30);
 
-              if (viz.state.showBase) {
+              if (state.showBase) {
                 ctx.fillStyle = '#3498db';
                 ctx.font = '13px serif';
                 ctx.fillText('Base S\u00B2', cx + R + 10, cy);
               }
-            },
-            controls: [
-              {
-                type: 'slider',
-                label: 'Fibers per ring',
-                min: 4,
-                max: 16,
-                step: 1,
-                initial: 8,
-                action: (viz, value) => { viz.state.numFibers = value; }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Animation',
-                action: (viz) => { viz.state.animating = !viz.state.animating; }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Base S\u00B2',
-                action: (viz) => { viz.state.showBase = !viz.state.showBase; }
-              }
-            ]
+            }
+
+            // Slider: Fibers per ring
+            var fLabel = document.createElement('label');
+            fLabel.style.color = '#c9d1d9'; fLabel.style.marginRight = '8px';
+            fLabel.textContent = 'Fibers per ring: 8';
+            controls.appendChild(fLabel);
+            var fSlider = document.createElement('input');
+            fSlider.type = 'range'; fSlider.min = 4; fSlider.max = 16; fSlider.step = 1; fSlider.value = 8;
+            fSlider.style.width = '200px';
+            fSlider.oninput = function() { state.numFibers = parseInt(fSlider.value); fLabel.textContent = 'Fibers per ring: ' + fSlider.value; draw(); };
+            controls.appendChild(fSlider);
+
+            // Button: Toggle Animation
+            var animBtn = document.createElement('button');
+            animBtn.textContent = 'Toggle Animation';
+            animBtn.style.background = '#238636'; animBtn.style.color = '#fff'; animBtn.style.border = 'none'; animBtn.style.padding = '4px 12px'; animBtn.style.borderRadius = '4px'; animBtn.style.cursor = 'pointer'; animBtn.style.marginLeft = '15px';
+            animBtn.onclick = function() { state.animating = !state.animating; draw(); };
+            controls.appendChild(animBtn);
+
+            // Button: Toggle Base S^2
+            var baseBtn = document.createElement('button');
+            baseBtn.textContent = 'Toggle Base S\u00B2';
+            baseBtn.style.background = '#238636'; baseBtn.style.color = '#fff'; baseBtn.style.border = 'none'; baseBtn.style.padding = '4px 12px'; baseBtn.style.borderRadius = '4px'; baseBtn.style.cursor = 'pointer'; baseBtn.style.marginLeft = '15px';
+            baseBtn.onclick = function() { state.showBase = !state.showBase; draw(); };
+            controls.appendChild(baseBtn);
+
+            draw();
           }
         },
         {
           id: 'les-fibration',
           title: 'Long Exact Sequence of a Fibration',
           description: 'Visualize the LES connecting homotopy groups of fiber, total space, and base',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                bundle: 'hopf',
-                highlightLevel: -1
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = { bundle: 'hopf', highlightLevel: -1 };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const bundle = viz.state.bundle;
+              const bundle = state.bundle;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
@@ -706,7 +726,7 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
 
               for (let n = 0; n < 5; n++) {
                 const y = startY + (n + 1) * rowH;
-                const hl = viz.state.highlightLevel === n;
+                const hl = state.highlightLevel === n;
 
                 if (hl) {
                   ctx.fillStyle = 'rgba(52, 152, 219, 0.08)';
@@ -786,28 +806,32 @@ Alternatively: the cylinder is orientable (\\(H_2 \\neq 0\\) relative to boundar
               if (bundle === 'hopf') {
                 ctx.fillText('Key: \u03C0_n(S\u00B3) \u2245 \u03C0_n(S\u00B2) for n \u2265 3 (since \u03C0_n(S\u00B9)=0)', 20, legY + 18);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Fibration',
-                options: [
-                  { value: 'hopf', label: 'Hopf: S\u00B9 \u2192 S\u00B3 \u2192 S\u00B2' },
-                  { value: 'covering', label: 'Cover: pt \u2192 R \u2192 S\u00B9' },
-                  { value: 'pathspace', label: 'Loop-path: \u03A9S\u00B2 \u2192 PS\u00B2 \u2192 S\u00B2' }
-                ],
-                action: (viz, value) => { viz.state.bundle = value; }
-              },
-              {
-                type: 'slider',
-                label: 'Highlight level n',
-                min: -1,
-                max: 4,
-                step: 1,
-                initial: -1,
-                action: (viz, value) => { viz.state.highlightLevel = value; }
-              }
-            ]
+            }
+
+            // Select: Fibration
+            var fibLabel = document.createElement('label');
+            fibLabel.style.color = '#c9d1d9'; fibLabel.style.marginRight = '8px';
+            fibLabel.textContent = 'Fibration: ';
+            controls.appendChild(fibLabel);
+            var fibSelect = document.createElement('select');
+            fibSelect.style.background = '#161b22'; fibSelect.style.color = '#c9d1d9'; fibSelect.style.border = '1px solid #30363d'; fibSelect.style.padding = '4px 8px'; fibSelect.style.borderRadius = '4px';
+            [{value:'hopf',label:'Hopf: S\u00B9 \u2192 S\u00B3 \u2192 S\u00B2'},{value:'covering',label:'Cover: pt \u2192 R \u2192 S\u00B9'},{value:'pathspace',label:'Loop-path: \u03A9S\u00B2 \u2192 PS\u00B2 \u2192 S\u00B2'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; fibSelect.appendChild(o); });
+            fibSelect.value = 'hopf';
+            fibSelect.onchange = function() { state.bundle = fibSelect.value; draw(); };
+            controls.appendChild(fibSelect);
+
+            // Slider: Highlight level n
+            var hlLabel = document.createElement('label');
+            hlLabel.style.color = '#c9d1d9'; hlLabel.style.marginLeft = '15px'; hlLabel.style.marginRight = '8px';
+            hlLabel.textContent = 'Highlight level n: -1';
+            controls.appendChild(hlLabel);
+            var hlSlider = document.createElement('input');
+            hlSlider.type = 'range'; hlSlider.min = -1; hlSlider.max = 4; hlSlider.step = 1; hlSlider.value = -1;
+            hlSlider.style.width = '200px';
+            hlSlider.oninput = function() { state.highlightLevel = parseInt(hlSlider.value); hlLabel.textContent = 'Highlight level n: ' + hlSlider.value; draw(); };
+            controls.appendChild(hlSlider);
+
+            draw();
           }
         }
       ],
@@ -887,24 +911,34 @@ So \\(\\pi_3(S^2) \\cong \\pi_3(S^3) \\cong \\mathbb{Z}\\), generated by the Hop
         <div class="env-block remark">
           <p><strong>The Philosophy of Spectral Sequences:</strong> Think of a spectral sequence as a "successive approximation" algorithm. The \\(E_2\\) page is the crude estimate (tensor product of fiber and base cohomology). Each page refines this by "killing" spurious classes via differentials, until \\(E_\\infty\\) gives the true answer. The art lies in identifying which differentials are nonzero.</p>
         </div>
+
+        <div class="viz-placeholder" data-viz="ss-e2-page"></div>
+        <div class="viz-placeholder" data-viz="ss-convergence-walkthrough"></div>
       `,
       visualizations: [
         {
           id: 'ss-e2-page',
           title: 'Spectral Sequence E\u2082 Page',
           description: 'Visualize the E\u2082 page of the Leray-Serre spectral sequence for various bundles',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = {
                 bundle: 'hopf',
                 page: 2,
                 showDifferentials: true
               };
-            },
-            draw: (viz, ctx, width, height) => {
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const bundle = viz.state.bundle;
-              const page = viz.state.page;
+              const bundle = state.bundle;
+              const page = state.page;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
@@ -1031,7 +1065,7 @@ So \\(\\pi_3(S^2) \\cong \\pi_3(S^3) \\cong \\mathbb{Z}\\), generated by the Hop
               }
 
               // Draw differentials
-              if (viz.state.showDifferentials && page === 2 && d.differentials2.length > 0) {
+              if (state.showDifferentials && page === 2 && d.differentials2.length > 0) {
                 for (const diff of d.differentials2) {
                   const [fp, fq] = diff.from;
                   const [tp, tq] = diff.to;
@@ -1080,49 +1114,74 @@ So \\(\\pi_3(S^2) \\cong \\pi_3(S^3) \\cong \\mathbb{Z}\\), generated by the Hop
                 ctx.fillStyle = '#27ae60';
                 ctx.fillText('No differentials: SS collapses at E\u2082 (Kunneth!)', 20, height - 15);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Bundle',
-                options: [
-                  { value: 'hopf', label: 'Hopf: S\u00B9 \u2192 S\u00B3 \u2192 S\u00B2' },
-                  { value: 'cpn', label: 'S\u00B9 \u2192 S\u2075 \u2192 CP\u00B2' },
-                  { value: 'trivial', label: 'Trivial: S\u00B9 \u00D7 S\u00B2' }
-                ],
-                action: (viz, value) => { viz.state.bundle = value; viz.state.page = 2; }
-              },
-              {
-                type: 'slider',
-                label: 'Page',
-                min: 2,
-                max: 3,
-                step: 1,
-                initial: 2,
-                action: (viz, value) => { viz.state.page = value; }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Differentials',
-                action: (viz) => { viz.state.showDifferentials = !viz.state.showDifferentials; }
-              }
-            ]
+            }
+
+            var label1 = document.createElement('label');
+            label1.style.color = '#c9d1d9'; label1.style.marginRight = '8px';
+            label1.textContent = 'Bundle: ';
+            controls.appendChild(label1);
+            var sel1 = document.createElement('select');
+            sel1.style.background = '#161b22'; sel1.style.color = '#c9d1d9';
+            sel1.style.border = '1px solid #30363d'; sel1.style.padding = '4px 8px';
+            sel1.style.borderRadius = '4px';
+            [{value:'hopf',label:'Hopf: S\u00B9 \u2192 S\u00B3 \u2192 S\u00B2'},{value:'cpn',label:'S\u00B9 \u2192 S\u2075 \u2192 CP\u00B2'},{value:'trivial',label:'Trivial: S\u00B9 \u00D7 S\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; sel1.appendChild(o);
+            });
+            sel1.value = 'hopf';
+            sel1.onchange = function() { state.bundle = sel1.value; state.page = 2; draw(); };
+            controls.appendChild(sel1);
+
+            controls.appendChild(document.createTextNode('  '));
+
+            var label2 = document.createElement('label');
+            label2.style.color = '#c9d1d9'; label2.style.marginRight = '8px';
+            label2.textContent = 'Page: ';
+            controls.appendChild(label2);
+            var slider1 = document.createElement('input');
+            slider1.type = 'range'; slider1.min = '2'; slider1.max = '3'; slider1.step = '1'; slider1.value = '2';
+            slider1.style.verticalAlign = 'middle';
+            slider1.oninput = function() { state.page = parseInt(slider1.value); draw(); };
+            controls.appendChild(slider1);
+            var span1 = document.createElement('span');
+            span1.style.color = '#c9d1d9'; span1.style.marginLeft = '6px';
+            span1.textContent = '2';
+            controls.appendChild(span1);
+            slider1.addEventListener('input', function() { span1.textContent = slider1.value; });
+
+            controls.appendChild(document.createTextNode('  '));
+
+            var btn1 = document.createElement('button');
+            btn1.textContent = 'Toggle Differentials';
+            btn1.style.background = '#238636'; btn1.style.color = '#fff';
+            btn1.style.border = 'none'; btn1.style.padding = '4px 12px';
+            btn1.style.borderRadius = '4px'; btn1.style.cursor = 'pointer';
+            btn1.onclick = function() { state.showDifferentials = !state.showDifferentials; draw(); };
+            controls.appendChild(btn1);
+
+            draw();
           }
         },
         {
           id: 'ss-convergence-walkthrough',
           title: 'Spectral Sequence Convergence',
           description: 'Walk through the spectral sequence step by step for the Hopf bundle',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = {
                 step: 0,
                 animPhase: 0
               };
-            },
-            draw: (viz, ctx, width, height) => {
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const step = viz.state.step;
+              const step = state.step;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
@@ -1276,18 +1335,24 @@ So \\(\\pi_3(S^2) \\cong \\pi_3(S^3) \\cong \\mathbb{Z}\\), generated by the Hop
                 ctx.font = '15px serif';
                 ctx.fillText('H*(S\u00B3; Z) = {Z, 0, 0, Z}  -- confirmed!', barX, baseY + 45);
               }
-            },
-            controls: [
-              {
-                type: 'slider',
-                label: 'Step',
-                min: 0,
-                max: 3,
-                step: 1,
-                initial: 0,
-                action: (viz, value) => { viz.state.step = value; }
-              }
-            ]
+            }
+
+            var label1 = document.createElement('label');
+            label1.style.color = '#c9d1d9'; label1.style.marginRight = '8px';
+            label1.textContent = 'Step: ';
+            controls.appendChild(label1);
+            var slider1 = document.createElement('input');
+            slider1.type = 'range'; slider1.min = '0'; slider1.max = '3'; slider1.step = '1'; slider1.value = '0';
+            slider1.style.verticalAlign = 'middle';
+            slider1.oninput = function() { state.step = parseInt(slider1.value); draw(); };
+            controls.appendChild(slider1);
+            var span1 = document.createElement('span');
+            span1.style.color = '#c9d1d9'; span1.style.marginLeft = '6px';
+            span1.textContent = '0';
+            controls.appendChild(span1);
+            slider1.addEventListener('input', function() { span1.textContent = slider1.value; });
+
+            draw();
           }
         }
       ],
@@ -1388,26 +1453,34 @@ Reassembling: \\(H^0(S^5) = \\mathbb{Z}\\), \\(H^5(S^5) = \\mathbb{Z}\\), all el
           </ul>
           <p>Together, they allow us to reduce global topological questions to local and algebraic ones.</p>
         </div>
+
+        <div class="viz-placeholder" data-viz="leray-serre-calculator"></div>
+        <div class="viz-placeholder" data-viz="cpn-cohomology-ring"></div>
       `,
       visualizations: [
         {
           id: 'leray-serre-calculator',
           title: 'Leray-Serre Calculator',
           description: 'Select a fibration and see the spectral sequence computation step by step.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = {
                 fibration: 'omega-s2',
                 step: 0,
                 animPhase: 0
               };
-            },
-            draw: (viz, ctx, width, height) => {
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.01;
-              const fib = viz.state.fibration;
+              state.animPhase += 0.01;
+              const fib = state.fibration;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 17px KaTeX_Main, serif';
@@ -1510,39 +1583,48 @@ Reassembling: \\(H^0(S^5) = \\mathbb{Z}\\), \\(H^5(S^5) = \\mathbb{Z}\\), all el
               }
 
               ctx.textAlign = 'start';
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Fibration',
-                options: [
-                  { value: 'omega-s2', label: '\u03A9S\u00B2 \u2192 PS\u00B2 \u2192 S\u00B2' },
-                  { value: 'omega-s3', label: '\u03A9S\u00B3 \u2192 PS\u00B3 \u2192 S\u00B3' },
-                  { value: 'gysin-cpn', label: 'Gysin: S\u00B9 \u2192 S\u2075 \u2192 \u2102P\u00B2' }
-                ],
-                action: (viz, value) => {
-                  viz.state.fibration = value;
-                  viz.state.step = 0;
-                }
-              }
-            ]
+            }
+
+            var label1 = document.createElement('label');
+            label1.style.color = '#c9d1d9'; label1.style.marginRight = '8px';
+            label1.textContent = 'Fibration: ';
+            controls.appendChild(label1);
+            var sel1 = document.createElement('select');
+            sel1.style.background = '#161b22'; sel1.style.color = '#c9d1d9';
+            sel1.style.border = '1px solid #30363d'; sel1.style.padding = '4px 8px';
+            sel1.style.borderRadius = '4px';
+            [{value:'omega-s2',label:'\u03A9S\u00B2 \u2192 PS\u00B2 \u2192 S\u00B2'},{value:'omega-s3',label:'\u03A9S\u00B3 \u2192 PS\u00B3 \u2192 S\u00B3'},{value:'gysin-cpn',label:'Gysin: S\u00B9 \u2192 S\u2075 \u2192 \u2102P\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; sel1.appendChild(o);
+            });
+            sel1.value = 'omega-s2';
+            sel1.onchange = function() { state.fibration = sel1.value; state.step = 0; draw(); };
+            controls.appendChild(sel1);
+
+            draw();
           }
         },
         {
           id: 'cpn-cohomology-ring',
           title: 'Cohomology Ring of CP^n',
           description: 'Visualize the truncated polynomial ring H*(CP^n) = Z[x]/(x^{n+1})',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = {
                 n: 3,
                 showRing: true,
                 highlightDegree: -1
               };
-            },
-            draw: (viz, ctx, width, height) => {
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const n = viz.state.n;
+              const n = state.n;
 
               function superscript(num) {
                 const sups = ['\u2070', '\u00B9', '\u00B2', '\u00B3', '\u2074', '\u2075', '\u2076', '\u2077'];
@@ -1566,7 +1648,7 @@ Reassembling: \\(H^0(S^5) = \\mathbb{Z}\\), \\(H^5(S^5) = \\mathbb{Z}\\), all el
                 const deg = 2 * k;
                 const barH = maxBarH * 0.8;
 
-                const hl = viz.state.highlightDegree === k;
+                const hl = state.highlightDegree === k;
 
                 const colors = ['#3498db', '#e74c3c', '#27ae60', '#f39c12', '#9b59b6', '#1abc9c'];
                 ctx.fillStyle = hl ? colors[k % colors.length] : colors[k % colors.length] + '99';
@@ -1601,33 +1683,47 @@ Reassembling: \\(H^0(S^5) = \\mathbb{Z}\\), \\(H^5(S^5) = \\mathbb{Z}\\), all el
 
               ctx.textAlign = 'left';
 
-              if (viz.state.showRing) {
+              if (state.showRing) {
                 ctx.fillStyle = '#7f8c8d';
                 ctx.font = '14px serif';
                 ctx.fillText('Ring structure: x^a cup x^b = x^{a+b} if a+b <= n, else 0', 20, height - 35);
                 ctx.fillText('Poincare duality: H^{2k} paired with H^{2n-2k} via cup product', 20, height - 15);
               }
-            },
-            controls: [
-              {
-                type: 'slider',
-                label: 'n (CP^n)',
-                min: 1,
-                max: 6,
-                step: 1,
-                initial: 3,
-                action: (viz, value) => { viz.state.n = value; }
-              },
-              {
-                type: 'slider',
-                label: 'Highlight degree',
-                min: -1,
-                max: 6,
-                step: 1,
-                initial: -1,
-                action: (viz, value) => { viz.state.highlightDegree = value; }
-              }
-            ]
+            }
+
+            var label1 = document.createElement('label');
+            label1.style.color = '#c9d1d9'; label1.style.marginRight = '8px';
+            label1.textContent = 'n (CP^n): ';
+            controls.appendChild(label1);
+            var slider1 = document.createElement('input');
+            slider1.type = 'range'; slider1.min = '1'; slider1.max = '6'; slider1.step = '1'; slider1.value = '3';
+            slider1.style.verticalAlign = 'middle';
+            slider1.oninput = function() { state.n = parseInt(slider1.value); draw(); };
+            controls.appendChild(slider1);
+            var span1 = document.createElement('span');
+            span1.style.color = '#c9d1d9'; span1.style.marginLeft = '6px';
+            span1.textContent = '3';
+            controls.appendChild(span1);
+            slider1.addEventListener('input', function() { span1.textContent = slider1.value; });
+
+            controls.appendChild(document.createTextNode('  '));
+
+            var label2 = document.createElement('label');
+            label2.style.color = '#c9d1d9'; label2.style.marginRight = '8px';
+            label2.textContent = 'Highlight degree: ';
+            controls.appendChild(label2);
+            var slider2 = document.createElement('input');
+            slider2.type = 'range'; slider2.min = '-1'; slider2.max = '6'; slider2.step = '1'; slider2.value = '-1';
+            slider2.style.verticalAlign = 'middle';
+            slider2.oninput = function() { state.highlightDegree = parseInt(slider2.value); draw(); };
+            controls.appendChild(slider2);
+            var span2 = document.createElement('span');
+            span2.style.color = '#c9d1d9'; span2.style.marginLeft = '6px';
+            span2.textContent = '-1';
+            controls.appendChild(span2);
+            slider2.addEventListener('input', function() { span2.textContent = slider2.value; });
+
+            draw();
           }
         }
       ],

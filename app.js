@@ -1,4 +1,4 @@
-// === Advanced Linear Algebra - Core Application ===
+// === Algebraic Topology - Core Application ===
 window.CHAPTERS = window.CHAPTERS || [];
 window.EXTRA_VIZ = window.EXTRA_VIZ || {};
 
@@ -47,11 +47,11 @@ const App = {
 
     // --- Progress ---
     loadProgress() {
-        try { this.progress = JSON.parse(localStorage.getItem('hds-progress') || '{}'); }
+        try { this.progress = JSON.parse(localStorage.getItem('at-progress') || '{}'); }
         catch (e) { this.progress = {}; }
     },
     saveProgress() {
-        try { localStorage.setItem('hds-progress', JSON.stringify(this.progress)); } catch (e) {}
+        try { localStorage.setItem('at-progress', JSON.stringify(this.progress)); } catch (e) {}
     },
     markSectionComplete(chId, idx) {
         if (!this.progress[chId]) this.progress[chId] = [];

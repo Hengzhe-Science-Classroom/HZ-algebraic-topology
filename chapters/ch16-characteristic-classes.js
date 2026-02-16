@@ -75,34 +75,41 @@ window.CHAPTERS.push({
         <div class="env-block remark">
           <p><strong>Why Characteristic Classes?</strong> A characteristic class is a natural transformation from vector bundles to cohomology. Given a bundle \\(\\xi \\to B\\), a characteristic class assigns \\(c(\\xi) \\in H^*(B)\\) such that for any map \\(f: B' \\to B\\), we have \\(c(f^*\\xi) = f^*c(\\xi)\\). In other words, characteristic classes are <em>functorial invariants</em> that live in the cohomology of the base space. They arise by pulling back universal cohomology classes from \\(H^*(BO(n))\\) or \\(H^*(BU(n))\\).</p>
         </div>
+        <div class="viz-placeholder" data-viz="vector-bundle-explorer"></div>
       `,
       visualizations: [
         {
           id: 'vector-bundle-explorer',
           title: 'Bundle Twisting Explorer',
           description: 'Visualize how fibers of a vector bundle twist as you move around the base space for trivial bundles, the Mobius band, and TS\u00b2',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                bundleType: 'trivial',
-                time: 0,
-                showFibers: true,
-                numFibers: 16,
-                highlightIndex: -1
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+            var state = {
+              bundleType: 'trivial',
+              time: 0,
+              showFibers: true,
+              numFibers: 16,
+              highlightIndex: -1
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.time += 0.015;
-              const t = viz.state.time;
-              const cx = width / 2;
-              const cy = height / 2;
-              const bundleType = viz.state.bundleType;
+              state.time += 0.015;
+              var t = state.time;
+              var cx = width / 2;
+              var cy = height / 2;
+              var bundleType = state.bundleType;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
-              const titles = {
+              var titles = {
                 'trivial': 'Trivial Line Bundle: S\u00B9 \u00D7 \u211D',
                 'mobius': 'Mobius Band (Non-Trivial Line Bundle over S\u00B9)',
                 'tangent': 'Tangent Bundle TS\u00B2 (Hairy Ball)'
@@ -110,57 +117,52 @@ window.CHAPTERS.push({
               ctx.fillText(titles[bundleType], cx, 28);
 
               if (bundleType === 'trivial' || bundleType === 'mobius') {
-                const R = Math.min(width, height) * 0.25;
-                const fiberLen = 50;
+                var R = Math.min(width, height) * 0.25;
+                var fiberLen = 50;
 
-                // Draw base circle
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 ctx.arc(cx, cy, R, 0, 2 * Math.PI);
                 ctx.stroke();
 
-                // Draw fibers
-                const N = viz.state.numFibers;
-                for (let i = 0; i < N; i++) {
-                  const theta = (2 * Math.PI * i) / N;
-                  const px = cx + R * Math.cos(theta);
-                  const py = cy + R * Math.sin(theta);
+                var N = state.numFibers;
+                for (var i = 0; i < N; i++) {
+                  var theta = (2 * Math.PI * i) / N;
+                  var px = cx + R * Math.cos(theta);
+                  var py = cy + R * Math.sin(theta);
 
-                  const nx = Math.cos(theta);
-                  const ny = Math.sin(theta);
+                  var nx = Math.cos(theta);
+                  var ny = Math.sin(theta);
 
-                  let fiberAngle;
+                  var fiberAngle;
                   if (bundleType === 'trivial') {
                     fiberAngle = 0;
                   } else {
-                    // Mobius: fiber rotates by pi as we go around
                     fiberAngle = theta / 2;
                   }
 
-                  const dirX = nx * Math.cos(fiberAngle) - ny * Math.sin(fiberAngle);
-                  const dirY = nx * Math.sin(fiberAngle) + ny * Math.cos(fiberAngle);
+                  var dirX = nx * Math.cos(fiberAngle) - ny * Math.sin(fiberAngle);
+                  var dirY = nx * Math.sin(fiberAngle) + ny * Math.cos(fiberAngle);
 
-                  // Color by angle to show twist
-                  const hue = (theta / (2 * Math.PI)) * 360;
-                  const isHighlight = (i === Math.floor((t * 2) % N));
+                  var hue = (theta / (2 * Math.PI)) * 360;
+                  var isHighlight = (i === Math.floor((t * 2) % N));
 
-                  if (viz.state.showFibers) {
-                    ctx.strokeStyle = isHighlight ? '#e74c3c' : `hsl(${hue}, 70%, 50%)`;
+                  if (state.showFibers) {
+                    ctx.strokeStyle = isHighlight ? '#e74c3c' : 'hsl(' + hue + ', 70%, 50%)';
                     ctx.lineWidth = isHighlight ? 3 : 1.5;
                     ctx.beginPath();
                     ctx.moveTo(px - dirX * fiberLen, py - dirY * fiberLen);
                     ctx.lineTo(px + dirX * fiberLen, py + dirY * fiberLen);
                     ctx.stroke();
 
-                    ctx.fillStyle = isHighlight ? '#e74c3c' : `hsl(${hue}, 70%, 50%)`;
+                    ctx.fillStyle = isHighlight ? '#e74c3c' : 'hsl(' + hue + ', 70%, 50%)';
                     ctx.beginPath();
                     ctx.arc(px, py, isHighlight ? 4 : 2, 0, 2 * Math.PI);
                     ctx.fill();
                   }
                 }
 
-                // Explanation
                 ctx.fillStyle = '#2c3e50';
                 ctx.font = '14px serif';
                 ctx.textAlign = 'center';
@@ -173,81 +175,76 @@ window.CHAPTERS.push({
                 }
 
               } else if (bundleType === 'tangent') {
-                const R = Math.min(width, height) * 0.28;
+                var R2 = Math.min(width, height) * 0.28;
 
-                // Draw sphere
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.arc(cx, cy, R, 0, 2 * Math.PI);
+                ctx.arc(cx, cy, R2, 0, 2 * Math.PI);
                 ctx.stroke();
 
-                // Equator
                 ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
-                ctx.ellipse(cx, cy, R, R * 0.3, 0, 0, 2 * Math.PI);
+                ctx.ellipse(cx, cy, R2, R2 * 0.3, 0, 0, 2 * Math.PI);
                 ctx.stroke();
 
-                // Draw tangent vectors as a dipole field
-                if (viz.state.showFibers) {
-                  const nLat = 6, nLon = 12;
-                  for (let i = 1; i < nLat; i++) {
-                    const phi = Math.PI * i / nLat;
-                    for (let j = 0; j < nLon; j++) {
-                      const theta = 2 * Math.PI * j / nLon;
+                if (state.showFibers) {
+                  var nLat = 6, nLon = 12;
+                  for (var ii = 1; ii < nLat; ii++) {
+                    var phi = Math.PI * ii / nLat;
+                    for (var j = 0; j < nLon; j++) {
+                      var th = 2 * Math.PI * j / nLon;
 
-                      const x3 = Math.sin(phi) * Math.cos(theta);
-                      const y3 = Math.sin(phi) * Math.sin(theta);
-                      const z3 = Math.cos(phi);
+                      var x3 = Math.sin(phi) * Math.cos(th);
+                      var y3 = Math.sin(phi) * Math.sin(th);
+                      var z3 = Math.cos(phi);
 
-                      const tilt = 0.3;
-                      const px = cx + R * (x3 * Math.cos(tilt) + z3 * Math.sin(tilt));
-                      const py = cy + R * (-z3 * Math.cos(tilt) + x3 * Math.sin(tilt)) * 0.3 + R * y3;
+                      var tilt = 0.3;
+                      var ppx = cx + R2 * (x3 * Math.cos(tilt) + z3 * Math.sin(tilt));
+                      var ppy = cy + R2 * (-z3 * Math.cos(tilt) + x3 * Math.sin(tilt)) * 0.3 + R2 * y3;
 
-                      const facing = x3 * Math.sin(tilt) + z3 * Math.cos(tilt);
+                      var facing = x3 * Math.sin(tilt) + z3 * Math.cos(tilt);
                       if (facing < 0.1) continue;
 
-                      const vx = Math.cos(phi) * Math.cos(theta);
-                      const vy = Math.cos(phi) * Math.sin(theta);
-                      const vz = -Math.sin(phi);
+                      var vx = Math.cos(phi) * Math.cos(th);
+                      var vy = Math.cos(phi) * Math.sin(th);
+                      var vz = -Math.sin(phi);
 
-                      const dvx = (vx * Math.cos(tilt) + vz * Math.sin(tilt));
-                      const dvy = (-vz * Math.cos(tilt) + vx * Math.sin(tilt)) * 0.3 + vy;
+                      var dvx = (vx * Math.cos(tilt) + vz * Math.sin(tilt));
+                      var dvy = (-vz * Math.cos(tilt) + vx * Math.sin(tilt)) * 0.3 + vy;
 
-                      const scale = 18 * facing;
-                      const arrowX = dvx * scale;
-                      const arrowY = dvy * scale;
-                      const fieldStrength = Math.sin(phi);
+                      var scale = 18 * facing;
+                      var arrowX = dvx * scale;
+                      var arrowY = dvy * scale;
+                      var fieldStrength = Math.sin(phi);
 
-                      ctx.strokeStyle = `rgba(231, 76, 60, ${0.3 + 0.6 * facing * fieldStrength})`;
+                      ctx.strokeStyle = 'rgba(231, 76, 60, ' + (0.3 + 0.6 * facing * fieldStrength) + ')';
                       ctx.lineWidth = 1.5;
                       ctx.beginPath();
-                      ctx.moveTo(px, py);
-                      ctx.lineTo(px + arrowX * fieldStrength, py + arrowY * fieldStrength);
+                      ctx.moveTo(ppx, ppy);
+                      ctx.lineTo(ppx + arrowX * fieldStrength, ppy + arrowY * fieldStrength);
                       ctx.stroke();
 
-                      // Arrowhead
                       if (fieldStrength > 0.3) {
-                        const angle = Math.atan2(arrowY, arrowX);
-                        ctx.fillStyle = `rgba(231, 76, 60, ${0.3 + 0.6 * facing * fieldStrength})`;
+                        var angle = Math.atan2(arrowY, arrowX);
+                        ctx.fillStyle = 'rgba(231, 76, 60, ' + (0.3 + 0.6 * facing * fieldStrength) + ')';
                         ctx.beginPath();
-                        ctx.moveTo(px + arrowX * fieldStrength, py + arrowY * fieldStrength);
-                        ctx.lineTo(px + arrowX * fieldStrength - 5 * Math.cos(angle - 0.4),
-                                   py + arrowY * fieldStrength - 5 * Math.sin(angle - 0.4));
-                        ctx.lineTo(px + arrowX * fieldStrength - 5 * Math.cos(angle + 0.4),
-                                   py + arrowY * fieldStrength - 5 * Math.sin(angle + 0.4));
+                        ctx.moveTo(ppx + arrowX * fieldStrength, ppy + arrowY * fieldStrength);
+                        ctx.lineTo(ppx + arrowX * fieldStrength - 5 * Math.cos(angle - 0.4),
+                                   ppy + arrowY * fieldStrength - 5 * Math.sin(angle - 0.4));
+                        ctx.lineTo(ppx + arrowX * fieldStrength - 5 * Math.cos(angle + 0.4),
+                                   ppy + arrowY * fieldStrength - 5 * Math.sin(angle + 0.4));
                         ctx.fill();
                       }
                     }
                   }
                 }
 
-                // Mark poles (zeros of the vector field)
-                const northY = cy - R * Math.cos(0.3);
-                const northX = cx + R * Math.sin(0.3);
-                const southY = cy + R * Math.cos(0.3);
-                const southX = cx - R * Math.sin(0.3);
+                var northY = cy - R2 * Math.cos(0.3);
+                var northX = cx + R2 * Math.sin(0.3);
+                var southY = cy + R2 * Math.cos(0.3);
+                var southX = cx - R2 * Math.sin(0.3);
 
                 ctx.fillStyle = '#f39c12';
                 ctx.beginPath();
@@ -268,28 +265,39 @@ window.CHAPTERS.push({
                 ctx.fillText('Hairy Ball Theorem: every tangent vector field on S\u00B2 has a zero', cx, height - 50);
                 ctx.fillText('e(TS\u00B2) = \u03C7(S\u00B2) = 2 (sum of indices of zeros)', cx, height - 30);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Bundle',
-                options: [
-                  { value: 'trivial', label: 'Trivial: S\u00B9 \u00D7 \u211D' },
-                  { value: 'mobius', label: 'Mobius Band (line bundle)' },
-                  { value: 'tangent', label: 'Tangent Bundle TS\u00B2' }
-                ],
-                action: (viz, value) => {
-                  viz.state.bundleType = value;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Fibers',
-                action: (viz) => {
-                  viz.state.showFibers = !viz.state.showFibers;
-                }
-              }
-            ]
+            }
+
+            // Select control: Bundle
+            var bundleSelect = document.createElement('select');
+            bundleSelect.style.background = '#161b22';
+            bundleSelect.style.color = '#c9d1d9';
+            bundleSelect.style.border = '1px solid #30363d';
+            bundleSelect.style.padding = '4px 8px';
+            bundleSelect.style.borderRadius = '4px';
+            [{value:'trivial',label:'Trivial: S\u00B9 \u00D7 \u211D'},{value:'mobius',label:'Mobius Band (line bundle)'},{value:'tangent',label:'Tangent Bundle TS\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value;
+              o.textContent = opt.label;
+              bundleSelect.appendChild(o);
+            });
+            bundleSelect.value = 'trivial';
+            bundleSelect.onchange = function() { state.bundleType = bundleSelect.value; draw(); };
+            controls.appendChild(bundleSelect);
+
+            // Button: Toggle Fibers
+            var fiberBtn = document.createElement('button');
+            fiberBtn.textContent = 'Toggle Fibers';
+            fiberBtn.style.marginLeft = '10px';
+            fiberBtn.style.padding = '4px 12px';
+            fiberBtn.style.background = '#21262d';
+            fiberBtn.style.color = '#c9d1d9';
+            fiberBtn.style.border = '1px solid #30363d';
+            fiberBtn.style.borderRadius = '4px';
+            fiberBtn.style.cursor = 'pointer';
+            fiberBtn.onclick = function() { state.showFibers = !state.showFibers; draw(); };
+            controls.appendChild(fiberBtn);
+
+            draw();
           }
         }
       ],
@@ -298,15 +306,7 @@ window.CHAPTERS.push({
           id: 'vb-ex1',
           question: 'Show that the tautological line bundle \\(\\gamma^1\\) over \\(\\mathbb{R}P^1 \\cong S^1\\) is isomorphic to the Mobius band bundle. Conclude that \\(\\gamma^1\\) is non-trivial.',
           hint: 'Recall that \\(\\mathbb{R}P^1\\) parametrizes lines through the origin in \\(\\mathbb{R}^2\\). Parametrize these lines by angle \\(\\theta \\in [0, \\pi)\\) and show the fiber identification undergoes a sign change as \\(\\theta \\to \\pi\\).',
-          solution: `Parametrize lines through the origin in \\(\\mathbb{R}^2\\) by \\(\\theta \\in [0, \\pi)\\), where the line \\(\\ell_\\theta\\) has direction \\((\\cos\\theta, \\sin\\theta)\\). The fiber over \\(\\ell_\\theta\\) is the 1-dimensional subspace \\(\\{t(\\cos\\theta, \\sin\\theta) : t \\in \\mathbb{R}\\}\\).
-
-Choose the local trivialization \\(\\varphi_\\theta: \\text{fiber} \\to \\mathbb{R}\\) by \\(t(\\cos\\theta, \\sin\\theta) \\mapsto t\\).
-
-As \\(\\theta\\) increases from \\(0\\) to \\(\\pi\\), the line \\(\\ell_\\pi = \\ell_0\\), but the direction vector \\((\\cos\\pi, \\sin\\pi) = -(\\cos 0, \\sin 0)\\). So the trivialization at \\(\\theta = \\pi\\) identifies \\(t \\mapsto -t\\) relative to the trivialization at \\(\\theta = 0\\).
-
-This sign flip is exactly the transition function of the Mobius band: \\(g_{01} = -1 \\in GL(1, \\mathbb{R})\\).
-
-Since the Mobius band has no nonvanishing section (a continuous function \\(f: S^1 \\to \\mathbb{R}\\) satisfying \\(f(\\theta + \\pi) = -f(\\theta)\\) must vanish somewhere by the intermediate value theorem), \\(\\gamma^1\\) is non-trivial. \\(\\square\\)`
+          solution: 'Parametrize lines through the origin in \\(\\mathbb{R}^2\\) by \\(\\theta \\in [0, \\pi)\\), where the line \\(\\ell_\\theta\\) has direction \\((\\cos\\theta, \\sin\\theta)\\). The fiber over \\(\\ell_\\theta\\) is the 1-dimensional subspace \\(\\{t(\\cos\\theta, \\sin\\theta) : t \\in \\mathbb{R}\\}\\).\n\nChoose the local trivialization \\(\\varphi_\\theta: \\text{fiber} \\to \\mathbb{R}\\) by \\(t(\\cos\\theta, \\sin\\theta) \\mapsto t\\).\n\nAs \\(\\theta\\) increases from \\(0\\) to \\(\\pi\\), the line \\(\\ell_\\pi = \\ell_0\\), but the direction vector \\((\\cos\\pi, \\sin\\pi) = -(\\cos 0, \\sin 0)\\). So the trivialization at \\(\\theta = \\pi\\) identifies \\(t \\mapsto -t\\) relative to the trivialization at \\(\\theta = 0\\).\n\nThis sign flip is exactly the transition function of the Mobius band: \\(g_{01} = -1 \\in GL(1, \\mathbb{R})\\).\n\nSince the Mobius band has no nonvanishing section (a continuous function \\(f: S^1 \\to \\mathbb{R}\\) satisfying \\(f(\\theta + \\pi) = -f(\\theta)\\) must vanish somewhere by the intermediate value theorem), \\(\\gamma^1\\) is non-trivial. \\(\\square\\)'
         }
       ]
     },
@@ -375,90 +375,88 @@ Since the Mobius band has no nonvanishing section (a continuous function \\(f: S
           <p><strong>Theorem (Stiefel-Whitney Numbers and Cobordism):</strong> For a closed \\(n\\)-manifold \\(M\\), the <em>Stiefel-Whitney numbers</em> are the values \\(\\langle w_{i_1} \\cup \\cdots \\cup w_{i_k}, [M]_2 \\rangle \\in \\mathbb{Z}/2\\) where \\(i_1 + \\cdots + i_k = n\\).</p>
           <p><strong>Thom's Theorem:</strong> Two closed manifolds are <em>unoriented cobordant</em> if and only if they have the same Stiefel-Whitney numbers.</p>
         </div>
+        <div class="viz-placeholder" data-viz="stiefel-whitney-calculator"></div>
       `,
       visualizations: [
         {
           id: 'stiefel-whitney-calculator',
           title: 'Stiefel-Whitney Class Calculator',
           description: 'Compute w(TRP^n) = (1+a)^(n+1) mod 2, see which classes vanish, and explore immersion obstructions',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                n: 4,
-                showDual: false,
-                showBinary: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
-              ctx.clearRect(0, 0, width, height);
-              const n = viz.state.n;
-              const cx = width / 2;
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+            var state = { n: 4, showDual: false, showBinary: true };
 
-              // Helper functions
-              function binomMod2(a, b) {
-                if (b < 0 || b > a) return 0;
-                while (a > 0 || b > 0) {
-                  if ((b & 1) > (a & 1)) return 0;
-                  a >>= 1;
-                  b >>= 1;
-                }
-                return 1;
+            function superscript(d) {
+              var sup = '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079';
+              return String(d).split('').map(function(c) {
+                if (c === '-') return '\u207B';
+                return sup[parseInt(c)] || c;
+              }).join('');
+            }
+
+            function subscriptStr(d) {
+              var sub = '\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089';
+              return String(d).split('').map(function(c) { return sub[parseInt(c)] || c; }).join('');
+            }
+
+            function binomMod2(a, b) {
+              if (b < 0 || b > a) return 0;
+              while (a > 0 || b > 0) {
+                if ((b & 1) > (a & 1)) return 0;
+                a >>= 1;
+                b >>= 1;
               }
+              return 1;
+            }
 
-              function invertMod2Poly(poly, maxDeg) {
-                const inv = new Array(maxDeg + 1).fill(0);
-                inv[0] = 1;
-                for (let k = 1; k <= maxDeg; k++) {
-                  let sum = 0;
-                  for (let j = 1; j <= k; j++) {
-                    if (j < poly.length) {
-                      sum ^= (poly[j] & inv[k - j]);
-                    }
+            function invertMod2Poly(poly, maxDeg) {
+              var inv = new Array(maxDeg + 1).fill(0);
+              inv[0] = 1;
+              for (var k = 1; k <= maxDeg; k++) {
+                var sum = 0;
+                for (var j = 1; j <= k; j++) {
+                  if (j < poly.length) {
+                    sum ^= (poly[j] & inv[k - j]);
                   }
-                  inv[k] = sum;
                 }
-                return inv;
+                inv[k] = sum;
               }
+              return inv;
+            }
 
-              function superscript(d) {
-                const sup = '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079';
-                return String(d).split('').map(c => {
-                  if (c === '-') return '\u207B';
-                  return sup[parseInt(c)] || c;
-                }).join('');
-              }
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
+              ctx.clearRect(0, 0, width, height);
+              var n = state.n;
+              var cx = width / 2;
 
-              function subscript(d) {
-                const sub = '\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089';
-                return String(d).split('').map(c => sub[parseInt(c)] || c).join('');
-              }
-
-              // Title
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
               ctx.fillText('Stiefel-Whitney Classes of \u211DP' + superscript(n), cx, 28);
 
-              // Compute (1+a)^(n+1) mod 2
-              const coeffs = [];
-              for (let k = 0; k <= n; k++) {
+              var coeffs = [];
+              for (var k = 0; k <= n; k++) {
                 coeffs.push(binomMod2(n + 1, k));
               }
 
-              // Polynomial display
               ctx.font = '16px serif';
               ctx.fillStyle = '#2c3e50';
               ctx.fillText('w(T\u211DP' + superscript(n) + ') = (1 + \u03B1)' + superscript(n + 1) + ' mod 2, \u03B1' + superscript(n + 1) + ' = 0', cx, 58);
 
-              // Draw coefficients as colored blocks
-              const blockW = Math.min(50, (width - 80) / (n + 1));
-              const startX = cx - (n + 1) * blockW / 2;
-              const blockY = 85;
-              const blockH = 40;
+              var blockW = Math.min(50, (width - 80) / (n + 1));
+              var startX = cx - (n + 1) * blockW / 2;
+              var blockY = 85;
+              var blockH = 40;
 
-              for (let k = 0; k <= n; k++) {
-                const x = startX + k * blockW;
-                const isNonzero = coeffs[k] === 1;
+              for (var k2 = 0; k2 <= n; k2++) {
+                var x = startX + k2 * blockW;
+                var isNonzero = coeffs[k2] === 1;
 
                 ctx.fillStyle = isNonzero ? 'rgba(231, 76, 60, 0.8)' : 'rgba(189, 195, 199, 0.3)';
                 ctx.fillRect(x + 2, blockY, blockW - 4, blockH);
@@ -469,19 +467,18 @@ Since the Mobius band has no nonvanishing section (a continuous function \\(f: S
                 ctx.fillStyle = isNonzero ? '#fff' : '#95a5a6';
                 ctx.font = 'bold 16px serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(coeffs[k].toString(), x + blockW / 2, blockY + 26);
+                ctx.fillText(coeffs[k2].toString(), x + blockW / 2, blockY + 26);
 
                 ctx.fillStyle = '#2c3e50';
                 ctx.font = '12px serif';
-                ctx.fillText('w' + subscript(k), x + blockW / 2, blockY + blockH + 16);
+                ctx.fillText('w' + subscriptStr(k2), x + blockW / 2, blockY + blockH + 16);
               }
 
-              // Total class
-              let totalStr = 'w = ';
-              let terms = [];
-              for (let k = 0; k <= n; k++) {
-                if (coeffs[k] === 1) {
-                  terms.push(k === 0 ? '1' : (k === 1 ? '\u03B1' : '\u03B1' + superscript(k)));
+              var totalStr = 'w = ';
+              var terms = [];
+              for (var k3 = 0; k3 <= n; k3++) {
+                if (coeffs[k3] === 1) {
+                  terms.push(k3 === 0 ? '1' : (k3 === 1 ? '\u03B1' : '\u03B1' + superscript(k3)));
                 }
               }
               totalStr += terms.join(' + ');
@@ -491,44 +488,41 @@ Since the Mobius band has no nonvanishing section (a continuous function \\(f: S
               ctx.textAlign = 'center';
               ctx.fillText(totalStr, cx, blockY + blockH + 45);
 
-              // Properties summary
-              const orientable = coeffs.length > 1 ? coeffs[1] === 0 : true;
-              const spin = orientable && (n < 2 || coeffs[2] === 0);
+              var orientable = coeffs.length > 1 ? coeffs[1] === 0 : true;
+              var spin = orientable && (n < 2 || coeffs[2] === 0);
               ctx.font = 'bold 14px serif';
               ctx.fillStyle = orientable ? '#27ae60' : '#e74c3c';
               ctx.fillText('\u211DP' + superscript(n) + ': ' + (orientable ? 'Orientable' : 'Non-orientable') +
                 (orientable ? (spin ? ', Spin' : ', Not Spin') : ''), cx, blockY + blockH + 68);
 
-              // Binary explanation (Lucas' theorem)
-              if (viz.state.showBinary) {
-                const binY = blockY + blockH + 90;
+              if (state.showBinary) {
+                var binY = blockY + blockH + 90;
                 ctx.fillStyle = '#8e44ad';
                 ctx.font = 'bold 14px serif';
                 ctx.textAlign = 'center';
                 ctx.fillText("Lucas' Theorem: C(n+1, k) mod 2 from binary digits", cx, binY);
 
-                const binStr = (n + 1).toString(2);
+                var binStr = (n + 1).toString(2);
                 ctx.font = '14px monospace';
                 ctx.fillStyle = '#2c3e50';
                 ctx.fillText('n+1 = ' + (n + 1) + ' = ' + binStr + '\u2082', cx, binY + 22);
                 ctx.fillText('C(n+1,k) mod 2 = 1 iff each binary digit of k \u2264 that of n+1', cx, binY + 44);
               }
 
-              // Dual Stiefel-Whitney classes
-              if (viz.state.showDual) {
-                const dualY = height - 90;
-                const dual = invertMod2Poly(coeffs, n);
+              if (state.showDual) {
+                var dualY = height - 90;
+                var dual = invertMod2Poly(coeffs, n);
 
                 ctx.fillStyle = '#27ae60';
                 ctx.font = 'bold 14px serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('Dual Stiefel-Whitney classes (normal bundle):', cx, dualY);
 
-                let dualStr = 'w\u0305 = ';
-                let dualTerms = [];
-                for (let k = 0; k <= n; k++) {
-                  if (dual[k] === 1) {
-                    dualTerms.push(k === 0 ? '1' : (k === 1 ? '\u03B1' : '\u03B1' + superscript(k)));
+                var dualStr = 'w\u0305 = ';
+                var dualTerms = [];
+                for (var k4 = 0; k4 <= n; k4++) {
+                  if (dual[k4] === 1) {
+                    dualTerms.push(k4 === 0 ? '1' : (k4 === 1 ? '\u03B1' : '\u03B1' + superscript(k4)));
                   }
                 }
                 dualStr += dualTerms.join(' + ');
@@ -537,15 +531,14 @@ Since the Mobius band has no nonvanishing section (a continuous function \\(f: S
                 ctx.fillStyle = '#2c3e50';
                 ctx.fillText(dualStr, cx, dualY + 24);
 
-                // Immersion obstruction
-                let maxDualDeg = 0;
-                for (let k = n; k >= 1; k--) {
-                  if (dual[k] === 1) { maxDualDeg = k; break; }
+                var maxDualDeg = 0;
+                for (var k5 = n; k5 >= 1; k5--) {
+                  if (dual[k5] === 1) { maxDualDeg = k5; break; }
                 }
                 if (maxDualDeg > 0) {
                   ctx.fillStyle = '#e74c3c';
                   ctx.font = '14px serif';
-                  ctx.fillText('Highest nonzero dual class: w\u0305' + subscript(maxDualDeg) + ' \u2260 0', cx, dualY + 48);
+                  ctx.fillText('Highest nonzero dual class: w\u0305' + subscriptStr(maxDualDeg) + ' \u2260 0', cx, dualY + 48);
                   ctx.fillText('\u21D2 \u211DP' + superscript(n) + ' cannot immerse in \u211D' + superscript(2 * n - maxDualDeg), cx, dualY + 68);
                 } else {
                   ctx.fillStyle = '#27ae60';
@@ -553,34 +546,51 @@ Since the Mobius band has no nonvanishing section (a continuous function \\(f: S
                   ctx.fillText('All dual classes vanish (no SW immersion obstruction)', cx, dualY + 48);
                 }
               }
-            },
-            controls: [
-              {
-                type: 'slider',
-                label: 'n (dimension of \u211DP\u207F)',
-                min: 1,
-                max: 10,
-                step: 1,
-                initial: 4,
-                action: (viz, value) => {
-                  viz.state.n = value;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Dual Classes',
-                action: (viz) => {
-                  viz.state.showDual = !viz.state.showDual;
-                }
-              },
-              {
-                type: 'button',
-                label: "Toggle Lucas' Theorem",
-                action: (viz) => {
-                  viz.state.showBinary = !viz.state.showBinary;
-                }
-              }
-            ]
+            }
+
+            // Slider: n
+            var nLabel = document.createElement('label');
+            nLabel.style.color = '#c9d1d9';
+            nLabel.style.marginRight = '8px';
+            nLabel.textContent = 'n: 4';
+            controls.appendChild(nLabel);
+            var nSlider = document.createElement('input');
+            nSlider.type = 'range';
+            nSlider.min = 1;
+            nSlider.max = 10;
+            nSlider.step = 1;
+            nSlider.value = 4;
+            nSlider.style.width = '200px';
+            nSlider.oninput = function() { state.n = parseFloat(nSlider.value); nLabel.textContent = 'n: ' + nSlider.value; draw(); };
+            controls.appendChild(nSlider);
+
+            // Button: Toggle Dual
+            var dualBtn = document.createElement('button');
+            dualBtn.textContent = 'Toggle Dual Classes';
+            dualBtn.style.marginLeft = '10px';
+            dualBtn.style.padding = '4px 12px';
+            dualBtn.style.background = '#21262d';
+            dualBtn.style.color = '#c9d1d9';
+            dualBtn.style.border = '1px solid #30363d';
+            dualBtn.style.borderRadius = '4px';
+            dualBtn.style.cursor = 'pointer';
+            dualBtn.onclick = function() { state.showDual = !state.showDual; draw(); };
+            controls.appendChild(dualBtn);
+
+            // Button: Toggle Lucas
+            var lucasBtn = document.createElement('button');
+            lucasBtn.textContent = "Toggle Lucas' Theorem";
+            lucasBtn.style.marginLeft = '10px';
+            lucasBtn.style.padding = '4px 12px';
+            lucasBtn.style.background = '#21262d';
+            lucasBtn.style.color = '#c9d1d9';
+            lucasBtn.style.border = '1px solid #30363d';
+            lucasBtn.style.borderRadius = '4px';
+            lucasBtn.style.cursor = 'pointer';
+            lucasBtn.onclick = function() { state.showBinary = !state.showBinary; draw(); };
+            controls.appendChild(lucasBtn);
+
+            draw();
           }
         }
       ],
@@ -589,19 +599,7 @@ Since the Mobius band has no nonvanishing section (a continuous function \\(f: S
           id: 'sw-ex1',
           question: 'Using Stiefel-Whitney classes, show that \\(\\mathbb{R}P^8\\) cannot be immersed in \\(\\mathbb{R}^{14}\\).',
           hint: 'Compute \\(w(T\\mathbb{R}P^8) = (1+\\alpha)^9\\) mod 2, then find the dual classes \\(\\bar{w}\\) and look for the highest nonzero dual class.',
-          solution: `We have \\(w(T\\mathbb{R}P^8) = (1+\\alpha)^9\\) in \\(H^*(\\mathbb{R}P^8; \\mathbb{Z}/2) = \\mathbb{Z}/2[\\alpha]/(\\alpha^9)\\).
-
-By Lucas' theorem, \\(\\binom{9}{k} \\mod 2 = 1\\) iff each binary digit of \\(k\\) is \\(\\leq\\) the corresponding digit of \\(9 = 1001_2\\).
-
-So \\(k\\) must have binary digits \\(\\leq 1001\\), giving \\(k \\in \\{0, 1, 8\\}\\) (but \\(\\alpha^8 \\neq 0\\) in \\(\\mathbb{R}P^8\\), \\(\\alpha^9 = 0\\)).
-
-Thus \\(w = 1 + \\alpha + \\alpha^8\\).
-
-For the dual: \\(\\bar{w} \\cdot w = 1\\). We need \\(\\bar{w} \\cdot (1 + \\alpha + \\alpha^8) = 1 \\mod 2\\) up to degree 8.
-
-Computing: \\(\\bar{w} = 1 + \\alpha + \\alpha^2 + \\alpha^3 + \\alpha^4 + \\alpha^5 + \\alpha^6 + \\alpha^7\\).
-
-Since \\(\\bar{w}_7 \\neq 0\\), if \\(\\mathbb{R}P^8\\) immersed in \\(\\mathbb{R}^{8+k}\\), we'd need \\(\\bar{w}_i = 0\\) for \\(i > k\\). So we need \\(k \\geq 7\\), meaning \\(\\mathbb{R}P^8\\) requires at least \\(\\mathbb{R}^{15}\\) for immersion. It cannot immerse in \\(\\mathbb{R}^{14}\\). \\(\\square\\)`
+          solution: 'We have \\(w(T\\mathbb{R}P^8) = (1+\\alpha)^9\\) in \\(H^*(\\mathbb{R}P^8; \\mathbb{Z}/2) = \\mathbb{Z}/2[\\alpha]/(\\alpha^9)\\).\n\nBy Lucas\' theorem, \\(\\binom{9}{k} \\mod 2 = 1\\) iff each binary digit of \\(k\\) is \\(\\leq\\) the corresponding digit of \\(9 = 1001_2\\).\n\nSo \\(k\\) must have binary digits \\(\\leq 1001\\), giving \\(k \\in \\{0, 1, 8\\}\\) (but \\(\\alpha^8 \\neq 0\\) in \\(\\mathbb{R}P^8\\), \\(\\alpha^9 = 0\\)).\n\nThus \\(w = 1 + \\alpha + \\alpha^8\\).\n\nFor the dual: \\(\\bar{w} \\cdot w = 1\\). We need \\(\\bar{w} \\cdot (1 + \\alpha + \\alpha^8) = 1 \\mod 2\\) up to degree 8.\n\nComputing: \\(\\bar{w} = 1 + \\alpha + \\alpha^2 + \\alpha^3 + \\alpha^4 + \\alpha^5 + \\alpha^6 + \\alpha^7\\).\n\nSince \\(\\bar{w}_7 \\neq 0\\), if \\(\\mathbb{R}P^8\\) immersed in \\(\\mathbb{R}^{8+k}\\), we\'d need \\(\\bar{w}_i = 0\\) for \\(i > k\\). So we need \\(k \\geq 7\\), meaning \\(\\mathbb{R}P^8\\) requires at least \\(\\mathbb{R}^{15}\\) for immersion. It cannot immerse in \\(\\mathbb{R}^{14}\\). \\(\\square\\)'
         }
       ]
     },
@@ -717,51 +715,51 @@ Since \\(\\bar{w}_7 \\neq 0\\), if \\(\\mathbb{R}P^8\\) immersed in \\(\\mathbb{
             </tr>
           </table>
         </div>
+        <div class="viz-placeholder" data-viz="chern-class-visualizer"></div>
       `,
       visualizations: [
         {
           id: 'chern-class-visualizer',
           title: 'Chern Class of Line Bundles over CP^n',
           description: 'Visualize how c1 classifies complex line bundles and see the ring structure of H*(CP^n)',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                n: 2,
-                animT: 0,
-                showRing: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+            var state = { n: 2, animT: 0, showRing: true };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const n = viz.state.n;
+              var n = state.n;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
               ctx.fillText('Chern Classes of T\u2102P' + String.fromCharCode(0x2070 + n), width / 2, 28);
 
-              viz.state.animT += 0.01;
+              state.animT += 0.01;
 
-              // Show H*(CP^n) ring structure
-              const startY = 55;
+              var startY = 55;
               ctx.font = '15px serif';
               ctx.textAlign = 'left';
               ctx.fillStyle = '#7f8c8d';
               ctx.fillText('H*(\u2102P' + n + '; \u2124) = \u2124[h] / (h' + String.fromCharCode(0x2070 + n + 1) + '),  deg(h) = 2', 30, startY);
 
-              // Compute c(TCP^n) = (1+h)^(n+1) in Z[h]/(h^{n+1})
-              const coeffs = [];
-              for (let i = 0; i <= n; i++) {
-                let binom = 1;
-                for (let j = 0; j < i; j++) {
+              var coeffs = [];
+              for (var i = 0; i <= n; i++) {
+                var binom = 1;
+                for (var j = 0; j < i; j++) {
                   binom = binom * (n + 1 - j) / (j + 1);
                 }
                 coeffs.push(Math.round(binom));
               }
 
-              // Display Chern classes
-              const tableY = startY + 30;
-              const rowH = 30;
+              var tableY = startY + 30;
+              var rowH = 30;
 
               ctx.font = 'bold 14px serif';
               ctx.fillStyle = '#7f8c8d';
@@ -776,19 +774,19 @@ Since \\(\\bar{w}_7 \\neq 0\\), if \\(\\mathbb{R}P^8\\) immersed in \\(\\mathbb{
               ctx.lineTo(width - 30, tableY + 8);
               ctx.stroke();
 
-              for (let i = 0; i <= n; i++) {
-                const y = tableY + (i + 1) * rowH;
+              for (var ii = 0; ii <= n; ii++) {
+                var y = tableY + (ii + 1) * rowH;
                 ctx.font = '15px serif';
                 ctx.fillStyle = '#2c3e50';
-                ctx.fillText('c' + String.fromCharCode(0x2080 + i), 30, y);
-                ctx.fillText('' + (2 * i), 170, y);
-                if (i === 0) {
+                ctx.fillText('c' + String.fromCharCode(0x2080 + ii), 30, y);
+                ctx.fillText('' + (2 * ii), 170, y);
+                if (ii === 0) {
                   ctx.fillStyle = '#27ae60';
                   ctx.fillText('1', 250, y);
                 } else {
                   ctx.fillStyle = '#e74c3c';
                   ctx.font = 'bold 15px serif';
-                  ctx.fillText(coeffs[i] + 'h' + (i > 1 ? String.fromCharCode(0x2070 + i) : ''), 250, y);
+                  ctx.fillText(coeffs[ii] + 'h' + (ii > 1 ? String.fromCharCode(0x2070 + ii) : ''), 250, y);
                 }
 
                 ctx.strokeStyle = 'rgba(189,195,199,0.3)';
@@ -798,60 +796,61 @@ Since \\(\\bar{w}_7 \\neq 0\\), if \\(\\mathbb{R}P^8\\) immersed in \\(\\mathbb{
                 ctx.stroke();
               }
 
-              // Total Chern class
-              const totalY = tableY + (n + 2) * rowH + 10;
+              var totalY = tableY + (n + 2) * rowH + 10;
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 15px serif';
-              let totalStr = 'c(T\u2102P' + n + ') = (1+h)' + String.fromCharCode(0x2070 + n + 1) + ' = ';
-              let terms = [];
-              for (let i = 0; i <= n; i++) {
-                if (i === 0) terms.push('1');
-                else if (i === 1) terms.push(coeffs[i] + 'h');
-                else terms.push(coeffs[i] + 'h' + String.fromCharCode(0x2070 + i));
+              var totalStr = 'c(T\u2102P' + n + ') = (1+h)' + String.fromCharCode(0x2070 + n + 1) + ' = ';
+              var terms = [];
+              for (var k = 0; k <= n; k++) {
+                if (k === 0) terms.push('1');
+                else if (k === 1) terms.push(coeffs[k] + 'h');
+                else terms.push(coeffs[k] + 'h' + String.fromCharCode(0x2070 + k));
               }
               totalStr += terms.join(' + ');
               ctx.fillText(totalStr, 30, totalY);
 
-              // Euler characteristic
-              const chiY = totalY + 30;
-              const chi = n + 1;
+              var chiY = totalY + 30;
+              var chi = n + 1;
               ctx.fillStyle = '#9b59b6';
               ctx.font = '15px serif';
               ctx.fillText('\u03C7(\u2102P' + n + ') = c' + String.fromCharCode(0x2080 + n) + '[\u2102P' + n + '] = ' + coeffs[n] + ' (top Chern class = Euler class)', 30, chiY);
 
-              // CW structure
-              const geoY = chiY + 40;
+              var geoY = chiY + 40;
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 15px serif';
               ctx.fillText('CW structure of \u2102P' + n + ':', 30, geoY);
 
               ctx.font = '14px serif';
-              let cellStr = '';
-              for (let i = 0; i <= n; i++) {
-                cellStr += 'e' + String.fromCharCode(0x2070 + 2 * i);
-                if (i < n) cellStr += ' \u222A ';
+              var cellStr = '';
+              for (var m = 0; m <= n; m++) {
+                cellStr += 'e' + String.fromCharCode(0x2070 + 2 * m);
+                if (m < n) cellStr += ' \u222A ';
               }
               ctx.fillText('Cells: ' + cellStr + '  (one cell in each even dimension 0, 2, ..., ' + (2 * n) + ')', 30, geoY + 22);
 
-              // c1 classification note
-              const noteY = height - 35;
+              var noteY = height - 35;
               ctx.fillStyle = '#3498db';
               ctx.font = 'bold 14px serif';
               ctx.fillText('Key fact: c\u2081 classifies complex line bundles: Vect\u00B9\u2102(B) \u2245 H\u00B2(B;\u2124)', 30, noteY);
-            },
-            controls: [
-              {
-                type: 'slider',
-                label: 'n (dimension of \u2102P\u207F)',
-                min: 1,
-                max: 6,
-                step: 1,
-                initial: 2,
-                action: (viz, value) => {
-                  viz.state.n = value;
-                }
-              }
-            ]
+            }
+
+            // Slider: n
+            var nLabel = document.createElement('label');
+            nLabel.style.color = '#c9d1d9';
+            nLabel.style.marginRight = '8px';
+            nLabel.textContent = 'n: 2';
+            controls.appendChild(nLabel);
+            var nSlider = document.createElement('input');
+            nSlider.type = 'range';
+            nSlider.min = 1;
+            nSlider.max = 6;
+            nSlider.step = 1;
+            nSlider.value = 2;
+            nSlider.style.width = '200px';
+            nSlider.oninput = function() { state.n = parseFloat(nSlider.value); nLabel.textContent = 'n: ' + nSlider.value; draw(); };
+            controls.appendChild(nSlider);
+
+            draw();
           }
         }
       ],
@@ -860,23 +859,7 @@ Since \\(\\bar{w}_7 \\neq 0\\), if \\(\\mathbb{R}P^8\\) immersed in \\(\\mathbb{
           id: 'chern-ex1',
           question: 'Compute all Chern classes of \\(T\\mathbb{C}P^3\\) and verify that the Euler characteristic \\(\\chi(\\mathbb{C}P^3) = c_3[\\mathbb{C}P^3] = 4\\).',
           hint: 'Use \\(c(T\\mathbb{C}P^3) = (1+h)^4\\) in \\(\\mathbb{Z}[h]/(h^4)\\). Expand the binomial and evaluate the top class on the fundamental class.',
-          solution: `We have \\(c(T\\mathbb{C}P^3) = (1 + h)^4\\) in \\(H^*(\\mathbb{C}P^3; \\mathbb{Z}) = \\mathbb{Z}[h]/(h^4)\\) with \\(\\deg(h) = 2\\).
-
-Expanding:
-\\[ (1+h)^4 = 1 + 4h + 6h^2 + 4h^3 \\quad (\\text{since } h^4 = 0) \\]
-
-So:
-- \\(c_0 = 1\\)
-- \\(c_1 = 4h \\in H^2\\)
-- \\(c_2 = 6h^2 \\in H^4\\)
-- \\(c_3 = 4h^3 \\in H^6\\)
-
-The Euler characteristic is the top Chern number:
-\\[ \\chi(\\mathbb{C}P^3) = \\langle c_3, [\\mathbb{C}P^3] \\rangle = \\langle 4h^3, [\\mathbb{C}P^3] \\rangle = 4 \\]
-
-since \\(\\langle h^3, [\\mathbb{C}P^3] \\rangle = 1\\) (the generator \\(h^3\\) pairs with the fundamental class to give 1).
-
-Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each even dimension 0, 2, 4, 6). \\(\\checkmark\\)`
+          solution: 'We have \\(c(T\\mathbb{C}P^3) = (1 + h)^4\\) in \\(H^*(\\mathbb{C}P^3; \\mathbb{Z}) = \\mathbb{Z}[h]/(h^4)\\) with \\(\\deg(h) = 2\\).\n\nExpanding:\n\\[ (1+h)^4 = 1 + 4h + 6h^2 + 4h^3 \\quad (\\text{since } h^4 = 0) \\]\n\nSo:\n- \\(c_0 = 1\\)\n- \\(c_1 = 4h \\in H^2\\)\n- \\(c_2 = 6h^2 \\in H^4\\)\n- \\(c_3 = 4h^3 \\in H^6\\)\n\nThe Euler characteristic is the top Chern number:\n\\[ \\chi(\\mathbb{C}P^3) = \\langle c_3, [\\mathbb{C}P^3] \\rangle = \\langle 4h^3, [\\mathbb{C}P^3] \\rangle = 4 \\]\n\nsince \\(\\langle h^3, [\\mathbb{C}P^3] \\rangle = 1\\) (the generator \\(h^3\\) pairs with the fundamental class to give 1).\n\nAlternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each even dimension 0, 2, 4, 6). \\(\\checkmark\\)'
         }
       ]
     },
@@ -959,94 +942,106 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
             <li><strong>Topology \\(\\leftrightarrow\\) Physics:</strong> Gauge theory uses Chern classes (instantons), Stiefel-Whitney classes (fermion anomalies), and Pontryagin classes (gravitational anomalies).</li>
           </ul>
         </div>
+        <div class="viz-placeholder" data-viz="euler-class-vector-field"></div>
       `,
       visualizations: [
         {
           id: 'euler-class-vector-field',
           title: 'Euler Class and Vector Field Zeros',
           description: 'Visualize the connection between the Euler characteristic and zeros of vector fields on surfaces',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                surface: 'sphere',
-                time: 0,
-                showField: true,
-                showZeros: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+            var state = { surface: 'sphere', time: 0, showField: true, showZeros: true };
+
+            function drawArrow(ctx2, x1, y1, x2, y2, color) {
+              ctx2.strokeStyle = color;
+              ctx2.lineWidth = 2.5;
+              ctx2.beginPath();
+              ctx2.moveTo(x1, y1);
+              ctx2.lineTo(x2, y2);
+              ctx2.stroke();
+              var ang = Math.atan2(y2 - y1, x2 - x1);
+              ctx2.fillStyle = color;
+              ctx2.beginPath();
+              ctx2.moveTo(x2, y2);
+              ctx2.lineTo(x2 - 7 * Math.cos(ang - 0.4), y2 - 7 * Math.sin(ang - 0.4));
+              ctx2.lineTo(x2 - 7 * Math.cos(ang + 0.4), y2 - 7 * Math.sin(ang + 0.4));
+              ctx2.fill();
+            }
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.time += 0.02;
-              const cx = width / 2;
-              const cy = height / 2 - 10;
-              const surface = viz.state.surface;
+              state.time += 0.02;
+              var cx = width / 2;
+              var cy = height / 2 - 10;
+              var surface = state.surface;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
 
-              const data = {
+              var data = {
                 sphere: { name: 'S\u00B2', euler: 2, zeros: 'source + sink (indices +1, +1)' },
                 torus: { name: 'T\u00B2', euler: 0, zeros: 'no zeros needed' },
                 genus2: { name: '\u03A3\u2082', euler: -2, zeros: 'saddles (total index = -2)' }
               };
-              const d = data[surface];
+              var d = data[surface];
               ctx.fillText('Vector Field on ' + d.name + ', \u03C7 = ' + d.euler, cx, 28);
 
               if (surface === 'sphere') {
-                const R = Math.min(width, height) * 0.28;
-
-                // Draw sphere
+                var R = Math.min(width, height) * 0.28;
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2.5;
                 ctx.beginPath();
                 ctx.arc(cx, cy, R, 0, 2 * Math.PI);
                 ctx.stroke();
 
-                const grad = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.2, R * 0.1, cx, cy, R);
+                var grad = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.2, R * 0.1, cx, cy, R);
                 grad.addColorStop(0, 'rgba(52, 152, 219, 0.1)');
                 grad.addColorStop(1, 'rgba(52, 152, 219, 0.05)');
                 ctx.fillStyle = grad;
                 ctx.fill();
 
-                if (viz.state.showField) {
-                  const nRows = 5, nCols = 10;
-                  for (let i = 1; i < nRows; i++) {
-                    const phi = Math.PI * i / nRows;
-                    for (let j = 0; j < nCols; j++) {
-                      const theta = 2 * Math.PI * j / nCols;
-                      const px = cx + R * 0.88 * Math.sin(phi) * Math.cos(theta);
-                      const py = cy - R * 0.88 * Math.cos(phi);
+                if (state.showField) {
+                  var nRows = 5, nCols = 10;
+                  for (var i = 1; i < nRows; i++) {
+                    var phi = Math.PI * i / nRows;
+                    for (var j = 0; j < nCols; j++) {
+                      var theta = 2 * Math.PI * j / nCols;
+                      var px = cx + R * 0.88 * Math.sin(phi) * Math.cos(theta);
+                      var py = cy - R * 0.88 * Math.cos(phi);
 
-                      const distSq = (px - cx) * (px - cx) + (py - cy) * (py - cy);
+                      var distSq = (px - cx) * (px - cx) + (py - cy) * (py - cy);
                       if (distSq > R * R * 0.8) continue;
 
-                      const speed = Math.sin(phi) * 15;
-                      const vx = 0;
-                      const vy = speed;
-
+                      var speed = Math.sin(phi) * 15;
                       ctx.strokeStyle = 'rgba(231, 76, 60, 0.6)';
                       ctx.lineWidth = 1.5;
                       ctx.beginPath();
                       ctx.moveTo(px, py);
-                      ctx.lineTo(px + vx, py + vy);
+                      ctx.lineTo(px, py + speed);
                       ctx.stroke();
 
                       if (speed > 3) {
-                        const angle = Math.atan2(vy, vx);
+                        var angle = Math.PI / 2;
                         ctx.fillStyle = 'rgba(231, 76, 60, 0.6)';
                         ctx.beginPath();
-                        ctx.moveTo(px + vx, py + vy);
-                        ctx.lineTo(px + vx - 4 * Math.cos(angle - 0.5), py + vy - 4 * Math.sin(angle - 0.5));
-                        ctx.lineTo(px + vx - 4 * Math.cos(angle + 0.5), py + vy - 4 * Math.sin(angle + 0.5));
+                        ctx.moveTo(px, py + speed);
+                        ctx.lineTo(px - 4 * Math.cos(angle - 0.5), py + speed - 4 * Math.sin(angle - 0.5));
+                        ctx.lineTo(px - 4 * Math.cos(angle + 0.5), py + speed - 4 * Math.sin(angle + 0.5));
                         ctx.fill();
                       }
                     }
                   }
                 }
 
-                if (viz.state.showZeros) {
-                  // North pole (source)
+                if (state.showZeros) {
                   ctx.fillStyle = '#f39c12';
                   ctx.beginPath();
                   ctx.arc(cx, cy - R * 0.88, 7, 0, 2 * Math.PI);
@@ -1060,7 +1055,6 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
                   ctx.textAlign = 'left';
                   ctx.fillText('source (index +1)', cx + 12, cy - R * 0.88 + 4);
 
-                  // South pole (sink)
                   ctx.fillStyle = '#f39c12';
                   ctx.beginPath();
                   ctx.arc(cx, cy + R * 0.88, 7, 0, 2 * Math.PI);
@@ -1076,10 +1070,10 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
                 }
 
               } else if (surface === 'torus') {
-                const w = Math.min(width * 0.55, 260);
-                const h = w * 0.6;
-                const x0 = cx - w / 2;
-                const y0 = cy - h / 2;
+                var w = Math.min(width * 0.55, 260);
+                var h = w * 0.6;
+                var x0 = cx - w / 2;
+                var y0 = cy - h / 2;
 
                 ctx.fillStyle = 'rgba(46, 204, 113, 0.08)';
                 ctx.fillRect(x0, y0, w, h);
@@ -1087,7 +1081,6 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
                 ctx.lineWidth = 2;
                 ctx.strokeRect(x0, y0, w, h);
 
-                // Identification arrows
                 drawArrow(ctx, x0 + w * 0.3, y0 + h + 8, x0 + w * 0.7, y0 + h + 8, '#e74c3c');
                 ctx.fillStyle = '#e74c3c';
                 ctx.font = '13px serif';
@@ -1099,26 +1092,26 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
                 ctx.fillText('b', x0 - 22, y0 + h * 0.5 + 4);
                 drawArrow(ctx, x0 + w + 8, y0 + h * 0.7, x0 + w + 8, y0 + h * 0.3, '#3498db');
 
-                if (viz.state.showField) {
-                  const spacing = 30;
-                  const arrowLen = 14;
-                  const angle = Math.PI * 0.15;
-                  for (let xi = x0 + 15; xi < x0 + w - 10; xi += spacing) {
-                    for (let yi = y0 + 15; yi < y0 + h - 10; yi += spacing) {
+                if (state.showField) {
+                  var spacing = 30;
+                  var arrowLen = 14;
+                  var fAngle = Math.PI * 0.15;
+                  for (var xi = x0 + 15; xi < x0 + w - 10; xi += spacing) {
+                    for (var yi = y0 + 15; yi < y0 + h - 10; yi += spacing) {
                       ctx.strokeStyle = 'rgba(231, 76, 60, 0.5)';
                       ctx.lineWidth = 1.5;
                       ctx.beginPath();
                       ctx.moveTo(xi, yi);
-                      ctx.lineTo(xi + arrowLen * Math.cos(angle), yi + arrowLen * Math.sin(angle));
+                      ctx.lineTo(xi + arrowLen * Math.cos(fAngle), yi + arrowLen * Math.sin(fAngle));
                       ctx.stroke();
 
                       ctx.fillStyle = 'rgba(231, 76, 60, 0.5)';
                       ctx.beginPath();
-                      const ex = xi + arrowLen * Math.cos(angle);
-                      const ey = yi + arrowLen * Math.sin(angle);
+                      var ex = xi + arrowLen * Math.cos(fAngle);
+                      var ey = yi + arrowLen * Math.sin(fAngle);
                       ctx.moveTo(ex, ey);
-                      ctx.lineTo(ex - 4 * Math.cos(angle - 0.5), ey - 4 * Math.sin(angle - 0.5));
-                      ctx.lineTo(ex - 4 * Math.cos(angle + 0.5), ey - 4 * Math.sin(angle + 0.5));
+                      ctx.lineTo(ex - 4 * Math.cos(fAngle - 0.5), ey - 4 * Math.sin(fAngle - 0.5));
+                      ctx.lineTo(ex - 4 * Math.cos(fAngle + 0.5), ey - 4 * Math.sin(fAngle + 0.5));
                       ctx.fill();
                     }
                   }
@@ -1130,16 +1123,15 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
                 ctx.fillText('Constant field is well-defined on T\u00B2 (compatible with identifications)', cx, y0 + h + 44);
 
               } else if (surface === 'genus2') {
-                const R = Math.min(width, height) * 0.28;
+                var R3 = Math.min(width, height) * 0.28;
 
-                // Draw octagon
                 ctx.beginPath();
-                for (let i = 0; i < 8; i++) {
-                  const angle = (2 * Math.PI * i) / 8 - Math.PI / 8;
-                  const px = cx + R * Math.cos(angle);
-                  const py = cy + R * Math.sin(angle);
-                  if (i === 0) ctx.moveTo(px, py);
-                  else ctx.lineTo(px, py);
+                for (var ii = 0; ii < 8; ii++) {
+                  var a2 = (2 * Math.PI * ii) / 8 - Math.PI / 8;
+                  var ppx = cx + R3 * Math.cos(a2);
+                  var ppy = cy + R3 * Math.sin(a2);
+                  if (ii === 0) ctx.moveTo(ppx, ppy);
+                  else ctx.lineTo(ppx, ppy);
                 }
                 ctx.closePath();
                 ctx.fillStyle = 'rgba(155, 89, 182, 0.08)';
@@ -1148,29 +1140,29 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Label edges
-                const edgeLabels = ['a', 'b', 'a\u207B\u00B9', 'b\u207B\u00B9', 'c', 'd', 'c\u207B\u00B9', 'd\u207B\u00B9'];
-                const edgeColors = ['#e74c3c', '#3498db', '#e74c3c', '#3498db', '#27ae60', '#f39c12', '#27ae60', '#f39c12'];
-                for (let i = 0; i < 8; i++) {
-                  const a1 = (2 * Math.PI * i) / 8 - Math.PI / 8;
-                  const a2 = (2 * Math.PI * (i + 1)) / 8 - Math.PI / 8;
-                  const mx = cx + (R + 18) * Math.cos((a1 + a2) / 2);
-                  const my = cy + (R + 18) * Math.sin((a1 + a2) / 2);
-                  ctx.fillStyle = edgeColors[i];
+                var edgeLabels = ['a', 'b', 'a\u207B\u00B9', 'b\u207B\u00B9', 'c', 'd', 'c\u207B\u00B9', 'd\u207B\u00B9'];
+                var edgeColors = ['#e74c3c', '#3498db', '#e74c3c', '#3498db', '#27ae60', '#f39c12', '#27ae60', '#f39c12'];
+                for (var iii = 0; iii < 8; iii++) {
+                  var a1 = (2 * Math.PI * iii) / 8 - Math.PI / 8;
+                  var a22 = (2 * Math.PI * (iii + 1)) / 8 - Math.PI / 8;
+                  var mx = cx + (R3 + 18) * Math.cos((a1 + a22) / 2);
+                  var my = cy + (R3 + 18) * Math.sin((a1 + a22) / 2);
+                  ctx.fillStyle = edgeColors[iii];
                   ctx.font = '12px serif';
                   ctx.textAlign = 'center';
-                  ctx.fillText(edgeLabels[i], mx, my + 4);
+                  ctx.fillText(edgeLabels[iii], mx, my + 4);
                 }
 
-                if (viz.state.showField && viz.state.showZeros) {
-                  const zeros = [
-                    { x: cx, y: cy - R * 0.4, type: 'source', index: '+1' },
-                    { x: cx - R * 0.35, y: cy + R * 0.2, type: 'saddle', index: '-1' },
-                    { x: cx + R * 0.35, y: cy + R * 0.2, type: 'saddle', index: '-1' },
-                    { x: cx, y: cy + R * 0.5, type: 'saddle', index: '-1' }
+                if (state.showField && state.showZeros) {
+                  var zeros = [
+                    { x: cx, y: cy - R3 * 0.4, type: 'source', index: '+1' },
+                    { x: cx - R3 * 0.35, y: cy + R3 * 0.2, type: 'saddle', index: '-1' },
+                    { x: cx + R3 * 0.35, y: cy + R3 * 0.2, type: 'saddle', index: '-1' },
+                    { x: cx, y: cy + R3 * 0.5, type: 'saddle', index: '-1' }
                   ];
 
-                  for (const z of zeros) {
+                  for (var zi = 0; zi < zeros.length; zi++) {
+                    var z = zeros[zi];
                     ctx.fillStyle = z.type === 'source' ? '#f39c12' : '#9b59b6';
                     ctx.beginPath();
                     ctx.arc(z.x, z.y, 6, 0, 2 * Math.PI);
@@ -1187,57 +1179,57 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
                 }
               }
 
-              // Bottom info
               ctx.fillStyle = '#2c3e50';
               ctx.font = '14px serif';
               ctx.textAlign = 'center';
               ctx.fillText('e(T' + d.name + ') evaluated on [' + d.name + '] = \u03C7(' + d.name + ') = ' + d.euler, cx, height - 38);
               ctx.fillText('Zeros: ' + d.zeros, cx, height - 18);
+            }
 
-              function drawArrow(ctx2, x1, y1, x2, y2, color) {
-                ctx2.strokeStyle = color;
-                ctx2.lineWidth = 2.5;
-                ctx2.beginPath();
-                ctx2.moveTo(x1, y1);
-                ctx2.lineTo(x2, y2);
-                ctx2.stroke();
-                const ang = Math.atan2(y2 - y1, x2 - x1);
-                ctx2.fillStyle = color;
-                ctx2.beginPath();
-                ctx2.moveTo(x2, y2);
-                ctx2.lineTo(x2 - 7 * Math.cos(ang - 0.4), y2 - 7 * Math.sin(ang - 0.4));
-                ctx2.lineTo(x2 - 7 * Math.cos(ang + 0.4), y2 - 7 * Math.sin(ang + 0.4));
-                ctx2.fill();
-              }
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Surface',
-                options: [
-                  { value: 'sphere', label: 'Sphere S\u00B2 (\u03C7=2)' },
-                  { value: 'torus', label: 'Torus T\u00B2 (\u03C7=0)' },
-                  { value: 'genus2', label: 'Genus-2 \u03A3\u2082 (\u03C7=-2)' }
-                ],
-                action: (viz, value) => {
-                  viz.state.surface = value;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Field',
-                action: (viz) => {
-                  viz.state.showField = !viz.state.showField;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Zeros',
-                action: (viz) => {
-                  viz.state.showZeros = !viz.state.showZeros;
-                }
-              }
-            ]
+            // Select: Surface
+            var surfaceSelect = document.createElement('select');
+            surfaceSelect.style.background = '#161b22';
+            surfaceSelect.style.color = '#c9d1d9';
+            surfaceSelect.style.border = '1px solid #30363d';
+            surfaceSelect.style.padding = '4px 8px';
+            surfaceSelect.style.borderRadius = '4px';
+            [{value:'sphere',label:'Sphere S\u00B2 (\u03C7=2)'},{value:'torus',label:'Torus T\u00B2 (\u03C7=0)'},{value:'genus2',label:'Genus-2 \u03A3\u2082 (\u03C7=-2)'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value;
+              o.textContent = opt.label;
+              surfaceSelect.appendChild(o);
+            });
+            surfaceSelect.value = 'sphere';
+            surfaceSelect.onchange = function() { state.surface = surfaceSelect.value; draw(); };
+            controls.appendChild(surfaceSelect);
+
+            // Button: Toggle Field
+            var fieldBtn = document.createElement('button');
+            fieldBtn.textContent = 'Toggle Field';
+            fieldBtn.style.marginLeft = '10px';
+            fieldBtn.style.padding = '4px 12px';
+            fieldBtn.style.background = '#21262d';
+            fieldBtn.style.color = '#c9d1d9';
+            fieldBtn.style.border = '1px solid #30363d';
+            fieldBtn.style.borderRadius = '4px';
+            fieldBtn.style.cursor = 'pointer';
+            fieldBtn.onclick = function() { state.showField = !state.showField; draw(); };
+            controls.appendChild(fieldBtn);
+
+            // Button: Toggle Zeros
+            var zerosBtn = document.createElement('button');
+            zerosBtn.textContent = 'Toggle Zeros';
+            zerosBtn.style.marginLeft = '10px';
+            zerosBtn.style.padding = '4px 12px';
+            zerosBtn.style.background = '#21262d';
+            zerosBtn.style.color = '#c9d1d9';
+            zerosBtn.style.border = '1px solid #30363d';
+            zerosBtn.style.borderRadius = '4px';
+            zerosBtn.style.cursor = 'pointer';
+            zerosBtn.onclick = function() { state.showZeros = !state.showZeros; draw(); };
+            controls.appendChild(zerosBtn);
+
+            draw();
           }
         }
       ],
@@ -1246,19 +1238,7 @@ Alternatively: \\(\\chi(\\mathbb{C}P^3) = 1 + 1 + 1 + 1 = 4\\) (one cell in each
           id: 'pontryagin-ex1',
           question: 'Compute \\(p_1(T\\mathbb{C}P^2)\\) using the relation \\(p_1(E_{\\mathbb{R}}) = c_1(E)^2 - 2c_2(E)\\) and verify the Hirzebruch signature formula \\(\\sigma(\\mathbb{C}P^2) = \\frac{1}{3}p_1[\\mathbb{C}P^2]\\).',
           hint: 'For \\(T\\mathbb{C}P^2\\), we have \\(c_1 = 3h\\) and \\(c_2 = 3h^2\\). Use the formula \\(p_1 = c_1^2 - 2c_2\\).',
-          solution: `For \\(T\\mathbb{C}P^2\\) (a complex rank-2 bundle), \\(c(T\\mathbb{C}P^2) = (1+h)^3 = 1 + 3h + 3h^2\\), so \\(c_1 = 3h\\), \\(c_2 = 3h^2\\).
-
-Using \\(p_1(E_{\\mathbb{R}}) = c_1(E)^2 - 2c_2(E)\\):
-\\[ p_1(T\\mathbb{C}P^2) = (3h)^2 - 2(3h^2) = 9h^2 - 6h^2 = 3h^2 \\]
-
-Evaluating on the fundamental class:
-\\[ \\langle p_1, [\\mathbb{C}P^2] \\rangle = \\langle 3h^2, [\\mathbb{C}P^2] \\rangle = 3 \\]
-
-since \\(\\langle h^2, [\\mathbb{C}P^2] \\rangle = 1\\).
-
-Hirzebruch signature formula: \\(\\sigma(\\mathbb{C}P^2) = \\frac{1}{3} p_1[\\mathbb{C}P^2] = \\frac{1}{3} \\cdot 3 = 1\\).
-
-Indeed, \\(\\sigma(\\mathbb{C}P^2) = 1\\) since the intersection form on \\(H_2(\\mathbb{C}P^2; \\mathbb{Z}) \\cong \\mathbb{Z}\\) is \\(Q = (1)\\), which has signature 1. \\(\\checkmark\\)`
+          solution: 'For \\(T\\mathbb{C}P^2\\) (a complex rank-2 bundle), \\(c(T\\mathbb{C}P^2) = (1+h)^3 = 1 + 3h + 3h^2\\), so \\(c_1 = 3h\\), \\(c_2 = 3h^2\\).\n\nUsing \\(p_1(E_{\\mathbb{R}}) = c_1(E)^2 - 2c_2(E)\\):\n\\[ p_1(T\\mathbb{C}P^2) = (3h)^2 - 2(3h^2) = 9h^2 - 6h^2 = 3h^2 \\]\n\nEvaluating on the fundamental class:\n\\[ \\langle p_1, [\\mathbb{C}P^2] \\rangle = \\langle 3h^2, [\\mathbb{C}P^2] \\rangle = 3 \\]\n\nsince \\(\\langle h^2, [\\mathbb{C}P^2] \\rangle = 1\\).\n\nHirzebruch signature formula: \\(\\sigma(\\mathbb{C}P^2) = \\frac{1}{3} p_1[\\mathbb{C}P^2] = \\frac{1}{3} \\cdot 3 = 1\\).\n\nIndeed, \\(\\sigma(\\mathbb{C}P^2) = 1\\) since the intersection form on \\(H_2(\\mathbb{C}P^2; \\mathbb{Z}) \\cong \\mathbb{Z}\\) is \\(Q = (1)\\), which has signature 1. \\(\\checkmark\\)'
         }
       ]
     }

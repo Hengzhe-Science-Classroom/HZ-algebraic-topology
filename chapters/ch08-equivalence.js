@@ -63,24 +63,31 @@ window.CHAPTERS.push({
         <div class="env-block remark">
           <strong>Key Insight:</strong> Simplicial approximation allows us to replace continuous maps with combinatorial ones (simplicial maps), which induce chain maps algebraically. This bridges geometry and algebra.
         </div>
+
+        <div class="viz-placeholder" data-viz="subdivision-viz"></div>
+        <div class="viz-placeholder" data-viz="chain-map-viz"></div>
       `,
       visualizations: [
         {
           id: 'subdivision-viz',
           title: 'Subdivision Isomorphism Visualizer',
           description: 'See how barycentric subdivision refines a triangle and induces the same homology.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                level: 0,
-                maxLevel: 3,
-                showBarycenters: true,
-                showChain: false
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = {
+              level: 0,
+              showBarycenters: true,
+              showChain: false
+            };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
               const centerX = width / 2;
               const centerY = height / 2;
@@ -102,7 +109,7 @@ window.CHAPTERS.push({
                   y: (a.y + b.y + c.y) / 3
                 };
 
-                if (viz.state.showBarycenters && level === viz.state.level) {
+                if (state.showBarycenters && level === state.level) {
                   ctx.fillStyle = '#e74c3c';
                   ctx.beginPath();
                   ctx.arc(barycenter.x, barycenter.y, 4, 0, 2 * Math.PI);
@@ -113,18 +120,18 @@ window.CHAPTERS.push({
                 const mid12 = { x: (b.x + c.x) / 2, y: (b.y + c.y) / 2 };
                 const mid20 = { x: (c.x + a.x) / 2, y: (c.y + a.y) / 2 };
 
-                let result = [];
-                result.push(...subdivide([a, mid01, mid20], level - 1));
-                result.push(...subdivide([mid01, b, mid12], level - 1));
-                result.push(...subdivide([mid20, mid12, c], level - 1));
-                result.push(...subdivide([mid01, mid12, mid20], level - 1));
+                var result = [];
+                result.push.apply(result, subdivide([a, mid01, mid20], level - 1));
+                result.push.apply(result, subdivide([mid01, b, mid12], level - 1));
+                result.push.apply(result, subdivide([mid20, mid12, c], level - 1));
+                result.push.apply(result, subdivide([mid01, mid12, mid20], level - 1));
                 return result;
               }
 
-              const triangles = subdivide([v0, v1, v2], viz.state.level);
+              var triangles = subdivide([v0, v1, v2], state.level);
 
               // Draw subdivided triangles
-              triangles.forEach((tri, idx) => {
+              triangles.forEach(function(tri, idx) {
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
@@ -134,92 +141,118 @@ window.CHAPTERS.push({
                 ctx.closePath();
                 ctx.stroke();
 
-                if (viz.state.showChain) {
+                if (state.showChain) {
                   ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
                   ctx.fill();
                 }
               });
 
               // Draw original vertices
-              [v0, v1, v2].forEach((v, i) => {
+              [v0, v1, v2].forEach(function(v, i) {
                 ctx.fillStyle = '#2c3e50';
                 ctx.beginPath();
                 ctx.arc(v.x, v.y, 6, 0, 2 * Math.PI);
                 ctx.fill();
                 ctx.fillStyle = '#000';
                 ctx.font = '16px KaTeX_Main';
-                ctx.fillText(`v${i}`, v.x + 10, v.y - 10);
+                ctx.fillText('v' + i, v.x + 10, v.y - 10);
               });
 
               // Info text
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
-              ctx.fillText(`Subdivision level: ${viz.state.level}`, 10, 20);
-              ctx.fillText(`Triangles: ${triangles.length}`, 10, 40);
-              ctx.fillText(`Homology: H₀ = ℤ, H₁ = 0, H₂ = 0 (unchanged)`, 10, height - 10);
-            },
-            controls: [
-              {
-                type: 'slider',
-                id: 'level',
-                label: 'Subdivision Level',
-                min: 0,
-                max: 3,
-                step: 1,
-                value: 0
-              },
-              {
-                type: 'checkbox',
-                id: 'showBarycenters',
-                label: 'Show Barycenters',
-                value: true
-              },
-              {
-                type: 'checkbox',
-                id: 'showChain',
-                label: 'Highlight Chains',
-                value: false
-              }
-            ]
+              ctx.fillText('Subdivision level: ' + state.level, 10, 20);
+              ctx.fillText('Triangles: ' + triangles.length, 10, 40);
+              ctx.fillText('Homology: H\u2080 = \u2124, H\u2081 = 0, H\u2082 = 0 (unchanged)', 10, height - 10);
+            }
+
+            // Controls: slider for level
+            var levelLabel = document.createElement('label');
+            levelLabel.style.color = '#c9d1d9';
+            levelLabel.style.marginRight = '8px';
+            levelLabel.textContent = 'Subdivision Level: 0';
+            controls.appendChild(levelLabel);
+            var levelSlider = document.createElement('input');
+            levelSlider.type = 'range';
+            levelSlider.min = 0; levelSlider.max = 3; levelSlider.step = 1; levelSlider.value = 0;
+            levelSlider.style.width = '200px';
+            levelSlider.oninput = function() {
+              state.level = parseInt(levelSlider.value);
+              levelLabel.textContent = 'Subdivision Level: ' + levelSlider.value;
+              draw();
+            };
+            controls.appendChild(levelSlider);
+
+            // Checkbox: showBarycenters
+            var barContainer = document.createElement('label');
+            barContainer.style.color = '#c9d1d9';
+            barContainer.style.marginLeft = '15px';
+            barContainer.style.cursor = 'pointer';
+            var barCheckbox = document.createElement('input');
+            barCheckbox.type = 'checkbox';
+            barCheckbox.checked = true;
+            barCheckbox.onchange = function() { state.showBarycenters = barCheckbox.checked; draw(); };
+            barContainer.appendChild(barCheckbox);
+            barContainer.appendChild(document.createTextNode(' Show Barycenters'));
+            controls.appendChild(barContainer);
+
+            // Checkbox: showChain
+            var chainContainer = document.createElement('label');
+            chainContainer.style.color = '#c9d1d9';
+            chainContainer.style.marginLeft = '15px';
+            chainContainer.style.cursor = 'pointer';
+            var chainCheckbox = document.createElement('input');
+            chainCheckbox.type = 'checkbox';
+            chainCheckbox.checked = false;
+            chainCheckbox.onchange = function() { state.showChain = chainCheckbox.checked; draw(); };
+            chainContainer.appendChild(chainCheckbox);
+            chainContainer.appendChild(document.createTextNode(' Highlight Chains'));
+            controls.appendChild(chainContainer);
+
+            draw();
           }
         },
         {
           id: 'chain-map-viz',
           title: 'Chain Map Visualizer',
-          description: 'See how subdivision induces a chain map Sd: Cₙ → Cₙ.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                showOriginal: true,
-                showSubdivided: true,
-                showArrows: true,
-                step: 0
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          description: 'See how subdivision induces a chain map Sd: C\u2099 \u2192 C\u2099.',
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              showOriginal: true,
+              showSubdivided: true,
+              showArrows: true
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const leftX = width * 0.25;
-              const rightX = width * 0.75;
-              const centerY = height / 2;
-              const boxSize = 80;
+              var leftX = width * 0.25;
+              var rightX = width * 0.75;
+              var centerY = height / 2;
+              var boxSize = 80;
 
               // Original chain complex (left)
-              if (viz.state.showOriginal) {
+              if (state.showOriginal) {
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(leftX - boxSize / 2, centerY - boxSize / 2, boxSize, boxSize);
                 ctx.fillStyle = '#000';
                 ctx.font = '16px KaTeX_Main';
                 ctx.textAlign = 'center';
-                ctx.fillText('C₂(X)', leftX, centerY - boxSize);
-                ctx.fillText('1·σ', leftX, centerY);
+                ctx.fillText('C\u2082(X)', leftX, centerY - boxSize);
+                ctx.fillText('1\u00B7\u03C3', leftX, centerY);
 
-                // C₁
+                // C_1
                 ctx.strokeRect(leftX - boxSize / 2, centerY + boxSize, boxSize, boxSize / 2);
-                ctx.fillText('C₁(X)', leftX, centerY + boxSize - 10);
+                ctx.fillText('C\u2081(X)', leftX, centerY + boxSize - 10);
 
                 // Boundary arrow
                 ctx.strokeStyle = '#e74c3c';
@@ -235,26 +268,26 @@ window.CHAPTERS.push({
                 ctx.closePath();
                 ctx.fill();
                 ctx.fillStyle = '#000';
-                ctx.fillText('∂₂', leftX + 20, centerY + boxSize * 0.75);
+                ctx.fillText('\u2202\u2082', leftX + 20, centerY + boxSize * 0.75);
               }
 
               // Subdivided chain complex (right)
-              if (viz.state.showSubdivided) {
+              if (state.showSubdivided) {
                 ctx.strokeStyle = '#27ae60';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(rightX - boxSize / 2, centerY - boxSize / 2, boxSize, boxSize);
                 ctx.fillStyle = '#000';
                 ctx.font = '14px KaTeX_Main';
                 ctx.textAlign = 'center';
-                ctx.fillText('C₂(X)', rightX, centerY - boxSize);
-                ctx.fillText('4·Sd(σ)', rightX, centerY - 10);
+                ctx.fillText('C\u2082(X)', rightX, centerY - boxSize);
+                ctx.fillText('4\u00B7Sd(\u03C3)', rightX, centerY - 10);
                 ctx.font = '11px KaTeX_Main';
                 ctx.fillText('(4 subtriangles)', rightX, centerY + 10);
 
-                // C₁
+                // C_1
                 ctx.strokeRect(rightX - boxSize / 2, centerY + boxSize, boxSize, boxSize / 2);
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText('C₁(X)', rightX, centerY + boxSize - 10);
+                ctx.fillText('C\u2081(X)', rightX, centerY + boxSize - 10);
 
                 // Boundary arrow
                 ctx.strokeStyle = '#e74c3c';
@@ -269,11 +302,11 @@ window.CHAPTERS.push({
                 ctx.closePath();
                 ctx.fill();
                 ctx.fillStyle = '#000';
-                ctx.fillText('∂₂', rightX + 20, centerY + boxSize * 0.75);
+                ctx.fillText('\u2202\u2082', rightX + 20, centerY + boxSize * 0.75);
               }
 
               // Horizontal arrow (Sd map)
-              if (viz.state.showArrows) {
+              if (state.showArrows) {
                 ctx.strokeStyle = '#9b59b6';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
@@ -297,29 +330,49 @@ window.CHAPTERS.push({
               ctx.textAlign = 'left';
               ctx.font = '13px KaTeX_Main';
               ctx.fillStyle = '#000';
-              ctx.fillText('Subdivision is a chain map: ∂ ∘ Sd = Sd ∘ ∂', 10, height - 30);
-              ctx.fillText('Sd ≃ id ⟹ induces isomorphism on homology', 10, height - 10);
-            },
-            controls: [
-              {
-                type: 'checkbox',
-                id: 'showOriginal',
-                label: 'Show Original',
-                value: true
-              },
-              {
-                type: 'checkbox',
-                id: 'showSubdivided',
-                label: 'Show Subdivided',
-                value: true
-              },
-              {
-                type: 'checkbox',
-                id: 'showArrows',
-                label: 'Show Chain Map',
-                value: true
-              }
-            ]
+              ctx.fillText('Subdivision is a chain map: \u2202 \u2218 Sd = Sd \u2218 \u2202', 10, height - 30);
+              ctx.fillText('Sd \u2243 id \u27F9 induces isomorphism on homology', 10, height - 10);
+            }
+
+            // Checkbox: showOriginal
+            var origContainer = document.createElement('label');
+            origContainer.style.color = '#c9d1d9';
+            origContainer.style.marginRight = '15px';
+            origContainer.style.cursor = 'pointer';
+            var origCheckbox = document.createElement('input');
+            origCheckbox.type = 'checkbox';
+            origCheckbox.checked = true;
+            origCheckbox.onchange = function() { state.showOriginal = origCheckbox.checked; draw(); };
+            origContainer.appendChild(origCheckbox);
+            origContainer.appendChild(document.createTextNode(' Show Original'));
+            controls.appendChild(origContainer);
+
+            // Checkbox: showSubdivided
+            var subContainer = document.createElement('label');
+            subContainer.style.color = '#c9d1d9';
+            subContainer.style.marginRight = '15px';
+            subContainer.style.cursor = 'pointer';
+            var subCheckbox = document.createElement('input');
+            subCheckbox.type = 'checkbox';
+            subCheckbox.checked = true;
+            subCheckbox.onchange = function() { state.showSubdivided = subCheckbox.checked; draw(); };
+            subContainer.appendChild(subCheckbox);
+            subContainer.appendChild(document.createTextNode(' Show Subdivided'));
+            controls.appendChild(subContainer);
+
+            // Checkbox: showArrows
+            var arrowContainer = document.createElement('label');
+            arrowContainer.style.color = '#c9d1d9';
+            arrowContainer.style.cursor = 'pointer';
+            var arrowCheckbox = document.createElement('input');
+            arrowCheckbox.type = 'checkbox';
+            arrowCheckbox.checked = true;
+            arrowCheckbox.onchange = function() { state.showArrows = arrowCheckbox.checked; draw(); };
+            arrowContainer.appendChild(arrowCheckbox);
+            arrowContainer.appendChild(document.createTextNode(' Show Chain Map'));
+            controls.appendChild(arrowContainer);
+
+            draw();
           }
         }
       ],
@@ -328,31 +381,13 @@ window.CHAPTERS.push({
           id: 'ex-subdivision-1',
           question: 'Compute the first barycentric subdivision of the 1-simplex \\([v_0, v_1]\\). Show that \\(\\partial(\\text{Sd}([v_0, v_1])) = \\text{Sd}(\\partial([v_0, v_1]))\\).',
           hint: 'The barycenter is \\(\\hat{v} = (v_0 + v_1)/2\\). Subdivision gives two 1-simplices.',
-          solution: `The barycenter is \\(\\hat{v} = \\frac{v_0 + v_1}{2}\\). Then:
-          \\[
-          \\text{Sd}([v_0, v_1]) = [v_0, \\hat{v}] + [\\hat{v}, v_1]
-          \\]
-          Applying \\(\\partial\\):
-          \\[
-          \\partial(\\text{Sd}([v_0, v_1])) = \\partial([v_0, \\hat{v}]) + \\partial([\\hat{v}, v_1]) = (\\hat{v} - v_0) + (v_1 - \\hat{v}) = v_1 - v_0
-          \\]
-          On the other hand:
-          \\[
-          \\text{Sd}(\\partial([v_0, v_1])) = \\text{Sd}(v_1 - v_0) = v_1 - v_0
-          \\]
-          Thus \\(\\partial \\circ \\text{Sd} = \\text{Sd} \\circ \\partial\\). \\(\\square\\)`
+          solution: 'The barycenter is \\(\\hat{v} = \\frac{v_0 + v_1}{2}\\). Then:\n          \\[\n          \\text{Sd}([v_0, v_1]) = [v_0, \\hat{v}] + [\\hat{v}, v_1]\n          \\]\n          Applying \\(\\partial\\):\n          \\[\n          \\partial(\\text{Sd}([v_0, v_1])) = \\partial([v_0, \\hat{v}]) + \\partial([\\hat{v}, v_1]) = (\\hat{v} - v_0) + (v_1 - \\hat{v}) = v_1 - v_0\n          \\]\n          On the other hand:\n          \\[\n          \\text{Sd}(\\partial([v_0, v_1])) = \\text{Sd}(v_1 - v_0) = v_1 - v_0\n          \\]\n          Thus \\(\\partial \\circ \\text{Sd} = \\text{Sd} \\circ \\partial\\). \\(\\square\\)'
         },
         {
           id: 'ex-simplicial-approx',
           question: 'Let \\(f: S^1 \\to S^1\\), \\(z \\mapsto z^3\\). Describe a simplicial approximation using a triangulation with 6 vertices.',
           hint: 'Place vertices at \\(e^{2\\pi i k/6}\\) for \\(k = 0, \\ldots, 5\\). Map each vertex to the nearest vertex under \\(f\\).',
-          solution: `Triangulate \\(S^1\\) with vertices \\(v_k = e^{2\\pi i k/6}\\) for \\(k = 0, \\ldots, 5\\). Then \\(f(v_k) = e^{2\\pi i k/2}\\).
-
-          A simplicial approximation \\(\\phi\\) maps:
-          \\[
-          \\phi(v_k) = v_{3k \\mod 6}
-          \\]
-          For example, \\(\\phi(v_0) = v_0\\), \\(\\phi(v_1) = v_3\\), \\(\\phi(v_2) = v_0\\), etc. This wraps the circle 3 times, matching the degree of \\(f\\). \\(\\square\\)`
+          solution: 'Triangulate \\(S^1\\) with vertices \\(v_k = e^{2\\pi i k/6}\\) for \\(k = 0, \\ldots, 5\\). Then \\(f(v_k) = e^{2\\pi i k/2}\\).\n\n          A simplicial approximation \\(\\phi\\) maps:\n          \\[\n          \\phi(v_k) = v_{3k \\mod 6}\n          \\]\n          For example, \\(\\phi(v_0) = v_0\\), \\(\\phi(v_1) = v_3\\), \\(\\phi(v_2) = v_0\\), etc. This wraps the circle 3 times, matching the degree of \\(f\\). \\(\\square\\)'
         }
       ]
     },
@@ -425,40 +460,46 @@ window.CHAPTERS.push({
         <div class="env-block definition">
           <strong>Definition (Polyhedron):</strong> A <strong>polyhedron</strong> is a space \\(X\\) homeomorphic to \\(|K|\\) for some simplicial complex \\(K\\). Examples: all finite CW complexes, compact manifolds, graphs.
         </div>
+
+        <div class="viz-placeholder" data-viz="simplicial-singular-comparison"></div>
       `,
       visualizations: [
         {
           id: 'simplicial-singular-comparison',
           title: 'Simplicial vs Singular Comparison',
           description: 'Compare simplicial and singular homology computations side-by-side.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.8,
-            setup: (viz) => {
-              viz.state = {
-                space: 'circle', // 'circle', 'torus', 'sphere'
-                showSimplicial: true,
-                showSingular: true,
-                degree: 0
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.8);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              space: 'circle',
+              showSimplicial: true,
+              showSingular: true
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const leftX = width * 0.25;
-              const rightX = width * 0.75;
-              const centerY = height / 2;
+              var leftX = width * 0.25;
+              var rightX = width * 0.75;
+              var centerY = height / 2;
 
-              const spaces = {
-                circle: { name: 'S¹', H0: 'ℤ', H1: 'ℤ', H2: '0' },
-                torus: { name: 'T²', H0: 'ℤ', H1: 'ℤ²', H2: 'ℤ' },
-                sphere: { name: 'S²', H0: 'ℤ', H1: '0', H2: 'ℤ' }
+              var spaces = {
+                circle: { name: 'S\u00B9', H0: '\u2124', H1: '\u2124', H2: '0' },
+                torus: { name: 'T\u00B2', H0: '\u2124', H1: '\u2124\u00B2', H2: '\u2124' },
+                sphere: { name: 'S\u00B2', H0: '\u2124', H1: '0', H2: '\u2124' }
               };
 
-              const current = spaces[viz.state.space];
+              var current = spaces[state.space];
 
               // Simplicial side
-              if (viz.state.showSimplicial) {
+              if (state.showSimplicial) {
                 ctx.fillStyle = '#3498db';
                 ctx.font = 'bold 18px KaTeX_Main';
                 ctx.textAlign = 'center';
@@ -466,18 +507,18 @@ window.CHAPTERS.push({
 
                 ctx.fillStyle = '#000';
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(`Space: ${current.name}`, leftX, 60);
+                ctx.fillText('Space: ' + current.name, leftX, 60);
 
                 // Chain complex
-                const y0 = 100;
-                const spacing = 50;
-                ['C₂', 'C₁', 'C₀'].forEach((label, i) => {
+                var y0 = 100;
+                var spacing = 50;
+                ['C\u2082', 'C\u2081', 'C\u2080'].forEach(function(label, i) {
                   ctx.strokeStyle = '#3498db';
                   ctx.lineWidth = 2;
-                  const y = y0 + i * spacing;
+                  var y = y0 + i * spacing;
                   ctx.strokeRect(leftX - 40, y - 15, 80, 30);
                   ctx.fillStyle = '#000';
-                  ctx.fillText(`${label}ᐃ(X)`, leftX, y + 5);
+                  ctx.fillText(label + '\u1D43(X)', leftX, y + 5);
 
                   if (i < 2) {
                     ctx.strokeStyle = '#e74c3c';
@@ -494,23 +535,23 @@ window.CHAPTERS.push({
                     ctx.closePath();
                     ctx.fill();
                     ctx.fillStyle = '#000';
-                    ctx.fillText('∂', leftX + 25, y + spacing - 20);
+                    ctx.fillText('\u2202', leftX + 25, y + spacing - 20);
                   }
                 });
 
                 // Homology groups
                 ctx.font = '16px KaTeX_Main';
                 ctx.fillStyle = '#27ae60';
-                const resY = y0 + 180;
+                var resY = y0 + 180;
                 ctx.fillText('Results:', leftX, resY);
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(`H₀ = ${current.H0}`, leftX, resY + 25);
-                ctx.fillText(`H₁ = ${current.H1}`, leftX, resY + 45);
-                ctx.fillText(`H₂ = ${current.H2}`, leftX, resY + 65);
+                ctx.fillText('H\u2080 = ' + current.H0, leftX, resY + 25);
+                ctx.fillText('H\u2081 = ' + current.H1, leftX, resY + 45);
+                ctx.fillText('H\u2082 = ' + current.H2, leftX, resY + 65);
               }
 
               // Singular side
-              if (viz.state.showSingular) {
+              if (state.showSingular) {
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = 'bold 18px KaTeX_Main';
                 ctx.textAlign = 'center';
@@ -518,52 +559,52 @@ window.CHAPTERS.push({
 
                 ctx.fillStyle = '#000';
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(`Space: ${current.name}`, rightX, 60);
+                ctx.fillText('Space: ' + current.name, rightX, 60);
 
                 // Chain complex
-                const y0 = 100;
-                const spacing = 50;
-                ['C₂', 'C₁', 'C₀'].forEach((label, i) => {
+                var y0s = 100;
+                var spacings = 50;
+                ['C\u2082', 'C\u2081', 'C\u2080'].forEach(function(label, i) {
                   ctx.strokeStyle = '#9b59b6';
                   ctx.lineWidth = 2;
-                  const y = y0 + i * spacing;
+                  var y = y0s + i * spacings;
                   ctx.strokeRect(rightX - 40, y - 15, 80, 30);
                   ctx.fillStyle = '#000';
-                  ctx.fillText(`${label}(X)`, rightX, y + 5);
+                  ctx.fillText(label + '(X)', rightX, y + 5);
 
                   if (i < 2) {
                     ctx.strokeStyle = '#e74c3c';
                     ctx.beginPath();
                     ctx.moveTo(rightX, y + 15);
-                    ctx.lineTo(rightX, y + 15 + spacing - 30);
+                    ctx.lineTo(rightX, y + 15 + spacings - 30);
                     ctx.stroke();
                     ctx.fillStyle = '#e74c3c';
                     ctx.beginPath();
-                    ctx.moveTo(rightX, y + spacing - 15);
-                    ctx.lineTo(rightX - 4, y + spacing - 25);
-                    ctx.lineTo(rightX + 4, y + spacing - 25);
+                    ctx.moveTo(rightX, y + spacings - 15);
+                    ctx.lineTo(rightX - 4, y + spacings - 25);
+                    ctx.lineTo(rightX + 4, y + spacings - 25);
                     ctx.closePath();
                     ctx.fill();
                     ctx.fillStyle = '#000';
-                    ctx.fillText('∂', rightX + 25, y + spacing - 20);
+                    ctx.fillText('\u2202', rightX + 25, y + spacings - 20);
                   }
                 });
 
                 // Homology groups
                 ctx.font = '16px KaTeX_Main';
                 ctx.fillStyle = '#27ae60';
-                const resY = y0 + 180;
-                ctx.fillText('Results:', rightX, resY);
+                var resYs = y0s + 180;
+                ctx.fillText('Results:', rightX, resYs);
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(`H₀ = ${current.H0}`, rightX, resY + 25);
-                ctx.fillText(`H₁ = ${current.H1}`, rightX, resY + 45);
-                ctx.fillText(`H₂ = ${current.H2}`, rightX, resY + 65);
+                ctx.fillText('H\u2080 = ' + current.H0, rightX, resYs + 25);
+                ctx.fillText('H\u2081 = ' + current.H1, rightX, resYs + 45);
+                ctx.fillText('H\u2082 = ' + current.H2, rightX, resYs + 65);
               }
 
               // Equivalence arrow
               ctx.strokeStyle = '#f39c12';
               ctx.lineWidth = 4;
-              const arrowY = centerY + 50;
+              var arrowY = centerY + 50;
               ctx.beginPath();
               ctx.moveTo(leftX + 60, arrowY);
               ctx.lineTo(rightX - 60, arrowY);
@@ -586,35 +627,55 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 16px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText('≅', (leftX + rightX) / 2, arrowY - 10);
+              ctx.fillText('\u2245', (leftX + rightX) / 2, arrowY - 10);
               ctx.font = '12px KaTeX_Main';
               ctx.fillText('(for polyhedra)', (leftX + rightX) / 2, arrowY + 25);
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'space',
-                label: 'Space',
-                options: [
-                  { value: 'circle', label: 'Circle S¹' },
-                  { value: 'torus', label: 'Torus T²' },
-                  { value: 'sphere', label: 'Sphere S²' }
-                ],
-                value: 'circle'
-              },
-              {
-                type: 'checkbox',
-                id: 'showSimplicial',
-                label: 'Show Simplicial',
-                value: true
-              },
-              {
-                type: 'checkbox',
-                id: 'showSingular',
-                label: 'Show Singular',
-                value: true
-              }
-            ]
+            }
+
+            // Select: space
+            var spaceLabel = document.createElement('label');
+            spaceLabel.style.color = '#c9d1d9';
+            spaceLabel.style.marginRight = '8px';
+            spaceLabel.textContent = 'Space: ';
+            controls.appendChild(spaceLabel);
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22'; spaceSelect.style.color = '#c9d1d9'; spaceSelect.style.border = '1px solid #30363d'; spaceSelect.style.padding = '4px 8px'; spaceSelect.style.borderRadius = '4px';
+            [{value:'circle',label:'Circle S\u00B9'},{value:'torus',label:'Torus T\u00B2'},{value:'sphere',label:'Sphere S\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 'circle';
+            spaceSelect.onchange = function() { state.space = spaceSelect.value; draw(); };
+            controls.appendChild(spaceSelect);
+
+            // Checkbox: showSimplicial
+            var simpContainer = document.createElement('label');
+            simpContainer.style.color = '#c9d1d9';
+            simpContainer.style.marginLeft = '15px';
+            simpContainer.style.cursor = 'pointer';
+            var simpCheckbox = document.createElement('input');
+            simpCheckbox.type = 'checkbox';
+            simpCheckbox.checked = true;
+            simpCheckbox.onchange = function() { state.showSimplicial = simpCheckbox.checked; draw(); };
+            simpContainer.appendChild(simpCheckbox);
+            simpContainer.appendChild(document.createTextNode(' Show Simplicial'));
+            controls.appendChild(simpContainer);
+
+            // Checkbox: showSingular
+            var singContainer = document.createElement('label');
+            singContainer.style.color = '#c9d1d9';
+            singContainer.style.marginLeft = '15px';
+            singContainer.style.cursor = 'pointer';
+            var singCheckbox = document.createElement('input');
+            singCheckbox.type = 'checkbox';
+            singCheckbox.checked = true;
+            singCheckbox.onchange = function() { state.showSingular = singCheckbox.checked; draw(); };
+            singContainer.appendChild(singCheckbox);
+            singContainer.appendChild(document.createTextNode(' Show Singular'));
+            controls.appendChild(singContainer);
+
+            draw();
           }
         }
       ],
@@ -623,38 +684,13 @@ window.CHAPTERS.push({
           id: 'ex-equiv-1',
           question: 'Verify that the natural inclusion \\(i: C_n^\\Delta(S^1) \\to C_n(S^1)\\) is a chain map for the circle triangulated with 3 vertices.',
           hint: 'Check that \\(\\partial \\circ i = i \\circ \\partial\\) on a 1-simplex \\([v_0, v_1]\\).',
-          solution: `Triangulate \\(S^1\\) with vertices \\(v_0, v_1, v_2\\) and edges \\([v_0, v_1], [v_1, v_2], [v_2, v_0]\\).
-
-          For a simplicial 1-chain \\(c = [v_0, v_1]\\), we have:
-          \\[
-          \\partial([v_0, v_1]) = v_1 - v_0 \\quad \\text{(simplicial boundary)}
-          \\]
-          Applying \\(i\\):
-          \\[
-          i(\\partial([v_0, v_1])) = i(v_1 - v_0) = v_1 - v_0 \\quad \\text{(as singular 0-chains)}
-          \\]
-          On the other hand:
-          \\[
-          \\partial(i([v_0, v_1])) = \\partial([v_0, v_1]) = v_1 - v_0 \\quad \\text{(singular boundary)}
-          \\]
-          Thus \\(\\partial \\circ i = i \\circ \\partial\\), so \\(i\\) is a chain map. \\(\\square\\)`
+          solution: 'Triangulate \\(S^1\\) with vertices \\(v_0, v_1, v_2\\) and edges \\([v_0, v_1], [v_1, v_2], [v_2, v_0]\\).\n\n          For a simplicial 1-chain \\(c = [v_0, v_1]\\), we have:\n          \\[\n          \\partial([v_0, v_1]) = v_1 - v_0 \\quad \\text{(simplicial boundary)}\n          \\]\n          Applying \\(i\\):\n          \\[\n          i(\\partial([v_0, v_1])) = i(v_1 - v_0) = v_1 - v_0 \\quad \\text{(as singular 0-chains)}\n          \\]\n          On the other hand:\n          \\[\n          \\partial(i([v_0, v_1])) = \\partial([v_0, v_1]) = v_1 - v_0 \\quad \\text{(singular boundary)}\n          \\]\n          Thus \\(\\partial \\circ i = i \\circ \\partial\\), so \\(i\\) is a chain map. \\(\\square\\)'
         },
         {
           id: 'ex-equiv-2',
           question: 'Show that for \\(X = S^2\\) (2-sphere), \\(H_2^\\Delta(X) \\cong H_2(X) \\cong \\mathbb{Z}\\).',
           hint: 'Use a triangulation with 2 triangles glued along their boundaries.',
-          solution: `Triangulate \\(S^2\\) with upper and lower hemispheres as 2-simplices \\(\\sigma_+\\) and \\(\\sigma_-\\), sharing boundary \\(\\partial \\sigma_+ = -\\partial \\sigma_-\\) (the equator).
-
-          <strong>Simplicial:</strong> \\(C_2^\\Delta = \\langle \\sigma_+, \\sigma_- \\rangle \\cong \\mathbb{Z}^2\\). The boundary map:
-          \\[
-          \\partial_2(a\\sigma_+ + b\\sigma_-) = a(\\partial \\sigma_+) + b(\\partial \\sigma_-) = (a - b)(\\partial \\sigma_+)
-          \\]
-          Thus \\(\\ker \\partial_2 = \\langle \\sigma_+ + \\sigma_- \\rangle \\cong \\mathbb{Z}\\) (cycles are "whole sphere").
-          Since \\(\\text{im } \\partial_3 = 0\\), \\(H_2^\\Delta(S^2) = \\mathbb{Z}\\).
-
-          <strong>Singular:</strong> Any singular 2-cycle represents a multiple of the fundamental class \\([S^2]\\). By the equivalence theorem, \\(H_2(S^2) \\cong \\mathbb{Z}\\).
-
-          The isomorphism \\(i_*: H_2^\\Delta \\to H_2\\) sends \\([\\sigma_+ + \\sigma_-] \\mapsto [S^2]\\). \\(\\square\\)`
+          solution: 'Triangulate \\(S^2\\) with upper and lower hemispheres as 2-simplices \\(\\sigma_+\\) and \\(\\sigma_-\\), sharing boundary \\(\\partial \\sigma_+ = -\\partial \\sigma_-\\) (the equator).\n\n          <strong>Simplicial:</strong> \\(C_2^\\Delta = \\langle \\sigma_+, \\sigma_- \\rangle \\cong \\mathbb{Z}^2\\). The boundary map:\n          \\[\n          \\partial_2(a\\sigma_+ + b\\sigma_-) = a(\\partial \\sigma_+) + b(\\partial \\sigma_-) = (a - b)(\\partial \\sigma_+)\n          \\]\n          Thus \\(\\ker \\partial_2 = \\langle \\sigma_+ + \\sigma_- \\rangle \\cong \\mathbb{Z}\\) (cycles are "whole sphere").\n          Since \\(\\text{im } \\partial_3 = 0\\), \\(H_2^\\Delta(S^2) = \\mathbb{Z}\\).\n\n          <strong>Singular:</strong> Any singular 2-cycle represents a multiple of the fundamental class \\([S^2]\\). By the equivalence theorem, \\(H_2(S^2) \\cong \\mathbb{Z}\\).\n\n          The isomorphism \\(i_*: H_2^\\Delta \\to H_2\\) sends \\([\\sigma_+ + \\sigma_-] \\mapsto [S^2]\\). \\(\\square\\)'
         }
       ]
     },
@@ -740,73 +776,80 @@ window.CHAPTERS.push({
 
           Result: \\(H_0 = \\mathbb{Z}\\), \\(H_1 = \\mathbb{Z}/2\\), \\(H_2 = 0\\).
         </div>
+
+        <div class="viz-placeholder" data-viz="cw-builder"></div>
       `,
       visualizations: [
         {
           id: 'cw-builder',
           title: 'CW Complex Builder',
           description: 'Build CW complexes interactively by attaching cells.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                structure: 'sphere', // 'sphere', 'torus', 'rp2', 'custom'
-                dimension: 2,
-                showCells: true,
-                showAttaching: false
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              structure: 'sphere',
+              dimension: 2,
+              showCells: true,
+              showAttaching: false
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const centerX = width / 2;
-              const centerY = height / 2;
+              var centerX = width / 2;
+              var centerY = height / 2;
 
-              const structures = {
+              var structures = {
                 sphere: {
-                  name: 'S²',
+                  name: 'S\u00B2',
                   cells: [
-                    { dim: 0, label: 'e⁰', x: centerX, y: centerY - 100, color: '#e74c3c' },
-                    { dim: 2, label: 'e²', x: centerX, y: centerY + 50, color: '#3498db', radius: 80 }
+                    { dim: 0, label: 'e\u2070', x: centerX, y: centerY - 100, color: '#e74c3c' },
+                    { dim: 2, label: 'e\u00B2', x: centerX, y: centerY + 50, color: '#3498db', radius: 80 }
                   ],
-                  description: 'S² = e⁰ ∪ e²'
+                  description: 'S\u00B2 = e\u2070 \u222A e\u00B2'
                 },
                 torus: {
-                  name: 'T²',
+                  name: 'T\u00B2',
                   cells: [
-                    { dim: 0, label: 'e⁰', x: centerX, y: centerY - 100, color: '#e74c3c' },
-                    { dim: 1, label: 'e¹ₐ', x: centerX - 80, y: centerY, color: '#27ae60' },
-                    { dim: 1, label: 'e¹ᵦ', x: centerX + 80, y: centerY, color: '#27ae60' },
-                    { dim: 2, label: 'e²', x: centerX, y: centerY + 80, color: '#3498db', radius: 60 }
+                    { dim: 0, label: 'e\u2070', x: centerX, y: centerY - 100, color: '#e74c3c' },
+                    { dim: 1, label: 'e\u00B9\u2090', x: centerX - 80, y: centerY, color: '#27ae60' },
+                    { dim: 1, label: 'e\u00B9\u1D47', x: centerX + 80, y: centerY, color: '#27ae60' },
+                    { dim: 2, label: 'e\u00B2', x: centerX, y: centerY + 80, color: '#3498db', radius: 60 }
                   ],
-                  description: 'T² = e⁰ ∪ e¹ₐ ∪ e¹ᵦ ∪ e²'
+                  description: 'T\u00B2 = e\u2070 \u222A e\u00B9\u2090 \u222A e\u00B9\u1D47 \u222A e\u00B2'
                 },
                 rp2: {
-                  name: 'ℝP²',
+                  name: '\u211DP\u00B2',
                   cells: [
-                    { dim: 0, label: 'e⁰', x: centerX - 100, y: centerY, color: '#e74c3c' },
-                    { dim: 1, label: 'e¹', x: centerX, y: centerY, color: '#27ae60' },
-                    { dim: 2, label: 'e²', x: centerX + 100, y: centerY, color: '#3498db', radius: 50 }
+                    { dim: 0, label: 'e\u2070', x: centerX - 100, y: centerY, color: '#e74c3c' },
+                    { dim: 1, label: 'e\u00B9', x: centerX, y: centerY, color: '#27ae60' },
+                    { dim: 2, label: 'e\u00B2', x: centerX + 100, y: centerY, color: '#3498db', radius: 50 }
                   ],
-                  description: 'ℝP² = e⁰ ∪ e¹ ∪ e²'
+                  description: '\u211DP\u00B2 = e\u2070 \u222A e\u00B9 \u222A e\u00B2'
                 }
               };
 
-              const current = structures[viz.state.structure];
+              var current = structures[state.structure];
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 20px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`CW Structure: ${current.name}`, centerX, 30);
+              ctx.fillText('CW Structure: ' + current.name, centerX, 30);
               ctx.font = '14px KaTeX_Main';
               ctx.fillText(current.description, centerX, 55);
 
               // Draw cells
-              if (viz.state.showCells) {
-                current.cells.forEach(cell => {
-                  if (cell.dim <= viz.state.dimension) {
+              if (state.showCells) {
+                current.cells.forEach(function(cell) {
+                  if (cell.dim <= state.dimension) {
                     if (cell.dim === 0) {
                       // 0-cell (point)
                       ctx.fillStyle = cell.color;
@@ -844,20 +887,20 @@ window.CHAPTERS.push({
               }
 
               // Show attaching maps
-              if (viz.state.showAttaching && viz.state.structure === 'sphere') {
+              if (state.showAttaching && state.structure === 'sphere') {
                 ctx.strokeStyle = '#9b59b6';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([5, 5]);
                 ctx.beginPath();
-                const e0 = current.cells[0];
-                const e2 = current.cells[1];
+                var e0 = current.cells[0];
+                var e2 = current.cells[1];
                 ctx.moveTo(e2.x, e2.y - e2.radius);
                 ctx.lineTo(e0.x, e0.y);
                 ctx.stroke();
                 ctx.setLineDash([]);
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = '12px KaTeX_Main';
-                ctx.fillText('∂e² → e⁰', centerX + 40, centerY - 30);
+                ctx.fillText('\u2202e\u00B2 \u2192 e\u2070', centerX + 40, centerY - 30);
                 ctx.fillText('(boundary collapses)', centerX + 40, centerY - 15);
               }
 
@@ -865,47 +908,76 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
               ctx.textAlign = 'left';
-              const cells0 = current.cells.filter(c => c.dim === 0).length;
-              const cells1 = current.cells.filter(c => c.dim === 1).length;
-              const cells2 = current.cells.filter(c => c.dim === 2).length;
-              ctx.fillText(`0-cells: ${cells0}`, 10, height - 60);
-              ctx.fillText(`1-cells: ${cells1}`, 10, height - 40);
-              ctx.fillText(`2-cells: ${cells2}`, 10, height - 20);
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'structure',
-                label: 'CW Structure',
-                options: [
-                  { value: 'sphere', label: 'S² (Sphere)' },
-                  { value: 'torus', label: 'T² (Torus)' },
-                  { value: 'rp2', label: 'ℝP² (Projective Plane)' }
-                ],
-                value: 'sphere'
-              },
-              {
-                type: 'slider',
-                id: 'dimension',
-                label: 'Show up to dimension',
-                min: 0,
-                max: 2,
-                step: 1,
-                value: 2
-              },
-              {
-                type: 'checkbox',
-                id: 'showCells',
-                label: 'Show Cells',
-                value: true
-              },
-              {
-                type: 'checkbox',
-                id: 'showAttaching',
-                label: 'Show Attaching Maps',
-                value: false
-              }
-            ]
+              var cells0 = current.cells.filter(function(c) { return c.dim === 0; }).length;
+              var cells1 = current.cells.filter(function(c) { return c.dim === 1; }).length;
+              var cells2 = current.cells.filter(function(c) { return c.dim === 2; }).length;
+              ctx.fillText('0-cells: ' + cells0, 10, height - 60);
+              ctx.fillText('1-cells: ' + cells1, 10, height - 40);
+              ctx.fillText('2-cells: ' + cells2, 10, height - 20);
+            }
+
+            // Select: structure
+            var structLabel = document.createElement('label');
+            structLabel.style.color = '#c9d1d9';
+            structLabel.style.marginRight = '8px';
+            structLabel.textContent = 'CW Structure: ';
+            controls.appendChild(structLabel);
+            var structSelect = document.createElement('select');
+            structSelect.style.background = '#161b22'; structSelect.style.color = '#c9d1d9'; structSelect.style.border = '1px solid #30363d'; structSelect.style.padding = '4px 8px'; structSelect.style.borderRadius = '4px';
+            [{value:'sphere',label:'S\u00B2 (Sphere)'},{value:'torus',label:'T\u00B2 (Torus)'},{value:'rp2',label:'\u211DP\u00B2 (Projective Plane)'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              structSelect.appendChild(o);
+            });
+            structSelect.value = 'sphere';
+            structSelect.onchange = function() { state.structure = structSelect.value; draw(); };
+            controls.appendChild(structSelect);
+
+            // Slider: dimension
+            var dimLabel = document.createElement('label');
+            dimLabel.style.color = '#c9d1d9';
+            dimLabel.style.marginLeft = '15px';
+            dimLabel.style.marginRight = '8px';
+            dimLabel.textContent = 'Show up to dimension: 2';
+            controls.appendChild(dimLabel);
+            var dimSlider = document.createElement('input');
+            dimSlider.type = 'range';
+            dimSlider.min = 0; dimSlider.max = 2; dimSlider.step = 1; dimSlider.value = 2;
+            dimSlider.style.width = '120px';
+            dimSlider.oninput = function() {
+              state.dimension = parseInt(dimSlider.value);
+              dimLabel.textContent = 'Show up to dimension: ' + dimSlider.value;
+              draw();
+            };
+            controls.appendChild(dimSlider);
+
+            // Checkbox: showCells
+            var cellContainer = document.createElement('label');
+            cellContainer.style.color = '#c9d1d9';
+            cellContainer.style.marginLeft = '15px';
+            cellContainer.style.cursor = 'pointer';
+            var cellCheckbox = document.createElement('input');
+            cellCheckbox.type = 'checkbox';
+            cellCheckbox.checked = true;
+            cellCheckbox.onchange = function() { state.showCells = cellCheckbox.checked; draw(); };
+            cellContainer.appendChild(cellCheckbox);
+            cellContainer.appendChild(document.createTextNode(' Show Cells'));
+            controls.appendChild(cellContainer);
+
+            // Checkbox: showAttaching
+            var attachContainer = document.createElement('label');
+            attachContainer.style.color = '#c9d1d9';
+            attachContainer.style.marginLeft = '15px';
+            attachContainer.style.cursor = 'pointer';
+            var attachCheckbox = document.createElement('input');
+            attachCheckbox.type = 'checkbox';
+            attachCheckbox.checked = false;
+            attachCheckbox.onchange = function() { state.showAttaching = attachCheckbox.checked; draw(); };
+            attachContainer.appendChild(attachCheckbox);
+            attachContainer.appendChild(document.createTextNode(' Show Attaching Maps'));
+            controls.appendChild(attachContainer);
+
+            draw();
           }
         }
       ],
@@ -914,38 +986,13 @@ window.CHAPTERS.push({
           id: 'ex-cw-1',
           question: 'Describe a CW structure on the circle \\(S^1\\) with one 0-cell and one 1-cell. What is the attaching map?',
           hint: 'Attach \\(D^1 = [0, 1]\\) by sending both endpoints to the same point.',
-          solution: `Choose one 0-cell \\(e^0 = \\{\\text{pt}\\}\\). Then attach a 1-cell \\(e^1 = [0, 1]\\) via:
-          \\[
-          \\phi: \\partial D^1 = \\{0, 1\\} \\to e^0
-          \\]
-          sending both \\(0\\) and \\(1\\) to the single 0-cell. The result is \\(S^1 = e^0 \\cup e^1\\).
-
-          Cellular complex:
-          \\[
-          0 \\to \\mathbb{Z} \\xrightarrow{d_1 = 0} \\mathbb{Z} \\to 0
-          \\]
-          (boundary of the 1-cell is \\(1 - 1 = 0\\) since both ends attach to the same point).
-
-          Thus \\(H_0(S^1) = \\mathbb{Z}\\), \\(H_1(S^1) = \\mathbb{Z}\\). \\(\\square\\)`
+          solution: 'Choose one 0-cell \\(e^0 = \\{\\text{pt}\\}\\). Then attach a 1-cell \\(e^1 = [0, 1]\\) via:\n          \\[\n          \\phi: \\partial D^1 = \\{0, 1\\} \\to e^0\n          \\]\n          sending both \\(0\\) and \\(1\\) to the single 0-cell. The result is \\(S^1 = e^0 \\cup e^1\\).\n\n          Cellular complex:\n          \\[\n          0 \\to \\mathbb{Z} \\xrightarrow{d_1 = 0} \\mathbb{Z} \\to 0\n          \\]\n          (boundary of the 1-cell is \\(1 - 1 = 0\\) since both ends attach to the same point).\n\n          Thus \\(H_0(S^1) = \\mathbb{Z}\\), \\(H_1(S^1) = \\mathbb{Z}\\). \\(\\square\\)'
         },
         {
           id: 'ex-cw-2',
           question: 'Show that \\(\\mathbb{R}P^2\\) has a CW structure with cells \\(e^0, e^1, e^2\\). Describe the attaching maps.',
           hint: 'Start with a point, attach a 1-cell (loop), then attach a 2-cell via the double cover \\(S^1 \\to S^1\\).',
-          solution: `<strong>CW structure:</strong>
-          <ul>
-            <li>\\(X^0 = e^0\\): a single point.</li>
-            <li>\\(X^1 = e^0 \\cup e^1\\): attach \\(D^1\\) with both endpoints identified (forming \\(\\mathbb{R}P^1 \\cong S^1\\)).</li>
-            <li>\\(X^2 = \\mathbb{R}P^2\\): attach \\(D^2\\) via \\(\\phi: S^1 \\to \\mathbb{R}P^1\\), the 2-to-1 quotient map (identifies antipodal points).</li>
-          </ul>
-
-          <strong>Attaching map for \\(e^2\\):</strong> The map \\(\\phi: S^1 \\to S^1\\), \\(z \\mapsto z^2\\) (degree 2 covering). This "wraps" the boundary of the 2-disk twice around \\(\\mathbb{R}P^1\\), creating the twisted topology of \\(\\mathbb{R}P^2\\).
-
-          <strong>Cellular chain complex:</strong>
-          \\[
-          0 \\to \\mathbb{Z} \\xrightarrow{d_2 = 2} \\mathbb{Z} \\xrightarrow{d_1 = 0} \\mathbb{Z} \\to 0
-          \\]
-          (The degree 2 map gives \\(d_2 = 2\\); we'll compute this carefully in Chapter 10.) \\(\\square\\)`
+          solution: '<strong>CW structure:</strong>\n          <ul>\n            <li>\\(X^0 = e^0\\): a single point.</li>\n            <li>\\(X^1 = e^0 \\cup e^1\\): attach \\(D^1\\) with both endpoints identified (forming \\(\\mathbb{R}P^1 \\cong S^1\\)).</li>\n            <li>\\(X^2 = \\mathbb{R}P^2\\): attach \\(D^2\\) via \\(\\phi: S^1 \\to \\mathbb{R}P^1\\), the 2-to-1 quotient map (identifies antipodal points).</li>\n          </ul>\n\n          <strong>Attaching map for \\(e^2\\):</strong> The map \\(\\phi: S^1 \\to S^1\\), \\(z \\mapsto z^2\\) (degree 2 covering). This "wraps" the boundary of the 2-disk twice around \\(\\mathbb{R}P^1\\), creating the twisted topology of \\(\\mathbb{R}P^2\\).\n\n          <strong>Cellular chain complex:</strong>\n          \\[\n          0 \\to \\mathbb{Z} \\xrightarrow{d_2 = 2} \\mathbb{Z} \\xrightarrow{d_1 = 0} \\mathbb{Z} \\to 0\n          \\]\n          (The degree 2 map gives \\(d_2 = 2\\); we\'ll compute this carefully in Chapter 10.) \\(\\square\\)'
         }
       ]
     }

@@ -1,4 +1,4 @@
-// === VizEngine: Visualization toolkit for linear algebra ===
+// === VizEngine: Visualization toolkit for algebraic topology ===
 class VizEngine {
     constructor(container, opts = {}) {
         // Responsive: use container width if available, but respect explicit opts

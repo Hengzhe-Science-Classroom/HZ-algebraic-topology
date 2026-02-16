@@ -81,33 +81,35 @@ window.CHAPTERS.push({
           </ul>
           <p>The chain complex of the tensor product correctly computes \\(H_*(I \\times I) = H_*(*) = \\mathbb{Z}\\) concentrated in degree 0, since \\(I \\times I\\) is contractible.</p>
         </div>
+        <div class="viz-placeholder" data-viz="product-space-builder"></div>
       `,
       visualizations: [
         {
           id: 'product-space-builder',
           title: 'Product Space Cell Structure',
           description: 'Visualize how cells of X and Y combine to form cells of X x Y',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                spaceX: 'S1',
-                spaceY: 'S1',
-                animPhase: 0,
-                showLabels: true,
-                highlightDeg: -1
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = { spaceX: 'S1', spaceY: 'S1', animPhase: 0, showLabels: true, highlightDeg: -1 };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.012;
-              const t = viz.state.animPhase;
+              state.animPhase += 0.012;
+              const t = state.animPhase;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'left';
 
-              const spX = viz.state.spaceX;
-              const spY = viz.state.spaceY;
+              const spX = state.spaceX;
+              const spY = state.spaceY;
 
               const cellData = {
                 'S1': { name: 'S\u00B9', cells: [{dim: 0, label: 'e\u2070', count: 1}, {dim: 1, label: 'e\u00B9', count: 1}] },
@@ -148,13 +150,13 @@ window.CHAPTERS.push({
                 const x0 = 20 + d * (boxW + gap);
                 const cells = byDeg[d] || [];
 
-                const isHighlighted = viz.state.highlightDeg === d;
+                const isHighlighted = state.highlightDeg === d;
                 ctx.fillStyle = isHighlighted ? '#e74c3c' : '#7f8c8d';
                 ctx.font = 'bold 14px serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('deg ' + d, x0 + boxW / 2, startY);
 
-                cells.forEach((pc, i) => {
+                cells.forEach(function(pc, i) {
                   const y0 = startY + 12 + i * (boxH + 6);
                   const pulse = isHighlighted ? 0.15 + 0.1 * Math.sin(t * 3) : 0;
 
@@ -166,7 +168,7 @@ window.CHAPTERS.push({
                   ctx.lineWidth = isHighlighted ? 2.5 : 1.5;
                   ctx.strokeRect(x0, y0, boxW, boxH);
 
-                  if (viz.state.showLabels) {
+                  if (state.showLabels) {
                     ctx.fillStyle = '#2c3e50';
                     ctx.font = '13px serif';
                     ctx.textAlign = 'center';
@@ -202,44 +204,45 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#7f8c8d';
               ctx.font = '13px serif';
               ctx.fillText('dim(e_X \u2297 e_Y) = dim(e_X) + dim(e_Y)', 20, height - 10);
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Space X',
-                options: [
-                  { value: 'S1', label: 'S\u00B9' },
-                  { value: 'S2', label: 'S\u00B2' },
-                  { value: 'I', label: 'Interval I' },
-                  { value: 'T2', label: 'T\u00B2' }
-                ],
-                action: (viz, value) => { viz.state.spaceX = value; }
-              },
-              {
-                type: 'select',
-                label: 'Space Y',
-                options: [
-                  { value: 'S1', label: 'S\u00B9' },
-                  { value: 'S2', label: 'S\u00B2' },
-                  { value: 'I', label: 'Interval I' },
-                  { value: 'T2', label: 'T\u00B2' }
-                ],
-                action: (viz, value) => { viz.state.spaceY = value; }
-              },
-              {
-                type: 'select',
-                label: 'Highlight degree',
-                options: [
-                  { value: '-1', label: 'None' },
-                  { value: '0', label: 'Degree 0' },
-                  { value: '1', label: 'Degree 1' },
-                  { value: '2', label: 'Degree 2' },
-                  { value: '3', label: 'Degree 3' },
-                  { value: '4', label: 'Degree 4' }
-                ],
-                action: (viz, value) => { viz.state.highlightDeg = parseInt(value); }
-              }
-            ]
+            }
+
+            // Select: Space X
+            var spaceXLabel = document.createElement('label');
+            spaceXLabel.style.color = '#c9d1d9'; spaceXLabel.style.marginRight = '8px';
+            spaceXLabel.textContent = 'Space X: ';
+            controls.appendChild(spaceXLabel);
+            var spaceXSelect = document.createElement('select');
+            spaceXSelect.style.background = '#161b22'; spaceXSelect.style.color = '#c9d1d9'; spaceXSelect.style.border = '1px solid #30363d'; spaceXSelect.style.padding = '4px 8px'; spaceXSelect.style.borderRadius = '4px';
+            [{value:'S1',label:'S\u00B9'},{value:'S2',label:'S\u00B2'},{value:'I',label:'Interval I'},{value:'T2',label:'T\u00B2'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; spaceXSelect.appendChild(o); });
+            spaceXSelect.value = 'S1';
+            spaceXSelect.onchange = function() { state.spaceX = spaceXSelect.value; draw(); };
+            controls.appendChild(spaceXSelect);
+
+            // Select: Space Y
+            var spaceYLabel = document.createElement('label');
+            spaceYLabel.style.color = '#c9d1d9'; spaceYLabel.style.marginLeft = '15px'; spaceYLabel.style.marginRight = '8px';
+            spaceYLabel.textContent = 'Space Y: ';
+            controls.appendChild(spaceYLabel);
+            var spaceYSelect = document.createElement('select');
+            spaceYSelect.style.background = '#161b22'; spaceYSelect.style.color = '#c9d1d9'; spaceYSelect.style.border = '1px solid #30363d'; spaceYSelect.style.padding = '4px 8px'; spaceYSelect.style.borderRadius = '4px';
+            [{value:'S1',label:'S\u00B9'},{value:'S2',label:'S\u00B2'},{value:'I',label:'Interval I'},{value:'T2',label:'T\u00B2'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; spaceYSelect.appendChild(o); });
+            spaceYSelect.value = 'S1';
+            spaceYSelect.onchange = function() { state.spaceY = spaceYSelect.value; draw(); };
+            controls.appendChild(spaceYSelect);
+
+            // Select: Highlight degree
+            var hlLabel = document.createElement('label');
+            hlLabel.style.color = '#c9d1d9'; hlLabel.style.marginLeft = '15px'; hlLabel.style.marginRight = '8px';
+            hlLabel.textContent = 'Highlight degree: ';
+            controls.appendChild(hlLabel);
+            var hlSelect = document.createElement('select');
+            hlSelect.style.background = '#161b22'; hlSelect.style.color = '#c9d1d9'; hlSelect.style.border = '1px solid #30363d'; hlSelect.style.padding = '4px 8px'; hlSelect.style.borderRadius = '4px';
+            [{value:'-1',label:'None'},{value:'0',label:'Degree 0'},{value:'1',label:'Degree 1'},{value:'2',label:'Degree 2'},{value:'3',label:'Degree 3'},{value:'4',label:'Degree 4'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; hlSelect.appendChild(o); });
+            hlSelect.value = '-1';
+            hlSelect.onchange = function() { state.highlightDeg = parseInt(hlSelect.value); draw(); };
+            controls.appendChild(hlSelect);
+
+            draw();
           }
         }
       ],
@@ -341,21 +344,25 @@ This matches \\(H_*(T^2; \\mathbb{Z})\\). \\(\\checkmark\\)`
           </ul>
           <p>Tor appears in the Künneth formula for homology; Ext appears in the Universal Coefficient Theorem for cohomology.</p>
         </div>
+        <div class="viz-placeholder" data-viz="tor-calculator"></div>
       `,
       visualizations: [
         {
           id: 'tor-calculator',
           title: 'Tor Calculator',
           description: 'Compute Tor(A, B) for cyclic groups step by step via free resolutions',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                groupA: 'Z2',
-                groupB: 'Z4',
-                showResolution: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = { groupA: 'Z2', groupB: 'Z4', showResolution: true };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
               const groups = {
@@ -366,27 +373,27 @@ This matches \\(H_*(T^2; \\mathbb{Z})\\). \\(\\checkmark\\)`
                 Z6: { name: 'Z/6', display: '\u2124/6', n: 6, isFree: false }
               };
 
-              const A = groups[viz.state.groupA];
-              const B = groups[viz.state.groupB];
+              const A = groups[state.groupA];
+              const B = groups[state.groupB];
 
               function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
 
-              let torResult;
+              var torResult;
               if (A.isFree || B.isFree) {
                 torResult = '0';
               } else {
-                const g = gcd(A.n, B.n);
+                var g = gcd(A.n, B.n);
                 torResult = g === 1 ? '0' : '\u2124/' + g;
               }
 
-              let tensorResult;
+              var tensorResult;
               if (A.isFree) {
                 tensorResult = B.display;
               } else if (B.isFree) {
                 tensorResult = A.display;
               } else {
-                const g = gcd(A.n, B.n);
-                tensorResult = g === 1 ? '0' : '\u2124/' + g;
+                var g2 = gcd(A.n, B.n);
+                tensorResult = g2 === 1 ? '0' : '\u2124/' + g2;
               }
 
               const cx = width / 2;
@@ -396,7 +403,7 @@ This matches \\(H_*(T^2; \\mathbb{Z})\\). \\(\\checkmark\\)`
               ctx.textAlign = 'center';
               ctx.fillText('Tor(' + A.display + ', ' + B.display + ') via Free Resolution', cx, 28);
 
-              if (viz.state.showResolution && !A.isFree) {
+              if (state.showResolution && !A.isFree) {
                 const resY = 70;
                 ctx.fillStyle = '#2c3e50';
                 ctx.font = 'bold 14px serif';
@@ -411,14 +418,14 @@ This matches \\(H_*(T^2; \\mathbb{Z})\\). \\(\\checkmark\\)`
                 const labels = ['0', '\u2124', '\u2124', A.display, '0'];
                 const arrows = ['', '\u00D7' + A.n, 'proj', '', ''];
 
-                labels.forEach((label, i) => {
+                labels.forEach(function(label, i) {
                   ctx.fillStyle = '#2c3e50';
                   ctx.font = '15px serif';
                   ctx.fillText(label, positions[i], seqY);
 
                   if (i < labels.length - 1) {
-                    const fromX = positions[i] + 20;
-                    const toX = positions[i + 1] - 20;
+                    var fromX = positions[i] + 20;
+                    var toX = positions[i + 1] - 20;
                     ctx.strokeStyle = '#7f8c8d';
                     ctx.lineWidth = 1.5;
                     ctx.beginPath();
@@ -480,9 +487,9 @@ This matches \\(H_*(T^2; \\mathbb{Z})\\). \\(\\checkmark\\)`
 
                 ctx.strokeStyle = '#27ae60';
                 ctx.lineWidth = 3;
-                const boxW = 200;
-                const boxH = 50;
-                ctx.strokeRect(cx - boxW / 2, resltY + 15, boxW, boxH);
+                var bxW = 200;
+                var bxH = 50;
+                ctx.strokeRect(cx - bxW / 2, resltY + 15, bxW, bxH);
                 ctx.fillStyle = '#27ae60';
                 ctx.font = 'bold 22px serif';
                 ctx.textAlign = 'center';
@@ -511,33 +518,33 @@ This matches \\(H_*(T^2; \\mathbb{Z})\\). \\(\\checkmark\\)`
               ctx.font = '13px serif';
               ctx.textAlign = 'center';
               ctx.fillText('For comparison: ' + A.display + ' \u2297 ' + B.display + ' = ' + tensorResult, cx, bottomY);
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Group A',
-                options: [
-                  { value: 'Z', label: '\u2124 (free)' },
-                  { value: 'Z2', label: '\u2124/2' },
-                  { value: 'Z3', label: '\u2124/3' },
-                  { value: 'Z4', label: '\u2124/4' },
-                  { value: 'Z6', label: '\u2124/6' }
-                ],
-                action: (viz, value) => { viz.state.groupA = value; }
-              },
-              {
-                type: 'select',
-                label: 'Group B',
-                options: [
-                  { value: 'Z', label: '\u2124 (free)' },
-                  { value: 'Z2', label: '\u2124/2' },
-                  { value: 'Z3', label: '\u2124/3' },
-                  { value: 'Z4', label: '\u2124/4' },
-                  { value: 'Z6', label: '\u2124/6' }
-                ],
-                action: (viz, value) => { viz.state.groupB = value; }
-              }
-            ]
+            }
+
+            // Select: Group A
+            var groupALabel = document.createElement('label');
+            groupALabel.style.color = '#c9d1d9'; groupALabel.style.marginRight = '8px';
+            groupALabel.textContent = 'Group A: ';
+            controls.appendChild(groupALabel);
+            var groupASelect = document.createElement('select');
+            groupASelect.style.background = '#161b22'; groupASelect.style.color = '#c9d1d9'; groupASelect.style.border = '1px solid #30363d'; groupASelect.style.padding = '4px 8px'; groupASelect.style.borderRadius = '4px';
+            [{value:'Z',label:'\u2124 (free)'},{value:'Z2',label:'\u2124/2'},{value:'Z3',label:'\u2124/3'},{value:'Z4',label:'\u2124/4'},{value:'Z6',label:'\u2124/6'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; groupASelect.appendChild(o); });
+            groupASelect.value = 'Z2';
+            groupASelect.onchange = function() { state.groupA = groupASelect.value; draw(); };
+            controls.appendChild(groupASelect);
+
+            // Select: Group B
+            var groupBLabel = document.createElement('label');
+            groupBLabel.style.color = '#c9d1d9'; groupBLabel.style.marginLeft = '15px'; groupBLabel.style.marginRight = '8px';
+            groupBLabel.textContent = 'Group B: ';
+            controls.appendChild(groupBLabel);
+            var groupBSelect = document.createElement('select');
+            groupBSelect.style.background = '#161b22'; groupBSelect.style.color = '#c9d1d9'; groupBSelect.style.border = '1px solid #30363d'; groupBSelect.style.padding = '4px 8px'; groupBSelect.style.borderRadius = '4px';
+            [{value:'Z',label:'\u2124 (free)'},{value:'Z2',label:'\u2124/2'},{value:'Z3',label:'\u2124/3'},{value:'Z4',label:'\u2124/4'},{value:'Z6',label:'\u2124/6'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; groupBSelect.appendChild(o); });
+            groupBSelect.value = 'Z4';
+            groupBSelect.onchange = function() { state.groupB = groupBSelect.value; draw(); };
+            controls.appendChild(groupBSelect);
+
+            draw();
           }
         }
       ],
@@ -642,33 +649,38 @@ Therefore:
           \\]
           <p>So \\(H_3(\\mathbb{R}P^2 \\times \\mathbb{R}P^2) = \\mathbb{Z}/2\\) -- coming entirely from the Tor term! Without the correction, we would incorrectly conclude \\(H_3 = 0\\).</p>
         </div>
+        <div class="viz-placeholder" data-viz="kunneth-calculator"></div>
       `,
       visualizations: [
         {
           id: 'kunneth-calculator',
           title: 'K\u00FCnneth Calculator',
           description: 'Input H*(X) and H*(Y), compute H*(X x Y) via the K\u00FCnneth formula',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                spaceX: 'S1',
-                spaceY: 'S1',
-                animPhase: 0
-              };
-              viz.homology = {
-                'S1': {name: 'S\u00B9', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124', free: 1, torsion: null}]},
-                'S2': {name: 'S\u00B2', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 2, grp: '\u2124', free: 1, torsion: null}]},
-                'T2': {name: 'T\u00B2', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124\u00B2', free: 2, torsion: null}, {deg: 2, grp: '\u2124', free: 1, torsion: null}]},
-                'RP2': {name: '\u211DP\u00B2', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124/2', free: 0, torsion: 2}]},
-                'KB': {name: 'Klein', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124 \u2295 \u2124/2', free: 1, torsion: 2}]}
-              };
-            },
-            draw: (viz, ctx, width, height) => {
-              ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.01;
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
 
-              const hX = viz.homology[viz.state.spaceX];
-              const hY = viz.homology[viz.state.spaceY];
+            const homology = {
+              'S1': {name: 'S\u00B9', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124', free: 1, torsion: null}]},
+              'S2': {name: 'S\u00B2', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 2, grp: '\u2124', free: 1, torsion: null}]},
+              'T2': {name: 'T\u00B2', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124\u00B2', free: 2, torsion: null}, {deg: 2, grp: '\u2124', free: 1, torsion: null}]},
+              'RP2': {name: '\u211DP\u00B2', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124/2', free: 0, torsion: 2}]},
+              'KB': {name: 'Klein', groups: [{deg: 0, grp: '\u2124', free: 1, torsion: null}, {deg: 1, grp: '\u2124 \u2295 \u2124/2', free: 1, torsion: 2}]}
+            };
+
+            const state = { spaceX: 'S1', spaceY: 'S1', animPhase: 0 };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
+              ctx.clearRect(0, 0, width, height);
+              state.animPhase += 0.01;
+
+              const hX = homology[state.spaceX];
+              const hY = homology[state.spaceY];
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
@@ -677,11 +689,12 @@ Therefore:
 
               ctx.font = '14px serif';
               ctx.fillStyle = '#3498db';
-              let yPos = 52;
+              var yPos = 52;
 
               ctx.fillText('H*(' + hX.name + '):', 20, yPos);
-              let xStr = '';
-              for (const g of hX.groups) {
+              var xStr = '';
+              for (var gi = 0; gi < hX.groups.length; gi++) {
+                var g = hX.groups[gi];
                 if (xStr) xStr += ', ';
                 xStr += 'H' + g.deg + ' = ' + g.grp;
               }
@@ -691,10 +704,11 @@ Therefore:
               yPos += 20;
               ctx.fillStyle = '#e74c3c';
               ctx.fillText('H*(' + hY.name + '):', 20, yPos);
-              let yStr = '';
-              for (const g of hY.groups) {
+              var yStr = '';
+              for (var gj = 0; gj < hY.groups.length; gj++) {
+                var gg = hY.groups[gj];
                 if (yStr) yStr += ', ';
-                yStr += 'H' + g.deg + ' = ' + g.grp;
+                yStr += 'H' + gg.deg + ' = ' + gg.grp;
               }
               ctx.fillStyle = '#2c3e50';
               ctx.fillText(yStr, 20 + ctx.measureText('H*(' + hY.name + '): ').width, yPos);
@@ -705,65 +719,67 @@ Therefore:
               ctx.fillText('Result: H*(' + hX.name + ' \u00D7 ' + hY.name + ')', 20, yPos);
 
               yPos += 5;
-              const maxDeg = Math.max(...hX.groups.map(g => g.deg)) + Math.max(...hY.groups.map(g => g.deg));
+              var maxDeg = Math.max.apply(null, hX.groups.map(function(g){return g.deg;})) + Math.max.apply(null, hY.groups.map(function(g){return g.deg;}));
 
               function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
-              function sub(n) { const subs = '\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089'; return n < 10 ? subs[n] : '' + n; }
-              function sup(n) { const sups = '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079'; return n < 10 ? sups[n] : '' + n; }
+              function sub(n) { var subs = '\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089'; return n < 10 ? subs[n] : '' + n; }
+              function sup(n) { var sups = '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079'; return n < 10 ? sups[n] : '' + n; }
 
-              for (let n = 0; n <= maxDeg; n++) {
-                let tensorFree = 0;
-                let tensorTorsionParts = [];
-                for (const gx of hX.groups) {
-                  for (const gy of hY.groups) {
+              for (var n = 0; n <= maxDeg; n++) {
+                var tensorFree = 0;
+                var tensorTorsionParts = [];
+                for (var xi = 0; xi < hX.groups.length; xi++) {
+                  for (var yi = 0; yi < hY.groups.length; yi++) {
+                    var gx = hX.groups[xi];
+                    var gy = hY.groups[yi];
                     if (gx.deg + gy.deg === n) {
                       tensorFree += gx.free * gy.free;
                       if (gx.torsion && gy.free > 0) {
-                        for (let k = 0; k < gy.free; k++) tensorTorsionParts.push(gx.torsion);
+                        for (var k = 0; k < gy.free; k++) tensorTorsionParts.push(gx.torsion);
                       }
                       if (gy.torsion && gx.free > 0) {
-                        for (let k = 0; k < gx.free; k++) tensorTorsionParts.push(gy.torsion);
+                        for (var k2 = 0; k2 < gx.free; k2++) tensorTorsionParts.push(gy.torsion);
                       }
                       if (gx.torsion && gy.torsion) {
-                        const g = gcd(gx.torsion, gy.torsion);
-                        tensorTorsionParts.push(g);
+                        tensorTorsionParts.push(gcd(gx.torsion, gy.torsion));
                       }
                     }
                   }
                 }
 
-                let torParts = [];
-                for (const gx of hX.groups) {
-                  for (const gy of hY.groups) {
-                    if (gx.deg + gy.deg === n - 1) {
-                      if (gx.torsion && gy.torsion) {
-                        const g = gcd(gx.torsion, gy.torsion);
-                        torParts.push(g);
+                var torParts = [];
+                for (var xi2 = 0; xi2 < hX.groups.length; xi2++) {
+                  for (var yi2 = 0; yi2 < hY.groups.length; yi2++) {
+                    var gx2 = hX.groups[xi2];
+                    var gy2 = hY.groups[yi2];
+                    if (gx2.deg + gy2.deg === n - 1) {
+                      if (gx2.torsion && gy2.torsion) {
+                        torParts.push(gcd(gx2.torsion, gy2.torsion));
                       }
                     }
                   }
                 }
 
-                let parts = [];
+                var parts = [];
                 if (tensorFree > 0) {
                   parts.push(tensorFree === 1 ? '\u2124' : '\u2124' + sup(tensorFree));
                 }
-                for (const m of tensorTorsionParts) parts.push('\u2124/' + m);
-                for (const m of torParts) parts.push('\u2124/' + m);
+                for (var mi = 0; mi < tensorTorsionParts.length; mi++) parts.push('\u2124/' + tensorTorsionParts[mi]);
+                for (var ti = 0; ti < torParts.length; ti++) parts.push('\u2124/' + torParts[ti]);
 
                 if (parts.length === 0) continue;
 
                 yPos += 22;
-                const pulse = 0.7 + 0.3 * Math.sin(viz.state.animPhase * 2 + n);
+                var pulse = 0.7 + 0.3 * Math.sin(state.animPhase * 2 + n);
 
-                ctx.fillStyle = `rgba(44, 62, 80, ${pulse})`;
+                ctx.fillStyle = 'rgba(44, 62, 80, ' + pulse + ')';
                 ctx.font = '14px serif';
                 ctx.fillText('H' + sub(n) + ' = ' + parts.join(' \u2295 '), 30, yPos);
 
                 if (torParts.length > 0) {
                   ctx.fillStyle = '#9b59b6';
                   ctx.font = '12px serif';
-                  ctx.fillText('  (Tor: ' + torParts.map(m => '\u2124/' + m).join(' \u2295 ') + ')', 30 + ctx.measureText('H' + sub(n) + ' = ' + parts.join(' \u2295 ')).width + 5, yPos);
+                  ctx.fillText('  (Tor: ' + torParts.map(function(m){return '\u2124/' + m;}).join(' \u2295 ') + ')', 30 + ctx.measureText('H' + sub(n) + ' = ' + parts.join(' \u2295 ')).width + 5, yPos);
                 }
               }
 
@@ -771,33 +787,33 @@ Therefore:
               ctx.font = '13px serif';
               ctx.textAlign = 'left';
               ctx.fillText('Tor(\u2124/m, \u2124/n) = \u2124/gcd(m,n).  Tor = 0 if either factor is free.', 20, height - 12);
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Space X',
-                options: [
-                  { value: 'S1', label: 'S\u00B9' },
-                  { value: 'S2', label: 'S\u00B2' },
-                  { value: 'T2', label: 'T\u00B2' },
-                  { value: 'RP2', label: '\u211DP\u00B2' },
-                  { value: 'KB', label: 'Klein Bottle' }
-                ],
-                action: (viz, value) => { viz.state.spaceX = value; }
-              },
-              {
-                type: 'select',
-                label: 'Space Y',
-                options: [
-                  { value: 'S1', label: 'S\u00B9' },
-                  { value: 'S2', label: 'S\u00B2' },
-                  { value: 'T2', label: 'T\u00B2' },
-                  { value: 'RP2', label: '\u211DP\u00B2' },
-                  { value: 'KB', label: 'Klein Bottle' }
-                ],
-                action: (viz, value) => { viz.state.spaceY = value; }
-              }
-            ]
+            }
+
+            // Select: Space X
+            var sxLabel = document.createElement('label');
+            sxLabel.style.color = '#c9d1d9'; sxLabel.style.marginRight = '8px';
+            sxLabel.textContent = 'Space X: ';
+            controls.appendChild(sxLabel);
+            var sxSelect = document.createElement('select');
+            sxSelect.style.background = '#161b22'; sxSelect.style.color = '#c9d1d9'; sxSelect.style.border = '1px solid #30363d'; sxSelect.style.padding = '4px 8px'; sxSelect.style.borderRadius = '4px';
+            [{value:'S1',label:'S\u00B9'},{value:'S2',label:'S\u00B2'},{value:'T2',label:'T\u00B2'},{value:'RP2',label:'\u211DP\u00B2'},{value:'KB',label:'Klein Bottle'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; sxSelect.appendChild(o); });
+            sxSelect.value = 'S1';
+            sxSelect.onchange = function() { state.spaceX = sxSelect.value; draw(); };
+            controls.appendChild(sxSelect);
+
+            // Select: Space Y
+            var syLabel = document.createElement('label');
+            syLabel.style.color = '#c9d1d9'; syLabel.style.marginLeft = '15px'; syLabel.style.marginRight = '8px';
+            syLabel.textContent = 'Space Y: ';
+            controls.appendChild(syLabel);
+            var sySelect = document.createElement('select');
+            sySelect.style.background = '#161b22'; sySelect.style.color = '#c9d1d9'; sySelect.style.border = '1px solid #30363d'; sySelect.style.padding = '4px 8px'; sySelect.style.borderRadius = '4px';
+            [{value:'S1',label:'S\u00B9'},{value:'S2',label:'S\u00B2'},{value:'T2',label:'T\u00B2'},{value:'RP2',label:'\u211DP\u00B2'},{value:'KB',label:'Klein Bottle'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; sySelect.appendChild(o); });
+            sySelect.value = 'S1';
+            sySelect.onchange = function() { state.spaceY = sySelect.value; draw(); };
+            controls.appendChild(sySelect);
+
+            draw();
           }
         }
       ],
@@ -923,25 +939,28 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
             <li>\\(S^2 \\vee S^4\\): \\(\\alpha^2 = 0\\) (all cup products of positive-degree classes are zero)</li>
           </ul>
         </div>
+        <div class="viz-placeholder" data-viz="cross-product-visualizer"></div>
       `,
       visualizations: [
         {
           id: 'cross-product-visualizer',
           title: 'Cross Product Visualizer',
           description: 'See how homology classes in X and Y combine via the cross product to give classes in X x Y',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                classX: 0,
-                classY: 0,
-                animPhase: 0,
-                showFormula: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = { classX: 0, classY: 0, animPhase: 0, showFormula: true };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.015;
-              const t = viz.state.animPhase;
+              state.animPhase += 0.015;
+              const t = state.animPhase;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
@@ -950,8 +969,6 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
 
               const cx = width / 2;
               const cy = height / 2;
-
-              // Draw X = S^1 on the left
               const leftX = width * 0.18;
               const leftY = cy - 20;
               const rSmall = 45;
@@ -967,9 +984,9 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
               ctx.textAlign = 'center';
               ctx.fillText('X = S\u00B9', leftX, leftY - rSmall - 12);
 
-              if (viz.state.classX === 1) {
-                const glow = 0.5 + 0.5 * Math.sin(t * 2);
-                ctx.strokeStyle = `rgba(231, 76, 60, ${glow})`;
+              if (state.classX === 1) {
+                var glow = 0.5 + 0.5 * Math.sin(t * 2);
+                ctx.strokeStyle = 'rgba(231, 76, 60, ' + glow + ')';
                 ctx.lineWidth = 5;
                 ctx.beginPath();
                 ctx.arc(leftX, leftY, rSmall, 0, Math.PI * 2);
@@ -986,7 +1003,6 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
                 ctx.fillText('1 \u2208 H\u2080(S\u00B9)', leftX, leftY + rSmall + 20);
               }
 
-              // Draw Y = S^1 on the right
               const rightX = width * 0.82;
               const rightY = cy - 20;
 
@@ -1000,9 +1016,9 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
               ctx.font = 'bold 14px serif';
               ctx.fillText('Y = S\u00B9', rightX, rightY - rSmall - 12);
 
-              if (viz.state.classY === 1) {
-                const glow = 0.5 + 0.5 * Math.sin(t * 2 + 1);
-                ctx.strokeStyle = `rgba(155, 89, 182, ${glow})`;
+              if (state.classY === 1) {
+                var glow2 = 0.5 + 0.5 * Math.sin(t * 2 + 1);
+                ctx.strokeStyle = 'rgba(155, 89, 182, ' + glow2 + ')';
                 ctx.lineWidth = 5;
                 ctx.beginPath();
                 ctx.arc(rightX, rightY, rSmall, 0, Math.PI * 2);
@@ -1019,7 +1035,6 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
                 ctx.fillText('1 \u2208 H\u2080(S\u00B9)', rightX, rightY + rSmall + 20);
               }
 
-              // Arrow
               ctx.strokeStyle = '#7f8c8d';
               ctx.lineWidth = 1.5;
               ctx.setLineDash([6, 4]);
@@ -1033,16 +1048,14 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
               ctx.stroke();
               ctx.setLineDash([]);
 
-              // Cross product symbol
               ctx.fillStyle = '#27ae60';
               ctx.font = 'bold 24px serif';
               ctx.textAlign = 'center';
               ctx.fillText('\u00D7', cx, cy - 15);
 
-              // Draw product in T^2 below
               const productY = height - 75;
-              const degX = viz.state.classX;
-              const degY = viz.state.classY;
+              const degX = state.classX;
+              const degY = state.classY;
               const totalDeg = degX + degY;
 
               ctx.fillStyle = '#27ae60';
@@ -1056,10 +1069,10 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
                 '1,1': '\u03B1 \u00D7 \u03B2 \u2208 H\u2082(T\u00B2)     [fundamental class [T\u00B2]]'
               };
 
-              const key = degX + ',' + degY;
+              var key = degX + ',' + degY;
               ctx.fillText(classNames[key] || '', cx, productY);
 
-              if (viz.state.showFormula) {
+              if (state.showFormula) {
                 ctx.fillStyle = 'rgba(44, 62, 80, 0.05)';
                 ctx.fillRect(15, height - 50, width - 30, 42);
                 ctx.strokeStyle = '#bdc3c7';
@@ -1071,27 +1084,33 @@ Without the Tor correction, we would incorrectly conclude \\(H_3 = 0\\). The Tor
                 ctx.textAlign = 'center';
                 ctx.fillText('\u03B1 \u00D7 \u03B2 = EZ(\u03B1 \u2297 \u03B2) \u2208 H_{p+q}(X \u00D7 Y),   deg(\u03B1\u00D7\u03B2) = deg(\u03B1) + deg(\u03B2) = ' + degX + '+' + degY + ' = ' + totalDeg, cx, height - 24);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Class in X',
-                options: [
-                  { value: '0', label: '1 \u2208 H\u2080(S\u00B9)' },
-                  { value: '1', label: '\u03B1 \u2208 H\u2081(S\u00B9)' }
-                ],
-                action: (viz, value) => { viz.state.classX = parseInt(value); }
-              },
-              {
-                type: 'select',
-                label: 'Class in Y',
-                options: [
-                  { value: '0', label: '1 \u2208 H\u2080(S\u00B9)' },
-                  { value: '1', label: '\u03B2 \u2208 H\u2081(S\u00B9)' }
-                ],
-                action: (viz, value) => { viz.state.classY = parseInt(value); }
-              }
-            ]
+            }
+
+            // Select: Class in X
+            var cxLabel = document.createElement('label');
+            cxLabel.style.color = '#c9d1d9'; cxLabel.style.marginRight = '8px';
+            cxLabel.textContent = 'Class in X: ';
+            controls.appendChild(cxLabel);
+            var cxSelect = document.createElement('select');
+            cxSelect.style.background = '#161b22'; cxSelect.style.color = '#c9d1d9'; cxSelect.style.border = '1px solid #30363d'; cxSelect.style.padding = '4px 8px'; cxSelect.style.borderRadius = '4px';
+            [{value:'0',label:'1 \u2208 H\u2080(S\u00B9)'},{value:'1',label:'\u03B1 \u2208 H\u2081(S\u00B9)'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; cxSelect.appendChild(o); });
+            cxSelect.value = '0';
+            cxSelect.onchange = function() { state.classX = parseInt(cxSelect.value); draw(); };
+            controls.appendChild(cxSelect);
+
+            // Select: Class in Y
+            var cyLabel = document.createElement('label');
+            cyLabel.style.color = '#c9d1d9'; cyLabel.style.marginLeft = '15px'; cyLabel.style.marginRight = '8px';
+            cyLabel.textContent = 'Class in Y: ';
+            controls.appendChild(cyLabel);
+            var cySelect = document.createElement('select');
+            cySelect.style.background = '#161b22'; cySelect.style.color = '#c9d1d9'; cySelect.style.border = '1px solid #30363d'; cySelect.style.padding = '4px 8px'; cySelect.style.borderRadius = '4px';
+            [{value:'0',label:'1 \u2208 H\u2080(S\u00B9)'},{value:'1',label:'\u03B2 \u2208 H\u2081(S\u00B9)'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; cySelect.appendChild(o); });
+            cySelect.value = '0';
+            cySelect.onchange = function() { state.classY = parseInt(cySelect.value); draw(); };
+            controls.appendChild(cySelect);
+
+            draw();
           }
         }
       ],
@@ -1203,273 +1222,158 @@ Note: \\(H^1 = H^4 = 0\\). The ring is the exterior algebra \\(\\Lambda_{\\mathb
           </ul>
           <p>Since a homotopy equivalence must preserve the ring structure, \\(S^2 \\times S^4 \\not\\simeq \\mathbb{C}P^3\\).</p>
         </div>
+        <div class="viz-placeholder" data-viz="torus-from-circles"></div>
+        <div class="viz-placeholder" data-viz="sphere-product-viz"></div>
       `,
       visualizations: [
         {
           id: 'torus-from-circles',
           title: 'Torus from S\u00B9 \u00D7 S\u00B9',
           description: 'Step-by-step construction of T\u00B2 from two circles, showing how cells combine',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                step: 0,
-                animPhase: 0
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = { step: 0, animPhase: 0 };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.015;
-              const t = viz.state.animPhase;
-              const step = viz.state.step;
+              state.animPhase += 0.015;
+              const t = state.animPhase;
+              const step = state.step;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
               ctx.textAlign = 'center';
-              const titles = [
-                'Step 0: The two circles S\u00B9 and S\u00B9',
-                'Step 1: Product of 0-cells (e\u2070 \u2297 e\u2070)',
-                'Step 2: Product with 1-cells (two 1-cells)',
-                'Step 3: Product of 1-cells (the 2-cell)',
-                'Step 4: Complete T\u00B2 = S\u00B9 \u00D7 S\u00B9'
-              ];
+              const titles = ['Step 0: The two circles S\u00B9 and S\u00B9','Step 1: Product of 0-cells (e\u2070 \u2297 e\u2070)','Step 2: Product with 1-cells (two 1-cells)','Step 3: Product of 1-cells (the 2-cell)','Step 4: Complete T\u00B2 = S\u00B9 \u00D7 S\u00B9'];
               ctx.fillText(titles[step], width / 2, 28);
 
               const cx = width / 2;
               const cy = height / 2;
 
               if (step === 0) {
-                const r = 50;
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(cx - 100, cy, r, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = 'bold 16px serif';
+                var r = 50;
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(cx - 100, cy, r, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 16px serif';
                 ctx.fillText('S\u00B9 (X)', cx - 100, cy - r - 15);
-                ctx.font = '13px serif';
-                ctx.fillText('e\u2070 + e\u00B9', cx - 100, cy + r + 20);
-
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(cx + 100, cy, r, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.fillStyle = '#3498db';
-                ctx.font = 'bold 16px serif';
+                ctx.font = '13px serif'; ctx.fillText('e\u2070 + e\u00B9', cx - 100, cy + r + 20);
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(cx + 100, cy, r, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = '#3498db'; ctx.font = 'bold 16px serif';
                 ctx.fillText('S\u00B9 (Y)', cx + 100, cy - r - 15);
-                ctx.font = '13px serif';
-                ctx.fillText('e\u2070 + e\u00B9', cx + 100, cy + r + 20);
-
+                ctx.font = '13px serif'; ctx.fillText('e\u2070 + e\u00B9', cx + 100, cy + r + 20);
                 ctx.fillStyle = '#2c3e50';
-                ctx.beginPath();
-                ctx.arc(cx - 100 + r, cy, 5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(cx + 100 + r, cy, 5, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(cx - 100 + r, cy, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(cx + 100 + r, cy, 5, 0, Math.PI * 2); ctx.fill();
               } else if (step === 1) {
-                const size = 150;
-                const x0 = cx - size / 2;
-                const y0 = cy - size / 2;
-
-                ctx.strokeStyle = '#bdc3c7';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 4]);
-                ctx.strokeRect(x0, y0, size, size);
-                ctx.setLineDash([]);
-
-                const pulse = 5 + 3 * Math.sin(t * 3);
-                ctx.fillStyle = '#27ae60';
-                ctx.beginPath();
-                ctx.arc(x0, y0, pulse, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#27ae60';
-                ctx.font = 'bold 15px serif';
+                var size = 150; var x0 = cx - size / 2; var y0 = cy - size / 2;
+                ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+                ctx.strokeRect(x0, y0, size, size); ctx.setLineDash([]);
+                var pulse = 5 + 3 * Math.sin(t * 3);
+                ctx.fillStyle = '#27ae60'; ctx.beginPath(); ctx.arc(x0, y0, pulse, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#27ae60'; ctx.font = 'bold 15px serif';
                 ctx.fillText('e\u2070 \u2297 e\u2070 = vertex', cx, y0 + size + 35);
-                ctx.font = '13px serif';
-                ctx.fillStyle = '#2c3e50';
+                ctx.font = '13px serif'; ctx.fillStyle = '#2c3e50';
                 ctx.fillText('H\u2080(T\u00B2) = \u2124  (one component)', cx, y0 + size + 55);
               } else if (step === 2) {
-                const size = 150;
-                const x0 = cx - size / 2;
-                const y0 = cy - size / 2;
-
-                ctx.strokeStyle = '#bdc3c7';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 4]);
-                ctx.strokeRect(x0, y0, size, size);
-                ctx.setLineDash([]);
-
-                const glow1 = 0.5 + 0.5 * Math.sin(t * 2);
-                ctx.strokeStyle = `rgba(231, 76, 60, ${glow1})`;
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.moveTo(x0, y0 + size);
-                ctx.lineTo(x0 + size, y0 + size);
-                ctx.stroke();
-
-                const glow2 = 0.5 + 0.5 * Math.sin(t * 2 + 1);
-                ctx.strokeStyle = `rgba(52, 152, 219, ${glow2})`;
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.moveTo(x0, y0);
-                ctx.lineTo(x0, y0 + size);
-                ctx.stroke();
-
-                ctx.fillStyle = '#27ae60';
-                ctx.beginPath();
-                ctx.arc(x0, y0 + size, 5, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = 'bold 13px serif';
-                ctx.textAlign = 'left';
-                ctx.fillText('e\u00B9_X \u2297 e\u2070_Y  (meridian \u03B1)', x0 + size + 15, y0 + size);
-
-                ctx.fillStyle = '#3498db';
-                ctx.fillText('e\u2070_X \u2297 e\u00B9_Y  (longitude \u03B2)', x0 - 5, y0 - 12);
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.textAlign = 'center';
-                ctx.font = '13px serif';
-                ctx.fillText('H\u2081(T\u00B2) = \u2124\u00B2  (two independent 1-cycles)', cx, y0 + size + 55);
+                var size2 = 150; var x02 = cx - size2 / 2; var y02 = cy - size2 / 2;
+                ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+                ctx.strokeRect(x02, y02, size2, size2); ctx.setLineDash([]);
+                var glow1 = 0.5 + 0.5 * Math.sin(t * 2);
+                ctx.strokeStyle = 'rgba(231, 76, 60, ' + glow1 + ')'; ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.moveTo(x02, y02 + size2); ctx.lineTo(x02 + size2, y02 + size2); ctx.stroke();
+                var glow2 = 0.5 + 0.5 * Math.sin(t * 2 + 1);
+                ctx.strokeStyle = 'rgba(52, 152, 219, ' + glow2 + ')'; ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.moveTo(x02, y02); ctx.lineTo(x02, y02 + size2); ctx.stroke();
+                ctx.fillStyle = '#27ae60'; ctx.beginPath(); ctx.arc(x02, y02 + size2, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 13px serif'; ctx.textAlign = 'left';
+                ctx.fillText('e\u00B9_X \u2297 e\u2070_Y  (meridian \u03B1)', x02 + size2 + 15, y02 + size2);
+                ctx.fillStyle = '#3498db'; ctx.fillText('e\u2070_X \u2297 e\u00B9_Y  (longitude \u03B2)', x02 - 5, y02 - 12);
+                ctx.fillStyle = '#2c3e50'; ctx.textAlign = 'center'; ctx.font = '13px serif';
+                ctx.fillText('H\u2081(T\u00B2) = \u2124\u00B2  (two independent 1-cycles)', cx, y02 + size2 + 55);
               } else if (step === 3) {
-                const size = 150;
-                const x0 = cx - size / 2;
-                const y0 = cy - size / 2;
-
-                const pulse = 0.15 + 0.1 * Math.sin(t * 2);
-                ctx.fillStyle = `rgba(155, 89, 182, ${pulse})`;
-                ctx.fillRect(x0, y0, size, size);
-
-                ctx.strokeStyle = '#9b59b6';
-                ctx.lineWidth = 2.5;
-                ctx.strokeRect(x0, y0, size, size);
-
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(x0, y0 + size);
-                ctx.lineTo(x0 + size, y0 + size);
-                ctx.stroke();
-
+                var size3 = 150; var x03 = cx - size3 / 2; var y03 = cy - size3 / 2;
+                var pulse3 = 0.15 + 0.1 * Math.sin(t * 2);
+                ctx.fillStyle = 'rgba(155, 89, 182, ' + pulse3 + ')'; ctx.fillRect(x03, y03, size3, size3);
+                ctx.strokeStyle = '#9b59b6'; ctx.lineWidth = 2.5; ctx.strokeRect(x03, y03, size3, size3);
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(x03, y03 + size3); ctx.lineTo(x03 + size3, y03 + size3); ctx.stroke();
                 ctx.strokeStyle = '#3498db';
-                ctx.beginPath();
-                ctx.moveTo(x0, y0);
-                ctx.lineTo(x0, y0 + size);
-                ctx.stroke();
-
-                ctx.fillStyle = '#27ae60';
-                ctx.beginPath();
-                ctx.arc(x0, y0 + size, 5, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#9b59b6';
-                ctx.font = 'bold 16px serif';
+                ctx.beginPath(); ctx.moveTo(x03, y03); ctx.lineTo(x03, y03 + size3); ctx.stroke();
+                ctx.fillStyle = '#27ae60'; ctx.beginPath(); ctx.arc(x03, y03 + size3, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#9b59b6'; ctx.font = 'bold 16px serif';
                 ctx.fillText('e\u00B9 \u2297 e\u00B9', cx, cy);
-                ctx.font = '13px serif';
-                ctx.fillText('(2-cell = fundamental class)', cx, cy + 20);
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '13px serif';
-                ctx.fillText('H\u2082(T\u00B2) = \u2124  generated by [T\u00B2] = \u03B1 \u00D7 \u03B2', cx, y0 + size + 55);
+                ctx.font = '13px serif'; ctx.fillText('(2-cell = fundamental class)', cx, cy + 20);
+                ctx.fillStyle = '#2c3e50'; ctx.font = '13px serif';
+                ctx.fillText('H\u2082(T\u00B2) = \u2124  generated by [T\u00B2] = \u03B1 \u00D7 \u03B2', cx, y03 + size3 + 55);
               } else if (step === 4) {
-                const majorR = 80;
-                const minorR = 35;
-
-                ctx.strokeStyle = '#9b59b6';
-                ctx.lineWidth = 2.5;
-                ctx.beginPath();
-                ctx.arc(cx, cy, majorR + minorR, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(cx, cy, majorR - minorR, 0, Math.PI * 2);
-                ctx.stroke();
-
+                var majorR = 80; var minorR = 35;
+                ctx.strokeStyle = '#9b59b6'; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(cx, cy, majorR + minorR, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(cx, cy, majorR - minorR, 0, Math.PI * 2); ctx.stroke();
                 ctx.fillStyle = 'rgba(155, 89, 182, 0.1)';
-                ctx.beginPath();
-                ctx.arc(cx, cy, majorR + minorR, 0, Math.PI * 2);
-                ctx.arc(cx, cy, majorR - minorR, Math.PI * 2, 0, true);
-                ctx.closePath();
-                ctx.fill();
-
-                const mAngle = t * 0.5;
-                const mx = cx + majorR * Math.cos(mAngle);
-                const my = cy + majorR * Math.sin(mAngle);
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(mx, my, minorR, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = '13px serif';
+                ctx.beginPath(); ctx.arc(cx, cy, majorR + minorR, 0, Math.PI * 2);
+                ctx.arc(cx, cy, majorR - minorR, Math.PI * 2, 0, true); ctx.closePath(); ctx.fill();
+                var mAngle = t * 0.5;
+                var mx = cx + majorR * Math.cos(mAngle); var my = cy + majorR * Math.sin(mAngle);
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(mx, my, minorR, 0, Math.PI * 2); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.font = '13px serif';
                 ctx.fillText('\u03B1 (meridian)', mx + minorR + 10, my);
-
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.setLineDash([6, 3]);
-                ctx.beginPath();
-                ctx.arc(cx, cy, majorR, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-                ctx.fillStyle = '#3498db';
-                ctx.fillText('\u03B2 (longitude)', cx, cy - majorR - 12);
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '14px serif';
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3; ctx.setLineDash([6, 3]);
+                ctx.beginPath(); ctx.arc(cx, cy, majorR, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle = '#3498db'; ctx.fillText('\u03B2 (longitude)', cx, cy - majorR - 12);
+                ctx.fillStyle = '#2c3e50'; ctx.font = '14px serif';
                 ctx.fillText('T\u00B2 = S\u00B9 \u00D7 S\u00B9:  H* = (\u2124, \u2124\u00B2, \u2124)  by K\u00FCnneth', cx, height - 30);
                 ctx.fillText('H*(T\u00B2; \u2124) = \u039B[\u03B1, \u03B2]  (exterior algebra)', cx, height - 10);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Step',
-                options: [
-                  { value: '0', label: 'Step 0: Two circles' },
-                  { value: '1', label: 'Step 1: 0-cell (vertex)' },
-                  { value: '2', label: 'Step 2: 1-cells (edges)' },
-                  { value: '3', label: 'Step 3: 2-cell (face)' },
-                  { value: '4', label: 'Step 4: Complete T\u00B2' }
-                ],
-                action: (viz, value) => { viz.state.step = parseInt(value); }
-              }
-            ]
+            }
+
+            // Select: Step
+            var stepLabel = document.createElement('label');
+            stepLabel.style.color = '#c9d1d9'; stepLabel.style.marginRight = '8px';
+            stepLabel.textContent = 'Step: ';
+            controls.appendChild(stepLabel);
+            var stepSelect = document.createElement('select');
+            stepSelect.style.background = '#161b22'; stepSelect.style.color = '#c9d1d9'; stepSelect.style.border = '1px solid #30363d'; stepSelect.style.padding = '4px 8px'; stepSelect.style.borderRadius = '4px';
+            [{value:'0',label:'Step 0: Two circles'},{value:'1',label:'Step 1: 0-cell (vertex)'},{value:'2',label:'Step 2: 1-cells (edges)'},{value:'3',label:'Step 3: 2-cell (face)'},{value:'4',label:'Step 4: Complete T\u00B2'}].forEach(function(opt) { var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; stepSelect.appendChild(o); });
+            stepSelect.value = '0';
+            stepSelect.onchange = function() { state.step = parseInt(stepSelect.value); draw(); };
+            controls.appendChild(stepSelect);
+
+            draw();
           }
         },
         {
           id: 'sphere-product-viz',
           title: 'Sphere Products S\u207F \u00D7 S\u1D50',
           description: 'Visualize the homology of S^n x S^m for various n, m via K\u00FCnneth',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                n: 1,
-                m: 1,
-                animPhase: 0,
-                showPoincare: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = { n: 1, m: 1, animPhase: 0, showPoincare: true };
+
+            function sup(k) { var s = '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079'; return k < 10 ? s[k] : '' + k; }
+            function sub(k) { var s = '\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089'; return k < 10 ? s[k] : '' + k; }
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.012;
-              const t = viz.state.animPhase;
-
-              const n = viz.state.n;
-              const m = viz.state.m;
-
-              function sup(k) {
-                const s = '\u2070\u00B9\u00B2\u00B3\u2074\u2075\u2076\u2077\u2078\u2079';
-                if (k < 10) return s[k];
-                return '' + k;
-              }
-              function sub(k) {
-                const s = '\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089';
-                if (k < 10) return s[k];
-                return '' + k;
-              }
+              state.animPhase += 0.012;
+              const t = state.animPhase;
+              const n = state.n;
+              const m = state.m;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px serif';
@@ -1478,116 +1382,91 @@ Note: \\(H^1 = H^4 = 0\\). The ring is the exterior algebra \\(\\Lambda_{\\mathb
 
               const maxDeg = n + m;
               const groups = [];
-              for (let k = 0; k <= maxDeg; k++) {
-                let rank = 0;
+              for (var k = 0; k <= maxDeg; k++) {
+                var rank = 0;
                 if (k === 0) rank = 1;
                 else if (k === n && k === m) rank = 2;
                 else if (k === n) rank = 1;
                 else if (k === m) rank = 1;
                 else if (k === n + m) rank = 1;
-                else rank = 0;
                 groups.push({deg: k, rank: rank});
               }
 
-              const chartX = 40;
-              const chartY = 55;
-              const chartW = width - 80;
-              const chartH = height - 160;
+              const chartX = 40; const chartY = 55;
+              const chartW = width - 80; const chartH = height - 160;
               const barW = Math.min(60, chartW / (maxDeg + 2));
 
-              ctx.strokeStyle = '#7f8c8d';
-              ctx.lineWidth = 1.5;
-              ctx.beginPath();
-              ctx.moveTo(chartX, chartY);
-              ctx.lineTo(chartX, chartY + chartH);
-              ctx.lineTo(chartX + chartW, chartY + chartH);
-              ctx.stroke();
-
-              ctx.fillStyle = '#7f8c8d';
-              ctx.font = '12px serif';
-              ctx.textAlign = 'right';
+              ctx.strokeStyle = '#7f8c8d'; ctx.lineWidth = 1.5;
+              ctx.beginPath(); ctx.moveTo(chartX, chartY); ctx.lineTo(chartX, chartY + chartH); ctx.lineTo(chartX + chartW, chartY + chartH); ctx.stroke();
+              ctx.fillStyle = '#7f8c8d'; ctx.font = '12px serif'; ctx.textAlign = 'right';
               ctx.fillText('rank', chartX - 5, chartY + 5);
 
-              const maxRank = Math.max(...groups.map(g => g.rank), 1);
-              const barScale = chartH * 0.8 / maxRank;
+              var maxRank = Math.max.apply(null, groups.map(function(g){return g.rank;}).concat([1]));
+              var barScale = chartH * 0.8 / maxRank;
 
-              groups.forEach((g, i) => {
-                const x = chartX + 15 + i * (barW + 8);
-                const barH = g.rank * barScale;
-
+              groups.forEach(function(g, i) {
+                var x = chartX + 15 + i * (barW + 8);
+                var barH = g.rank * barScale;
                 if (g.rank > 0) {
-                  const pulse = 0.6 + 0.2 * Math.sin(t * 2 + i);
-                  const colors = ['rgba(46,204,113,', 'rgba(52,152,219,', 'rgba(231,76,60,', 'rgba(155,89,182,', 'rgba(241,196,15,', 'rgba(230,126,34,'];
-                  const colIdx = g.deg % colors.length;
-
+                  var pulse = 0.6 + 0.2 * Math.sin(t * 2 + i);
+                  var colors = ['rgba(46,204,113,', 'rgba(52,152,219,', 'rgba(231,76,60,', 'rgba(155,89,182,', 'rgba(241,196,15,', 'rgba(230,126,34,'];
+                  var colIdx = g.deg % colors.length;
                   ctx.fillStyle = colors[colIdx] + pulse + ')';
                   ctx.fillRect(x, chartY + chartH - barH, barW, barH);
-
-                  ctx.strokeStyle = colors[colIdx] + '0.8)';
-                  ctx.lineWidth = 1.5;
+                  ctx.strokeStyle = colors[colIdx] + '0.8)'; ctx.lineWidth = 1.5;
                   ctx.strokeRect(x, chartY + chartH - barH, barW, barH);
-
-                  ctx.fillStyle = '#2c3e50';
-                  ctx.font = 'bold 14px serif';
-                  ctx.textAlign = 'center';
+                  ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 14px serif'; ctx.textAlign = 'center';
                   ctx.fillText(g.rank === 1 ? '\u2124' : '\u2124' + sup(g.rank), x + barW / 2, chartY + chartH - barH - 8);
                 }
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '13px serif';
-                ctx.textAlign = 'center';
+                ctx.fillStyle = '#2c3e50'; ctx.font = '13px serif'; ctx.textAlign = 'center';
                 ctx.fillText('H' + sub(g.deg), x + barW / 2, chartY + chartH + 18);
               });
 
-              if (viz.state.showPoincare) {
-                const polyY = height - 55;
-                ctx.fillStyle = 'rgba(44, 62, 80, 0.05)';
-                ctx.fillRect(15, polyY - 5, width - 30, 50);
-                ctx.strokeStyle = '#bdc3c7';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(15, polyY - 5, width - 30, 50);
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '14px serif';
-                ctx.textAlign = 'center';
-
-                let poly = 'P(t) = (1 + t' + sup(n) + ')(1 + t' + sup(m) + ') = ';
-                let terms = [];
-                for (const g of groups) {
-                  if (g.rank > 0) {
-                    if (g.deg === 0) terms.push('' + g.rank);
-                    else terms.push((g.rank > 1 ? g.rank : '') + 't' + (g.deg > 1 ? sup(g.deg) : ''));
+              if (state.showPoincare) {
+                var polyY = height - 55;
+                ctx.fillStyle = 'rgba(44, 62, 80, 0.05)'; ctx.fillRect(15, polyY - 5, width - 30, 50);
+                ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1; ctx.strokeRect(15, polyY - 5, width - 30, 50);
+                ctx.fillStyle = '#2c3e50'; ctx.font = '14px serif'; ctx.textAlign = 'center';
+                var poly = 'P(t) = (1 + t' + sup(n) + ')(1 + t' + sup(m) + ') = ';
+                var terms = [];
+                for (var gi = 0; gi < groups.length; gi++) {
+                  var gg = groups[gi];
+                  if (gg.rank > 0) {
+                    if (gg.deg === 0) terms.push('' + gg.rank);
+                    else terms.push((gg.rank > 1 ? gg.rank : '') + 't' + (gg.deg > 1 ? sup(gg.deg) : ''));
                   }
                 }
                 poly += terms.join(' + ');
-
                 ctx.fillText(poly, width / 2, polyY + 14);
-
-                let euler = 0;
-                for (const g of groups) euler += (g.deg % 2 === 0 ? 1 : -1) * g.rank;
+                var euler = 0;
+                for (var ei = 0; ei < groups.length; ei++) euler += (groups[ei].deg % 2 === 0 ? 1 : -1) * groups[ei].rank;
                 ctx.fillText('\u03C7(S' + sup(n) + ' \u00D7 S' + sup(m) + ') = ' + euler, width / 2, polyY + 35);
               }
-            },
-            controls: [
-              {
-                type: 'slider',
-                label: 'n (dim of first sphere)',
-                min: 1,
-                max: 5,
-                step: 1,
-                initial: 1,
-                action: (viz, value) => { viz.state.n = value; }
-              },
-              {
-                type: 'slider',
-                label: 'm (dim of second sphere)',
-                min: 1,
-                max: 5,
-                step: 1,
-                initial: 1,
-                action: (viz, value) => { viz.state.m = value; }
-              }
-            ]
+            }
+
+            // Slider: n
+            var nLabel = document.createElement('label');
+            nLabel.style.color = '#c9d1d9'; nLabel.style.marginRight = '8px';
+            nLabel.textContent = 'n (dim of first sphere): 1';
+            controls.appendChild(nLabel);
+            var nSlider = document.createElement('input');
+            nSlider.type = 'range'; nSlider.min = 1; nSlider.max = 5; nSlider.step = 1; nSlider.value = 1;
+            nSlider.style.width = '200px';
+            nSlider.oninput = function() { state.n = parseInt(nSlider.value); nLabel.textContent = 'n (dim of first sphere): ' + nSlider.value; draw(); };
+            controls.appendChild(nSlider);
+
+            // Slider: m
+            var mLabel = document.createElement('label');
+            mLabel.style.color = '#c9d1d9'; mLabel.style.marginLeft = '15px'; mLabel.style.marginRight = '8px';
+            mLabel.textContent = 'm (dim of second sphere): 1';
+            controls.appendChild(mLabel);
+            var mSlider = document.createElement('input');
+            mSlider.type = 'range'; mSlider.min = 1; mSlider.max = 5; mSlider.step = 1; mSlider.value = 1;
+            mSlider.style.width = '200px';
+            mSlider.oninput = function() { state.m = parseInt(mSlider.value); mLabel.textContent = 'm (dim of second sphere): ' + mSlider.value; draw(); };
+            controls.appendChild(mSlider);
+
+            draw();
           }
         }
       ],

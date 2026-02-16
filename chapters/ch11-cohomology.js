@@ -7,7 +7,7 @@ window.CHAPTERS.push({
   sections: [
     {
       id: 'cochain-complex',
-      title: 'Cochain Complex C^n(X; G) = Hom(Cₙ(X), G)',
+      title: 'Cochain Complex C^n(X; G) = Hom(Cn(X), G)',
       content: `
         <div class="env-block intuition">
           <strong>Motivation:</strong> Homology measures "cycles mod boundaries" in \\(X\\). <em>Cohomology</em> dualizes this: instead of chains (formal sums of simplices), we study <em>cochains</em> (functions on chains). This brings new structure (cup product, ring structure) and computational tools (UCT).
@@ -84,43 +84,50 @@ window.CHAPTERS.push({
         <div class="env-block intuition">
           <strong>Geometric Interpretation:</strong> A cochain \\(\\phi \\in C^n(X; G)\\) assigns a value in \\(G\\) to each \\(n\\)-chain. Think of it as a "measurement" or "observable" on chains. Cocycles are measurements that vanish on boundaries, capturing global information.
         </div>
+
+        <div class="viz-placeholder" data-viz="dual-complex-viz"></div>
       `,
       visualizations: [
         {
           id: 'dual-complex-viz',
           title: 'Dual Complex Visualizer',
-          description: 'See Hom(Cₙ, G) as linear functionals on chains.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.6,
-            setup: (viz) => {
-              viz.state = {
-                dimension: 1,
-                coefficientGroup: 'Z', // 'Z', 'Z2', 'Q'
-                showDual: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          description: 'See Hom(Cn, G) as linear functionals on chains.',
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.6);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              dimension: 1,
+              coefficientGroup: 'Z',
+              showDual: true
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const groups = {
-                Z: { name: 'ℤ', description: 'Integers' },
-                Z2: { name: 'ℤ/2', description: 'Mod 2' },
-                Q: { name: 'ℚ', description: 'Rationals' }
+              var groups = {
+                Z: { name: '\u2124', description: 'Integers' },
+                Z2: { name: '\u2124/2', description: 'Mod 2' },
+                Q: { name: '\u211A', description: 'Rationals' }
               };
 
-              const G = groups[viz.state.coefficientGroup];
-              const n = viz.state.dimension;
+              var G = groups[state.coefficientGroup];
+              var n = state.dimension;
 
-              const centerX = width / 2;
-              const leftX = width * 0.25;
-              const rightX = width * 0.75;
+              var centerX = width / 2;
+              var leftX = width * 0.25;
+              var rightX = width * 0.75;
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`Cochain Complex with coefficients in ${G.name}`, centerX, 30);
+              ctx.fillText('Cochain Complex with coefficients in ' + G.name, centerX, 30);
 
               // Chains (left)
               ctx.fillStyle = '#3498db';
@@ -129,10 +136,10 @@ window.CHAPTERS.push({
 
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
-              const chainY = 120;
-              const spacing = 60;
-              ['C₂(X)', 'C₁(X)', 'C₀(X)'].forEach((label, i) => {
-                const y = chainY + i * spacing;
+              var chainY = 120;
+              var spacing = 60;
+              ['C\u2082(X)', 'C\u2081(X)', 'C\u2080(X)'].forEach(function(label, i) {
+                var y = chainY + i * spacing;
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(leftX - 50, y - 20, 100, 40);
@@ -155,12 +162,12 @@ window.CHAPTERS.push({
                   ctx.closePath();
                   ctx.fill();
                   ctx.fillStyle = '#000';
-                  ctx.fillText('∂', leftX + 25, y + spacing / 2);
+                  ctx.fillText('\u2202', leftX + 25, y + spacing / 2);
                 }
               });
 
               // Cochains (right)
-              if (viz.state.showDual) {
+              if (state.showDual) {
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = 'bold 16px KaTeX_Main';
                 ctx.textAlign = 'center';
@@ -168,8 +175,8 @@ window.CHAPTERS.push({
 
                 ctx.fillStyle = '#000';
                 ctx.font = '14px KaTeX_Main';
-                ['C⁰(X;' + G.name + ')', 'C¹(X;' + G.name + ')', 'C²(X;' + G.name + ')'].forEach((label, i) => {
-                  const y = chainY + (2 - i) * spacing;
+                ['C\u2070(X;' + G.name + ')', 'C\u00B9(X;' + G.name + ')', 'C\u00B2(X;' + G.name + ')'].forEach(function(label, i) {
+                  var y = chainY + (2 - i) * spacing;
                   ctx.strokeStyle = '#9b59b6';
                   ctx.lineWidth = 2;
                   ctx.strokeRect(rightX - 60, y - 20, 120, 40);
@@ -192,13 +199,13 @@ window.CHAPTERS.push({
                     ctx.closePath();
                     ctx.fill();
                     ctx.fillStyle = '#000';
-                    ctx.fillText('δ', rightX + 30, y - spacing / 2);
+                    ctx.fillText('\u03B4', rightX + 30, y - spacing / 2);
                   }
                 });
 
                 // Hom arrows
-                for (let i = 0; i < 3; i++) {
-                  const y = chainY + i * spacing;
+                for (var i = 0; i < 3; i++) {
+                  var y = chainY + i * spacing;
                   ctx.strokeStyle = '#27ae60';
                   ctx.lineWidth = 2;
                   ctx.setLineDash([5, 5]);
@@ -218,38 +225,60 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'left';
-              ctx.fillText(`Cⁿ(X; ${G.name}) = Hom(Cₙ(X), ${G.name})`, 10, height - 50);
-              ctx.fillText('Coboundary: (δφ)(c) = φ(∂c)', 10, height - 30);
-              ctx.fillText(`Cohomology: Hⁿ(X; ${G.name}) = ker(δ) / im(δ)`, 10, height - 10);
-            },
-            controls: [
-              {
-                type: 'slider',
-                id: 'dimension',
-                label: 'Dimension',
-                min: 0,
-                max: 2,
-                step: 1,
-                value: 1
-              },
-              {
-                type: 'select',
-                id: 'coefficientGroup',
-                label: 'Coefficient Group G',
-                options: [
-                  { value: 'Z', label: 'ℤ (integers)' },
-                  { value: 'Z2', label: 'ℤ/2 (mod 2)' },
-                  { value: 'Q', label: 'ℚ (rationals)' }
-                ],
-                value: 'Z'
-              },
-              {
-                type: 'checkbox',
-                id: 'showDual',
-                label: 'Show Cochain Complex',
-                value: true
-              }
-            ]
+              ctx.fillText('C\u207F(X; ' + G.name + ') = Hom(C\u2099(X), ' + G.name + ')', 10, height - 50);
+              ctx.fillText('Coboundary: (\u03B4\u03C6)(c) = \u03C6(\u2202c)', 10, height - 30);
+              ctx.fillText('Cohomology: H\u207F(X; ' + G.name + ') = ker(\u03B4) / im(\u03B4)', 10, height - 10);
+            }
+
+            // Controls: slider (dimension)
+            var dimLabel = document.createElement('label');
+            dimLabel.style.color = '#c9d1d9';
+            dimLabel.style.marginRight = '8px';
+            dimLabel.textContent = 'Dimension: 1';
+            controls.appendChild(dimLabel);
+            var dimSlider = document.createElement('input');
+            dimSlider.type = 'range';
+            dimSlider.min = 0; dimSlider.max = 2; dimSlider.step = 1; dimSlider.value = 1;
+            dimSlider.style.width = '200px';
+            dimSlider.oninput = function() {
+              state.dimension = parseInt(dimSlider.value);
+              dimLabel.textContent = 'Dimension: ' + dimSlider.value;
+              draw();
+            };
+            controls.appendChild(dimSlider);
+
+            // Controls: select (coefficientGroup)
+            var coeffLabel = document.createElement('label');
+            coeffLabel.style.color = '#c9d1d9';
+            coeffLabel.style.marginLeft = '15px';
+            coeffLabel.style.marginRight = '8px';
+            coeffLabel.textContent = 'Coefficient Group G: ';
+            controls.appendChild(coeffLabel);
+            var coeffSelect = document.createElement('select');
+            coeffSelect.style.background = '#161b22'; coeffSelect.style.color = '#c9d1d9'; coeffSelect.style.border = '1px solid #30363d'; coeffSelect.style.padding = '4px 8px'; coeffSelect.style.borderRadius = '4px';
+            [{value:'Z',label:'\u2124 (integers)'},{value:'Z2',label:'\u2124/2 (mod 2)'},{value:'Q',label:'\u211A (rationals)'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              coeffSelect.appendChild(o);
+            });
+            coeffSelect.value = 'Z';
+            coeffSelect.onchange = function() { state.coefficientGroup = coeffSelect.value; draw(); };
+            controls.appendChild(coeffSelect);
+
+            // Controls: checkbox (showDual)
+            var dualContainer = document.createElement('label');
+            dualContainer.style.color = '#c9d1d9';
+            dualContainer.style.marginLeft = '15px';
+            dualContainer.style.cursor = 'pointer';
+            var dualCheckbox = document.createElement('input');
+            dualCheckbox.type = 'checkbox';
+            dualCheckbox.checked = true;
+            dualCheckbox.onchange = function() { state.showDual = dualCheckbox.checked; draw(); };
+            dualContainer.appendChild(dualCheckbox);
+            dualContainer.appendChild(document.createTextNode(' Show Cochain Complex'));
+            controls.appendChild(dualContainer);
+
+            draw();
           }
         }
       ],
@@ -299,7 +328,7 @@ window.CHAPTERS.push({
           (f^* \\phi)(c) = \\phi(f_\\# c)
           \\]
           where \\(f_\\# : C_n(X) \\to C_n(Y)\\) is the induced map on chains.
-        </define>
+        </div>
 
         <div class="env-block remark">
           <strong>Contravariance:</strong> Cohomology is a <strong>contravariant functor</strong>:
@@ -351,32 +380,38 @@ window.CHAPTERS.push({
             <li><strong>Ring structure:</strong> Cohomology has a <strong>cup product</strong> \\(H^p \\otimes H^q \\to H^{p+q}\\), making \\(H^*(X) = \\bigoplus_n H^n(X)\\) a graded ring. Homology lacks this.</li>
             <li><strong>Computational:</strong> For spaces with torsion, cohomology can be easier to compute via the Universal Coefficient Theorem.</li>
             <li><strong>Characteristic classes:</strong> In differential geometry, characteristic classes (Chern, Stiefel-Whitney, Pontryagin) live in cohomology.</li>
-            <li><strong>Duality:</strong> Poincaré duality relates \\(H^k(M)\\) and \\(H_{n-k}(M)\\) for \\(n\\)-manifolds.</li>
+            <li><strong>Duality:</strong> Poincare duality relates \\(H^k(M)\\) and \\(H_{n-k}(M)\\) for \\(n\\)-manifolds.</li>
           </ol>
         </div>
+
+        <div class="viz-placeholder" data-viz="contravariant-viz"></div>
       `,
       visualizations: [
         {
           id: 'contravariant-viz',
           title: 'Contravariant Functor Visualizer',
           description: 'See how f induces f* backwards in cohomology.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                showHomology: true,
-                showCohomology: true,
-                mapDirection: 'forward' // 'forward', 'backward'
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              showHomology: true,
+              showCohomology: true
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const leftX = width * 0.25;
-              const rightX = width * 0.75;
-              const topY = height * 0.3;
-              const bottomY = height * 0.7;
+              var leftX = width * 0.25;
+              var rightX = width * 0.75;
+              var topY = height * 0.3;
+              var bottomY = height * 0.7;
 
               // Title
               ctx.fillStyle = '#000';
@@ -385,7 +420,7 @@ window.CHAPTERS.push({
               ctx.fillText('Contravariance: f induces f* in opposite direction', width / 2, 30);
 
               // Spaces
-              const drawSpace = (x, y, label) => {
+              var drawSpace = function(x, y, label) {
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
@@ -400,7 +435,7 @@ window.CHAPTERS.push({
               drawSpace(leftX, topY, 'X');
               drawSpace(rightX, topY, 'Y');
 
-              // Map f: X → Y
+              // Map f: X -> Y
               ctx.strokeStyle = '#e74c3c';
               ctx.lineWidth = 3;
               ctx.beginPath();
@@ -419,13 +454,13 @@ window.CHAPTERS.push({
               ctx.fillText('f', (leftX + rightX) / 2, topY - 15);
 
               // Homology (covariant)
-              if (viz.state.showHomology) {
-                const hy = bottomY - 80;
+              if (state.showHomology) {
+                var hy = bottomY - 80;
                 ctx.fillStyle = '#3498db';
                 ctx.font = 'bold 14px KaTeX_Main';
                 ctx.fillText('Homology (covariant)', width / 2, hy - 30);
 
-                const drawHom = (x, y, label) => {
+                var drawHom = function(x, y, label) {
                   ctx.strokeStyle = '#3498db';
                   ctx.lineWidth = 2;
                   ctx.strokeRect(x - 50, y - 20, 100, 40);
@@ -460,14 +495,14 @@ window.CHAPTERS.push({
               }
 
               // Cohomology (contravariant)
-              if (viz.state.showCohomology) {
-                const cy = bottomY + 40;
+              if (state.showCohomology) {
+                var cy = bottomY + 40;
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = 'bold 14px KaTeX_Main';
                 ctx.textAlign = 'center';
                 ctx.fillText('Cohomology (contravariant)', width / 2, cy - 30);
 
-                const drawCoh = (x, y, label) => {
+                var drawCoh = function(x, y, label) {
                   ctx.strokeStyle = '#9b59b6';
                   ctx.lineWidth = 2;
                   ctx.strokeRect(x - 50, y - 20, 100, 40);
@@ -500,21 +535,34 @@ window.CHAPTERS.push({
                 ctx.font = '11px KaTeX_Main';
                 ctx.fillText('(opposite direction!)', (leftX + rightX) / 2, cy + 25);
               }
-            },
-            controls: [
-              {
-                type: 'checkbox',
-                id: 'showHomology',
-                label: 'Show Homology',
-                value: true
-              },
-              {
-                type: 'checkbox',
-                id: 'showCohomology',
-                label: 'Show Cohomology',
-                value: true
-              }
-            ]
+            }
+
+            // Controls: checkbox (showHomology)
+            var homContainer = document.createElement('label');
+            homContainer.style.color = '#c9d1d9';
+            homContainer.style.cursor = 'pointer';
+            var homCheckbox = document.createElement('input');
+            homCheckbox.type = 'checkbox';
+            homCheckbox.checked = true;
+            homCheckbox.onchange = function() { state.showHomology = homCheckbox.checked; draw(); };
+            homContainer.appendChild(homCheckbox);
+            homContainer.appendChild(document.createTextNode(' Show Homology'));
+            controls.appendChild(homContainer);
+
+            // Controls: checkbox (showCohomology)
+            var cohContainer = document.createElement('label');
+            cohContainer.style.color = '#c9d1d9';
+            cohContainer.style.marginLeft = '15px';
+            cohContainer.style.cursor = 'pointer';
+            var cohCheckbox = document.createElement('input');
+            cohCheckbox.type = 'checkbox';
+            cohCheckbox.checked = true;
+            cohCheckbox.onchange = function() { state.showCohomology = cohCheckbox.checked; draw(); };
+            cohContainer.appendChild(cohCheckbox);
+            cohContainer.appendChild(document.createTextNode(' Show Cohomology'));
+            controls.appendChild(cohContainer);
+
+            draw();
           }
         }
       ],
@@ -653,63 +701,70 @@ window.CHAPTERS.push({
           H^1(T^2; \\mathbb{Z}/2) \\cong \\text{Hom}(\\mathbb{Z}^2, \\mathbb{Z}/2) = (\\mathbb{Z}/2)^2
           \\]
         </div>
+
+        <div class="viz-placeholder" data-viz="ext-tor-calculator"></div>
+        <div class="viz-placeholder" data-viz="coefficient-change"></div>
       `,
       visualizations: [
         {
           id: 'ext-tor-calculator',
           title: 'Ext and Tor Calculator',
           description: 'See the UCT in action: compute Ext(A, G) for various groups.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                groupA: 'Z2', // 'Z', 'Z2', 'Z3', 'Z4'
-                groupG: 'Z', // 'Z', 'Z2', 'Q'
-                functor: 'Ext' // 'Ext', 'Hom'
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              groupA: 'Z2',
+              groupG: 'Z'
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const groups = {
-                Z: { name: 'ℤ', desc: 'Integers' },
-                Z2: { name: 'ℤ/2', desc: 'Cyclic order 2' },
-                Z3: { name: 'ℤ/3', desc: 'Cyclic order 3' },
-                Z4: { name: 'ℤ/4', desc: 'Cyclic order 4' },
-                Q: { name: 'ℚ', desc: 'Rationals' }
+              var groups = {
+                Z: { name: '\u2124', desc: 'Integers' },
+                Z2: { name: '\u2124/2', desc: 'Cyclic order 2' },
+                Z3: { name: '\u2124/3', desc: 'Cyclic order 3' },
+                Z4: { name: '\u2124/4', desc: 'Cyclic order 4' },
+                Q: { name: '\u211A', desc: 'Rationals' }
               };
 
-              const A = groups[viz.state.groupA];
-              const G = groups[viz.state.groupG];
+              var A = groups[state.groupA];
+              var G = groups[state.groupG];
 
               // Compute Ext and Hom
-              const computeExt = (a, g) => {
+              var computeExt = function(a, g) {
                 if (a === 'Z') return '0';
-                if (g === 'Q') return '0'; // Q is divisible
-                if (a === 'Z2' && g === 'Z') return 'ℤ/2';
-                if (a === 'Z2' && g === 'Z2') return 'ℤ/2';
-                if (a === 'Z3' && g === 'Z') return 'ℤ/3';
-                if (a === 'Z4' && g === 'Z') return 'ℤ/4';
+                if (g === 'Q') return '0';
+                if (a === 'Z2' && g === 'Z') return '\u2124/2';
+                if (a === 'Z2' && g === 'Z2') return '\u2124/2';
+                if (a === 'Z3' && g === 'Z') return '\u2124/3';
+                if (a === 'Z4' && g === 'Z') return '\u2124/4';
                 return '?';
               };
 
-              const computeHom = (a, g) => {
-                if (a === 'Z' && g === 'Z') return 'ℤ';
-                if (a === 'Z' && g === 'Z2') return 'ℤ/2';
-                if (a === 'Z' && g === 'Q') return 'ℚ';
+              var computeHom = function(a, g) {
+                if (a === 'Z' && g === 'Z') return '\u2124';
+                if (a === 'Z' && g === 'Z2') return '\u2124/2';
+                if (a === 'Z' && g === 'Q') return '\u211A';
                 if (a === 'Z2' && g === 'Z') return '0';
-                if (a === 'Z2' && g === 'Z2') return 'ℤ/2';
+                if (a === 'Z2' && g === 'Z2') return '\u2124/2';
                 if (a === 'Z3' && g === 'Z') return '0';
-                if (a === 'Z4' && g === 'Z2') return 'ℤ/2';
+                if (a === 'Z4' && g === 'Z2') return '\u2124/2';
                 return '?';
               };
 
-              const extValue = computeExt(viz.state.groupA, viz.state.groupG);
-              const homValue = computeHom(viz.state.groupA, viz.state.groupG);
+              var extValue = computeExt(state.groupA, state.groupG);
+              var homValue = computeHom(state.groupA, state.groupG);
 
-              const centerX = width / 2;
-              const centerY = height / 2;
+              var centerX = width / 2;
+              var centerY = height / 2;
 
               // Title
               ctx.fillStyle = '#000';
@@ -719,11 +774,11 @@ window.CHAPTERS.push({
 
               // Input groups
               ctx.font = '15px KaTeX_Main';
-              ctx.fillText(`A = ${A.name}`, centerX - 150, 80);
-              ctx.fillText(`G = ${G.name}`, centerX + 150, 80);
+              ctx.fillText('A = ' + A.name, centerX - 150, 80);
+              ctx.fillText('G = ' + G.name, centerX + 150, 80);
 
               // Formulas
-              const formulaY = centerY - 60;
+              var formulaY = centerY - 60;
               ctx.fillStyle = '#3498db';
               ctx.font = 'bold 16px KaTeX_Main';
               ctx.fillText('Hom(A, G)', centerX - 150, formulaY);
@@ -739,7 +794,7 @@ window.CHAPTERS.push({
               ctx.fillText('(torsion part)', centerX + 150, formulaY + 20);
 
               // Results
-              const resY = centerY + 20;
+              var resY = centerY + 20;
               ctx.strokeStyle = '#3498db';
               ctx.lineWidth = 3;
               ctx.strokeRect(centerX - 230, resY, 160, 60);
@@ -757,99 +812,116 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
               ctx.textAlign = 'center';
-              const uctY = height - 60;
-              ctx.fillText('UCT: Hⁿ(X; G) ≅ Hom(Hₙ(X), G) ⊕ Ext(Hₙ₋₁(X), G)', centerX, uctY);
+              var uctY = height - 60;
+              ctx.fillText('UCT: H\u207F(X; G) \u2245 Hom(H\u2099(X), G) \u2295 Ext(H\u2099\u208B\u2081(X), G)', centerX, uctY);
               ctx.font = '12px KaTeX_Main';
               ctx.fillText('(splits non-canonically)', centerX, uctY + 20);
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'groupA',
-                label: 'Group A',
-                options: [
-                  { value: 'Z', label: 'ℤ' },
-                  { value: 'Z2', label: 'ℤ/2' },
-                  { value: 'Z3', label: 'ℤ/3' },
-                  { value: 'Z4', label: 'ℤ/4' }
-                ],
-                value: 'Z2'
-              },
-              {
-                type: 'select',
-                id: 'groupG',
-                label: 'Group G',
-                options: [
-                  { value: 'Z', label: 'ℤ' },
-                  { value: 'Z2', label: 'ℤ/2' },
-                  { value: 'Q', label: 'ℚ' }
-                ],
-                value: 'Z'
-              }
-            ]
+            }
+
+            // Controls: select (groupA)
+            var aLabel = document.createElement('label');
+            aLabel.style.color = '#c9d1d9';
+            aLabel.style.marginRight = '8px';
+            aLabel.textContent = 'Group A: ';
+            controls.appendChild(aLabel);
+            var aSelect = document.createElement('select');
+            aSelect.style.background = '#161b22'; aSelect.style.color = '#c9d1d9'; aSelect.style.border = '1px solid #30363d'; aSelect.style.padding = '4px 8px'; aSelect.style.borderRadius = '4px';
+            [{value:'Z',label:'\u2124'},{value:'Z2',label:'\u2124/2'},{value:'Z3',label:'\u2124/3'},{value:'Z4',label:'\u2124/4'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              aSelect.appendChild(o);
+            });
+            aSelect.value = 'Z2';
+            aSelect.onchange = function() { state.groupA = aSelect.value; draw(); };
+            controls.appendChild(aSelect);
+
+            // Controls: select (groupG)
+            var gLabel = document.createElement('label');
+            gLabel.style.color = '#c9d1d9';
+            gLabel.style.marginLeft = '15px';
+            gLabel.style.marginRight = '8px';
+            gLabel.textContent = 'Group G: ';
+            controls.appendChild(gLabel);
+            var gSelect = document.createElement('select');
+            gSelect.style.background = '#161b22'; gSelect.style.color = '#c9d1d9'; gSelect.style.border = '1px solid #30363d'; gSelect.style.padding = '4px 8px'; gSelect.style.borderRadius = '4px';
+            [{value:'Z',label:'\u2124'},{value:'Z2',label:'\u2124/2'},{value:'Q',label:'\u211A'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              gSelect.appendChild(o);
+            });
+            gSelect.value = 'Z';
+            gSelect.onchange = function() { state.groupG = gSelect.value; draw(); };
+            controls.appendChild(gSelect);
+
+            draw();
           }
         },
         {
           id: 'coefficient-change',
           title: 'Coefficient Change Comparison',
-          description: 'Compare Hⁿ(X; ℤ), Hⁿ(X; ℤ/2), Hⁿ(X; ℚ) for the same space.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                space: 'rp2' // 'circle', 'rp2', 'torus'
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          description: 'Compare Hn(X; Z), Hn(X; Z/2), Hn(X; Q) for the same space.',
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              space: 'rp2'
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const spaces = {
+              var spaces = {
                 circle: {
-                  name: 'S¹',
-                  Z: ['ℤ', 'ℤ', '0'],
-                  Z2: ['ℤ/2', 'ℤ/2', '0'],
-                  Q: ['ℚ', 'ℚ', '0']
+                  name: 'S\u00B9',
+                  Z: ['\u2124', '\u2124', '0'],
+                  Z2: ['\u2124/2', '\u2124/2', '0'],
+                  Q: ['\u211A', '\u211A', '0']
                 },
                 rp2: {
-                  name: 'ℝP²',
-                  Z: ['ℤ', '0', 'ℤ/2'],
-                  Z2: ['ℤ/2', 'ℤ/2', 'ℤ/2'],
-                  Q: ['ℚ', '0', '0']
+                  name: '\u211DP\u00B2',
+                  Z: ['\u2124', '0', '\u2124/2'],
+                  Z2: ['\u2124/2', '\u2124/2', '\u2124/2'],
+                  Q: ['\u211A', '0', '0']
                 },
                 torus: {
-                  name: 'T²',
-                  Z: ['ℤ', 'ℤ²', 'ℤ'],
-                  Z2: ['ℤ/2', '(ℤ/2)²', 'ℤ/2'],
-                  Q: ['ℚ', 'ℚ²', 'ℚ']
+                  name: 'T\u00B2',
+                  Z: ['\u2124', '\u2124\u00B2', '\u2124'],
+                  Z2: ['\u2124/2', '(\u2124/2)\u00B2', '\u2124/2'],
+                  Q: ['\u211A', '\u211A\u00B2', '\u211A']
                 }
               };
 
-              const current = spaces[viz.state.space];
+              var current = spaces[state.space];
 
-              const centerX = width / 2;
+              var centerX = width / 2;
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`Cohomology of ${current.name} with different coefficients`, centerX, 30);
+              ctx.fillText('Cohomology of ' + current.name + ' with different coefficients', centerX, 30);
 
               // Table
-              const tableY = 80;
-              const rowHeight = 40;
-              const colWidth = 150;
+              var tableY = 80;
+              var rowHeight = 40;
+              var colWidth = 150;
 
-              const headers = ['Degree', 'ℤ coeff', 'ℤ/2 coeff', 'ℚ coeff'];
-              const rows = [
-                ['H⁰', current.Z[0], current.Z2[0], current.Q[0]],
-                ['H¹', current.Z[1], current.Z2[1], current.Q[1]],
-                ['H²', current.Z[2], current.Z2[2], current.Q[2]]
+              var headers = ['Degree', '\u2124 coeff', '\u2124/2 coeff', '\u211A coeff'];
+              var rows = [
+                ['H\u2070', current.Z[0], current.Z2[0], current.Q[0]],
+                ['H\u00B9', current.Z[1], current.Z2[1], current.Q[1]],
+                ['H\u00B2', current.Z[2], current.Z2[2], current.Q[2]]
               ];
 
               // Draw headers
-              headers.forEach((h, i) => {
-                const x = 50 + i * colWidth;
+              headers.forEach(function(h, i) {
+                var x = 50 + i * colWidth;
                 ctx.fillStyle = '#3498db';
                 ctx.font = 'bold 15px KaTeX_Main';
                 ctx.textAlign = 'center';
@@ -857,10 +929,10 @@ window.CHAPTERS.push({
               });
 
               // Draw rows
-              rows.forEach((row, ri) => {
-                row.forEach((cell, ci) => {
-                  const x = 50 + ci * colWidth;
-                  const y = tableY + (ri + 1) * rowHeight;
+              rows.forEach(function(row, ri) {
+                row.forEach(function(cell, ci) {
+                  var x = 50 + ci * colWidth;
+                  var y = tableY + (ri + 1) * rowHeight;
 
                   ctx.strokeStyle = '#bdc3c7';
                   ctx.lineWidth = 1;
@@ -874,35 +946,41 @@ window.CHAPTERS.push({
               });
 
               // Observations
-              const obsY = tableY + 4 * rowHeight + 40;
+              var obsY = tableY + 4 * rowHeight + 40;
               ctx.fillStyle = '#000';
               ctx.font = 'bold 14px KaTeX_Main';
               ctx.textAlign = 'left';
               ctx.fillText('Observations:', 20, obsY);
               ctx.font = '13px KaTeX_Main';
 
-              if (viz.state.space === 'rp2') {
-                ctx.fillText('• ℤ coefficients: torsion appears in H² (from Ext)', 40, obsY + 25);
-                ctx.fillText('• ℤ/2 coefficients: all groups non-zero (mod 2 kills torsion issues)', 40, obsY + 45);
-                ctx.fillText('• ℚ coefficients: torsion vanishes (ℚ is divisible)', 40, obsY + 65);
-              } else if (viz.state.space === 'torus') {
-                ctx.fillText('• Torsion-free homology ⟹ Hⁿ(X; G) ≅ Hom(Hₙ(X), G)', 40, obsY + 25);
-                ctx.fillText('• Coefficient change just applies Hom(-, G) to each Hₙ', 40, obsY + 45);
+              if (state.space === 'rp2') {
+                ctx.fillText('\u2022 \u2124 coefficients: torsion appears in H\u00B2 (from Ext)', 40, obsY + 25);
+                ctx.fillText('\u2022 \u2124/2 coefficients: all groups non-zero (mod 2 kills torsion issues)', 40, obsY + 45);
+                ctx.fillText('\u2022 \u211A coefficients: torsion vanishes (\u211A is divisible)', 40, obsY + 65);
+              } else if (state.space === 'torus') {
+                ctx.fillText('\u2022 Torsion-free homology \u27F9 H\u207F(X; G) \u2245 Hom(H\u2099(X), G)', 40, obsY + 25);
+                ctx.fillText('\u2022 Coefficient change just applies Hom(-, G) to each H\u2099', 40, obsY + 45);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'space',
-                label: 'Space',
-                options: [
-                  { value: 'circle', label: 'S¹ (Circle)' },
-                  { value: 'rp2', label: 'ℝP² (Projective Plane)' },
-                  { value: 'torus', label: 'T² (Torus)' }
-                ],
-                value: 'rp2'
-              }
-            ]
+            }
+
+            // Controls: select (space)
+            var spaceLabel = document.createElement('label');
+            spaceLabel.style.color = '#c9d1d9';
+            spaceLabel.style.marginRight = '8px';
+            spaceLabel.textContent = 'Space: ';
+            controls.appendChild(spaceLabel);
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22'; spaceSelect.style.color = '#c9d1d9'; spaceSelect.style.border = '1px solid #30363d'; spaceSelect.style.padding = '4px 8px'; spaceSelect.style.borderRadius = '4px';
+            [{value:'circle',label:'S\u00B9 (Circle)'},{value:'rp2',label:'\u211DP\u00B2 (Projective Plane)'},{value:'torus',label:'T\u00B2 (Torus)'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 'rp2';
+            spaceSelect.onchange = function() { state.space = spaceSelect.value; draw(); };
+            controls.appendChild(spaceSelect);
+
+            draw();
           }
         }
       ],
@@ -991,7 +1069,7 @@ window.CHAPTERS.push({
             </tr>
             <tr>
               <td style="border: 1px solid #bdc3c7; padding: 8px;"><strong>Relationship</strong></td>
-              <td style="border: 1px solid #bdc3c7; padding: 8px;">—</td>
+              <td style="border: 1px solid #bdc3c7; padding: 8px;">\u2014</td>
               <td style="border: 1px solid #bdc3c7; padding: 8px;">\\(H^n(X; G) \\cong \\text{Hom}(H_n(X), G) \\oplus \\text{Ext}(H_{n-1}(X), G)\\)</td>
             </tr>
             <tr>
@@ -1032,101 +1110,108 @@ window.CHAPTERS.push({
         </div>
 
         <div class="env-block theorem">
-          <strong>Poincaré Duality (Preview):</strong> For a closed, oriented \\(n\\)-manifold \\(M\\):
+          <strong>Poincare Duality (Preview):</strong> For a closed, oriented \\(n\\)-manifold \\(M\\):
           \\[
           H^k(M; \\mathbb{Z}) \\cong H_{n-k}(M; \\mathbb{Z})
           \\]
-          This relates cohomology and homology in complementary dimensions—a deep result we'll explore in later chapters.
+          This relates cohomology and homology in complementary dimensions\u2014a deep result we'll explore in later chapters.
         </div>
+
+        <div class="viz-placeholder" data-viz="homology-cohomology-table"></div>
       `,
       visualizations: [
         {
           id: 'homology-cohomology-table',
           title: 'Homology vs Cohomology Comparison Table',
           description: 'Interactive comparison of homology and cohomology for various spaces.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.6,
-            setup: (viz) => {
-              viz.state = {
-                space: 'rp2',
-                showHomology: true,
-                showCohomology: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.6);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              space: 'rp2',
+              showHomology: true,
+              showCohomology: true
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const spaces = {
+              var spaces = {
                 circle: {
-                  name: 'S¹',
-                  homology: ['ℤ', 'ℤ', '0'],
-                  cohomology: ['ℤ', 'ℤ', '0']
+                  name: 'S\u00B9',
+                  homology: ['\u2124', '\u2124', '0'],
+                  cohomology: ['\u2124', '\u2124', '0']
                 },
                 rp2: {
-                  name: 'ℝP²',
-                  homology: ['ℤ', 'ℤ/2', '0'],
-                  cohomology: ['ℤ', '0', 'ℤ/2']
+                  name: '\u211DP\u00B2',
+                  homology: ['\u2124', '\u2124/2', '0'],
+                  cohomology: ['\u2124', '0', '\u2124/2']
                 },
                 torus: {
-                  name: 'T²',
-                  homology: ['ℤ', 'ℤ²', 'ℤ'],
-                  cohomology: ['ℤ', 'ℤ²', 'ℤ']
+                  name: 'T\u00B2',
+                  homology: ['\u2124', '\u2124\u00B2', '\u2124'],
+                  cohomology: ['\u2124', '\u2124\u00B2', '\u2124']
                 }
               };
 
-              const current = spaces[viz.state.space];
+              var current = spaces[state.space];
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`Comparison for ${current.name}`, width / 2, 30);
+              ctx.fillText('Comparison for ' + current.name, width / 2, 30);
 
-              const leftX = width * 0.3;
-              const rightX = width * 0.7;
-              const startY = 80;
-              const rowHeight = 50;
+              var leftX = width * 0.3;
+              var rightX = width * 0.7;
+              var startY = 80;
+              var rowHeight = 50;
 
               // Homology column
-              if (viz.state.showHomology) {
+              if (state.showHomology) {
                 ctx.fillStyle = '#3498db';
                 ctx.font = 'bold 16px KaTeX_Main';
                 ctx.fillText('Homology', leftX, startY);
 
-                current.homology.forEach((group, i) => {
-                  const y = startY + (i + 1) * rowHeight;
+                current.homology.forEach(function(group, i) {
+                  var y = startY + (i + 1) * rowHeight;
                   ctx.strokeStyle = '#3498db';
                   ctx.lineWidth = 2;
                   ctx.strokeRect(leftX - 60, y - 25, 120, 40);
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(`H${i} = ${group}`, leftX, y);
+                  ctx.fillText('H' + i + ' = ' + group, leftX, y);
                 });
               }
 
               // Cohomology column
-              if (viz.state.showCohomology) {
+              if (state.showCohomology) {
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = 'bold 16px KaTeX_Main';
                 ctx.textAlign = 'center';
                 ctx.fillText('Cohomology', rightX, startY);
 
-                current.cohomology.forEach((group, i) => {
-                  const y = startY + (i + 1) * rowHeight;
+                current.cohomology.forEach(function(group, i) {
+                  var y = startY + (i + 1) * rowHeight;
                   ctx.strokeStyle = '#9b59b6';
                   ctx.lineWidth = 2;
                   ctx.strokeRect(rightX - 60, y - 25, 120, 40);
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(`H${i} = ${group}`, rightX, y);
+                  ctx.fillText('H' + i + ' = ' + group, rightX, y);
                 });
               }
 
               // Highlight differences
-              if (viz.state.space === 'rp2' && viz.state.showHomology && viz.state.showCohomology) {
+              if (state.space === 'rp2' && state.showHomology && state.showCohomology) {
                 ctx.strokeStyle = '#e74c3c';
                 ctx.lineWidth = 3;
                 ctx.setLineDash([5, 5]);
@@ -1138,34 +1223,54 @@ window.CHAPTERS.push({
                 ctx.font = '12px KaTeX_Main';
                 ctx.textAlign = 'center';
                 ctx.fillText('Torsion shifts!', width / 2, height - 40);
-                ctx.fillText('H₁ has ℤ/2, but H¹ = 0. Instead, H² has ℤ/2 (from Ext).', width / 2, height - 20);
+                ctx.fillText('H\u2081 has \u2124/2, but H\u00B9 = 0. Instead, H\u00B2 has \u2124/2 (from Ext).', width / 2, height - 20);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'space',
-                label: 'Space',
-                options: [
-                  { value: 'circle', label: 'S¹' },
-                  { value: 'rp2', label: 'ℝP²' },
-                  { value: 'torus', label: 'T²' }
-                ],
-                value: 'rp2'
-              },
-              {
-                type: 'checkbox',
-                id: 'showHomology',
-                label: 'Show Homology',
-                value: true
-              },
-              {
-                type: 'checkbox',
-                id: 'showCohomology',
-                label: 'Show Cohomology',
-                value: true
-              }
-            ]
+            }
+
+            // Controls: select (space)
+            var spaceLabel = document.createElement('label');
+            spaceLabel.style.color = '#c9d1d9';
+            spaceLabel.style.marginRight = '8px';
+            spaceLabel.textContent = 'Space: ';
+            controls.appendChild(spaceLabel);
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22'; spaceSelect.style.color = '#c9d1d9'; spaceSelect.style.border = '1px solid #30363d'; spaceSelect.style.padding = '4px 8px'; spaceSelect.style.borderRadius = '4px';
+            [{value:'circle',label:'S\u00B9'},{value:'rp2',label:'\u211DP\u00B2'},{value:'torus',label:'T\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 'rp2';
+            spaceSelect.onchange = function() { state.space = spaceSelect.value; draw(); };
+            controls.appendChild(spaceSelect);
+
+            // Controls: checkbox (showHomology)
+            var homContainer = document.createElement('label');
+            homContainer.style.color = '#c9d1d9';
+            homContainer.style.marginLeft = '15px';
+            homContainer.style.cursor = 'pointer';
+            var homCheckbox = document.createElement('input');
+            homCheckbox.type = 'checkbox';
+            homCheckbox.checked = true;
+            homCheckbox.onchange = function() { state.showHomology = homCheckbox.checked; draw(); };
+            homContainer.appendChild(homCheckbox);
+            homContainer.appendChild(document.createTextNode(' Show Homology'));
+            controls.appendChild(homContainer);
+
+            // Controls: checkbox (showCohomology)
+            var cohContainer = document.createElement('label');
+            cohContainer.style.color = '#c9d1d9';
+            cohContainer.style.marginLeft = '15px';
+            cohContainer.style.cursor = 'pointer';
+            var cohCheckbox = document.createElement('input');
+            cohCheckbox.type = 'checkbox';
+            cohCheckbox.checked = true;
+            cohCheckbox.onchange = function() { state.showCohomology = cohCheckbox.checked; draw(); };
+            cohContainer.appendChild(cohCheckbox);
+            cohContainer.appendChild(document.createTextNode(' Show Cohomology'));
+            controls.appendChild(cohContainer);
+
+            draw();
           }
         }
       ],

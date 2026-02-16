@@ -52,96 +52,101 @@ window.CHAPTERS.push({
             <li>Homotopy-invariant: CW approximation shows any space is weakly equivalent to a CW complex.</li>
           </ul>
         </div>
+
+        <div class="viz-placeholder" data-viz="cw-structure-viz"></div>
       `,
       visualizations: [
         {
           id: 'cw-structure-viz',
           title: 'CW Structure Visualizer',
           description: 'Explore how cells attach to build up the skeleton.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                space: 'torus', // 'sphere', 'torus', 'rp2', 'klein'
-                skeleton: 2, // 0, 1, 2
-                showLabels: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            const canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+
+            const state = {
+              space: 'torus',
+              skeleton: 2,
+              showLabels: true
+            };
+
+            function draw() {
+              const width = canvas.width;
+              const height = canvas.height;
               ctx.clearRect(0, 0, width, height);
               const centerX = width / 2;
               const centerY = height / 2;
 
               const structures = {
                 sphere: {
-                  name: 'S²',
+                  name: 'S\u00B2',
                   cells: {
-                    0: [{ label: 'e⁰', x: centerX, y: centerY - 80 }],
+                    0: [{ label: 'e\u2070', x: centerX, y: centerY - 80 }],
                     1: [],
-                    2: [{ label: 'e²', x: centerX, y: centerY + 40, r: 90 }]
+                    2: [{ label: 'e\u00B2', x: centerX, y: centerY + 40, r: 90 }]
                   }
                 },
                 torus: {
-                  name: 'T²',
+                  name: 'T\u00B2',
                   cells: {
-                    0: [{ label: 'e⁰', x: centerX, y: centerY }],
+                    0: [{ label: 'e\u2070', x: centerX, y: centerY }],
                     1: [
-                      { label: 'eₐ¹', x: centerX - 80, y: centerY, path: 'loop-left' },
-                      { label: 'eᵦ¹', x: centerX + 80, y: centerY, path: 'loop-right' }
+                      { label: 'e\u2090\u00B9', x: centerX - 80, y: centerY, path: 'loop-left' },
+                      { label: 'e\u1D66\u00B9', x: centerX + 80, y: centerY, path: 'loop-right' }
                     ],
-                    2: [{ label: 'e²', x: centerX, y: centerY, r: 100 }]
+                    2: [{ label: 'e\u00B2', x: centerX, y: centerY, r: 100 }]
                   }
                 },
                 rp2: {
-                  name: 'ℝP²',
+                  name: '\u211DP\u00B2',
                   cells: {
-                    0: [{ label: 'e⁰', x: centerX - 120, y: centerY }],
-                    1: [{ label: 'e¹', x: centerX, y: centerY, path: 'line' }],
-                    2: [{ label: 'e²', x: centerX + 120, y: centerY, r: 60 }]
+                    0: [{ label: 'e\u2070', x: centerX - 120, y: centerY }],
+                    1: [{ label: 'e\u00B9', x: centerX, y: centerY, path: 'line' }],
+                    2: [{ label: 'e\u00B2', x: centerX + 120, y: centerY, r: 60 }]
                   }
                 },
                 klein: {
                   name: 'Klein Bottle',
                   cells: {
-                    0: [{ label: 'e⁰', x: centerX, y: centerY }],
+                    0: [{ label: 'e\u2070', x: centerX, y: centerY }],
                     1: [
-                      { label: 'eₐ¹', x: centerX - 80, y: centerY, path: 'loop-left' },
-                      { label: 'eᵦ¹', x: centerX + 80, y: centerY, path: 'loop-right' }
+                      { label: 'e\u2090\u00B9', x: centerX - 80, y: centerY, path: 'loop-left' },
+                      { label: 'e\u1D66\u00B9', x: centerX + 80, y: centerY, path: 'loop-right' }
                     ],
-                    2: [{ label: 'e²', x: centerX, y: centerY, r: 100 }]
+                    2: [{ label: 'e\u00B2', x: centerX, y: centerY, r: 100 }]
                   }
                 }
               };
 
-              const current = structures[viz.state.space];
+              var current = structures[state.space];
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`CW Structure: ${current.name}`, centerX, 25);
+              ctx.fillText('CW Structure: ' + current.name, centerX, 25);
               ctx.font = '14px KaTeX_Main';
-              ctx.fillText(`Showing ${viz.state.skeleton}-skeleton`, centerX, 50);
+              ctx.fillText('Showing ' + state.skeleton + '-skeleton', centerX, 50);
 
               // Draw cells up to current skeleton
-              for (let dim = 0; dim <= viz.state.skeleton; dim++) {
-                const cells = current.cells[dim] || [];
+              for (var dim = 0; dim <= state.skeleton; dim++) {
+                var cells = current.cells[dim] || [];
 
-                cells.forEach(cell => {
+                cells.forEach(function(cell) {
                   if (dim === 0) {
-                    // 0-cell (point)
                     ctx.fillStyle = '#e74c3c';
                     ctx.beginPath();
                     ctx.arc(cell.x, cell.y, 8, 0, 2 * Math.PI);
                     ctx.fill();
-                    if (viz.state.showLabels) {
+                    if (state.showLabels) {
                       ctx.fillStyle = '#000';
                       ctx.font = '13px KaTeX_Main';
                       ctx.fillText(cell.label, cell.x + 15, cell.y - 10);
                     }
                   } else if (dim === 1) {
-                    // 1-cell (edge/loop)
                     ctx.strokeStyle = '#27ae60';
                     ctx.lineWidth = 4;
                     if (cell.path === 'loop-left') {
@@ -158,13 +163,12 @@ window.CHAPTERS.push({
                       ctx.lineTo(centerX + 40, centerY);
                       ctx.stroke();
                     }
-                    if (viz.state.showLabels) {
+                    if (state.showLabels) {
                       ctx.fillStyle = '#000';
                       ctx.font = '13px KaTeX_Main';
                       ctx.fillText(cell.label, cell.x, cell.y - 50);
                     }
                   } else if (dim === 2) {
-                    // 2-cell (disk)
                     ctx.fillStyle = 'rgba(52, 152, 219, 0.3)';
                     ctx.strokeStyle = '#3498db';
                     ctx.lineWidth = 3;
@@ -172,7 +176,7 @@ window.CHAPTERS.push({
                     ctx.arc(cell.x, cell.y, cell.r, 0, 2 * Math.PI);
                     ctx.fill();
                     ctx.stroke();
-                    if (viz.state.showLabels) {
+                    if (state.showLabels) {
                       ctx.fillStyle = '#000';
                       ctx.font = '14px KaTeX_Main';
                       ctx.fillText(cell.label, cell.x, cell.y + 5);
@@ -185,40 +189,61 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'left';
-              const c0 = (current.cells[0] || []).length;
-              const c1 = (current.cells[1] || []).length;
-              const c2 = (current.cells[2] || []).length;
-              ctx.fillText(`Cells: c₀ = ${c0}, c₁ = ${c1}, c₂ = ${c2}`, 10, height - 20);
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'space',
-                label: 'Space',
-                options: [
-                  { value: 'sphere', label: 'S²' },
-                  { value: 'torus', label: 'T²' },
-                  { value: 'rp2', label: 'ℝP²' },
-                  { value: 'klein', label: 'Klein Bottle' }
-                ],
-                value: 'torus'
-              },
-              {
-                type: 'slider',
-                id: 'skeleton',
-                label: 'Skeleton dimension',
-                min: 0,
-                max: 2,
-                step: 1,
-                value: 2
-              },
-              {
-                type: 'checkbox',
-                id: 'showLabels',
-                label: 'Show Labels',
-                value: true
-              }
-            ]
+              var c0 = (current.cells[0] || []).length;
+              var c1 = (current.cells[1] || []).length;
+              var c2 = (current.cells[2] || []).length;
+              ctx.fillText('Cells: c\u2080 = ' + c0 + ', c\u2081 = ' + c1 + ', c\u2082 = ' + c2, 10, height - 20);
+            }
+
+            // Controls: select (space)
+            var spaceLabel = document.createElement('label');
+            spaceLabel.style.color = '#c9d1d9';
+            spaceLabel.style.marginRight = '8px';
+            spaceLabel.textContent = 'Space: ';
+            controls.appendChild(spaceLabel);
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22'; spaceSelect.style.color = '#c9d1d9'; spaceSelect.style.border = '1px solid #30363d'; spaceSelect.style.padding = '4px 8px'; spaceSelect.style.borderRadius = '4px';
+            [{value:'sphere',label:'S\u00B2'},{value:'torus',label:'T\u00B2'},{value:'rp2',label:'\u211DP\u00B2'},{value:'klein',label:'Klein Bottle'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 'torus';
+            spaceSelect.onchange = function() { state.space = spaceSelect.value; draw(); };
+            controls.appendChild(spaceSelect);
+
+            // Controls: slider (skeleton)
+            var skelLabel = document.createElement('label');
+            skelLabel.style.color = '#c9d1d9';
+            skelLabel.style.marginLeft = '15px';
+            skelLabel.style.marginRight = '8px';
+            skelLabel.textContent = 'Skeleton dimension: 2';
+            controls.appendChild(skelLabel);
+            var skelSlider = document.createElement('input');
+            skelSlider.type = 'range';
+            skelSlider.min = 0; skelSlider.max = 2; skelSlider.step = 1; skelSlider.value = 2;
+            skelSlider.style.width = '200px';
+            skelSlider.oninput = function() {
+              state.skeleton = parseInt(skelSlider.value);
+              skelLabel.textContent = 'Skeleton dimension: ' + skelSlider.value;
+              draw();
+            };
+            controls.appendChild(skelSlider);
+
+            // Controls: checkbox (showLabels)
+            var labelsContainer = document.createElement('label');
+            labelsContainer.style.color = '#c9d1d9';
+            labelsContainer.style.marginLeft = '15px';
+            labelsContainer.style.cursor = 'pointer';
+            var labelsCheckbox = document.createElement('input');
+            labelsCheckbox.type = 'checkbox';
+            labelsCheckbox.checked = true;
+            labelsCheckbox.onchange = function() { state.showLabels = labelsCheckbox.checked; draw(); };
+            labelsContainer.appendChild(labelsCheckbox);
+            labelsContainer.appendChild(document.createTextNode(' Show Labels'));
+            controls.appendChild(labelsContainer);
+
+            draw();
           }
         }
       ],
@@ -316,34 +341,41 @@ window.CHAPTERS.push({
         <div class="env-block remark">
           <strong>Computational Advantage:</strong> For \\(T^2\\), the cellular complex has 4 generators total. A simplicial complex for \\(T^2\\) might have 18 triangles, 27 edges, 9 vertices—much larger! Cellular homology is extremely efficient.
         </div>
+
+        <div class="viz-placeholder" data-viz="cellular-boundary-viz"></div>
       `,
       visualizations: [
         {
           id: 'cellular-boundary-viz',
           title: 'Cellular Boundary Animator',
-          description: 'Watch the boundary map dₙ: Cₙ → Cₙ₋₁ via attaching maps and degrees.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.6,
-            setup: (viz) => {
-              viz.state = {
-                space: 'rp2', // 'sphere', 'torus', 'rp2'
-                highlightCell: 'e2',
-                showDegree: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          description: 'Watch the boundary map dn: Cn -> Cn-1 via attaching maps and degrees.',
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.6);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              space: 'rp2',
+              highlightCell: 'e2',
+              showDegree: true
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const examples = {
+              var examples = {
                 sphere: {
-                  name: 'S²',
+                  name: 'S\u00B2',
                   cells: { e0: '0-cell', e2: '2-cell' },
                   boundary: { e2: '0 (constant attaching map)' },
                   diagram: { e0: {x: 150, y: 200}, e2: {x: 450, y: 200, r: 80} }
                 },
                 torus: {
-                  name: 'T²',
+                  name: 'T\u00B2',
                   cells: { e0: '0-cell', ea: '1-cell a', eb: '1-cell b', e2: '2-cell' },
                   boundary: { ea: '0', eb: '0', e2: '0' },
                   diagram: {
@@ -354,9 +386,9 @@ window.CHAPTERS.push({
                   }
                 },
                 rp2: {
-                  name: 'ℝP²',
+                  name: '\u211DP\u00B2',
                   cells: { e0: '0-cell', e1: '1-cell', e2: '2-cell' },
-                  boundary: { e1: '0', e2: '2·e¹ (degree 2)' },
+                  boundary: { e1: '0', e2: '2\u00B7e\u00B9 (degree 2)' },
                   diagram: {
                     e0: {x: 100, y: 250},
                     e1: {x: 280, y: 250},
@@ -365,18 +397,18 @@ window.CHAPTERS.push({
                 }
               };
 
-              const current = examples[viz.state.space];
+              var current = examples[state.space];
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`Cellular Boundary: ${current.name}`, width / 2, 30);
+              ctx.fillText('Cellular Boundary: ' + current.name, width / 2, 30);
 
               // Draw cells
-              Object.keys(current.diagram).forEach(key => {
-                const cell = current.diagram[key];
-                const isHighlighted = viz.state.highlightCell === key;
+              Object.keys(current.diagram).forEach(function(key) {
+                var cell = current.diagram[key];
+                var isHighlighted = state.highlightCell === key;
 
                 if (key === 'e0') {
                   ctx.fillStyle = isHighlighted ? '#e74c3c' : '#95a5a6';
@@ -386,15 +418,15 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '13px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText('e⁰', cell.x, cell.y + 30);
+                  ctx.fillText('e\u2070', cell.x, cell.y + 30);
                 } else if (key.startsWith('e1') || key === 'ea' || key === 'eb') {
                   ctx.strokeStyle = isHighlighted ? '#27ae60' : '#95a5a6';
                   ctx.lineWidth = isHighlighted ? 5 : 3;
                   ctx.beginPath();
-                  if (viz.state.space === 'torus') {
+                  if (state.space === 'torus') {
                     ctx.arc(cell.x, cell.y, 40, 0, 2 * Math.PI);
                   } else {
-                    const e0 = current.diagram.e0;
+                    var e0 = current.diagram.e0;
                     ctx.moveTo(e0.x + 20, e0.y);
                     ctx.lineTo(cell.x - 20, cell.y);
                   }
@@ -402,7 +434,7 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '13px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  const label = key === 'ea' ? 'eₐ¹' : key === 'eb' ? 'eᵦ¹' : 'e¹';
+                  var label = key === 'ea' ? 'e\u2090\u00B9' : key === 'eb' ? 'e\u1D66\u00B9' : 'e\u00B9';
                   ctx.fillText(label, cell.x, cell.y - 50);
                 } else if (key === 'e2') {
                   ctx.fillStyle = isHighlighted ? 'rgba(52, 152, 219, 0.5)' : 'rgba(149, 165, 166, 0.3)';
@@ -415,39 +447,39 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText('e²', cell.x, cell.y + 5);
+                  ctx.fillText('e\u00B2', cell.x, cell.y + 5);
                 }
               });
 
               // Show boundary computation
-              if (viz.state.showDegree && viz.state.highlightCell === 'e2') {
-                const boundaryText = current.boundary.e2;
+              if (state.showDegree && state.highlightCell === 'e2') {
+                var boundaryText = current.boundary.e2;
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = 'bold 15px KaTeX_Main';
                 ctx.textAlign = 'left';
-                ctx.fillText(`d₂(e²) = ${boundaryText}`, 20, height - 60);
+                ctx.fillText('d\u2082(e\u00B2) = ' + boundaryText, 20, height - 60);
 
-                if (viz.state.space === 'rp2') {
+                if (state.space === 'rp2') {
                   ctx.font = '13px KaTeX_Main';
-                  ctx.fillText('Attaching map: S¹ → ℝP¹ ≃ S¹ is z ↦ z² (degree 2)', 20, height - 35);
-                  ctx.fillText('∴ The 2-cell wraps twice around the 1-cell', 20, height - 15);
+                  ctx.fillText('Attaching map: S\u00B9 \u2192 \u211DP\u00B9 \u2243 S\u00B9 is z \u21A6 z\u00B2 (degree 2)', 20, height - 35);
+                  ctx.fillText('\u2234 The 2-cell wraps twice around the 1-cell', 20, height - 15);
                 }
               }
 
               // Chain complex
-              const chainY = 100;
+              var chainY = 100;
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
               ctx.textAlign = 'center';
               ctx.fillText('Cellular Chain Complex:', width / 2, chainY - 20);
 
-              const terms = viz.state.space === 'torus'
-                ? ['C₂ = ℤ', 'C₁ = ℤ²', 'C₀ = ℤ']
-                : ['C₂ = ℤ', 'C₁ = ℤ', 'C₀ = ℤ'];
+              var terms = state.space === 'torus'
+                ? ['C\u2082 = \u2124', 'C\u2081 = \u2124\u00B2', 'C\u2080 = \u2124']
+                : ['C\u2082 = \u2124', 'C\u2081 = \u2124', 'C\u2080 = \u2124'];
 
-              const spacing = width / (terms.length + 1);
-              terms.forEach((term, i) => {
-                const x = spacing * (i + 1);
+              var spacing = width / (terms.length + 1);
+              terms.forEach(function(term, i) {
+                var x = spacing * (i + 1);
                 ctx.fillText(term, x, chainY);
 
                 if (i < terms.length - 1) {
@@ -465,40 +497,60 @@ window.CHAPTERS.push({
                   ctx.closePath();
                   ctx.fill();
                   ctx.fillStyle = '#000';
-                  ctx.fillText(`d${2 - i}`, (x + x + spacing) / 2, chainY + 20);
+                  ctx.fillText('d' + (2 - i), (x + x + spacing) / 2, chainY + 20);
                 }
               });
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'space',
-                label: 'Space',
-                options: [
-                  { value: 'sphere', label: 'S²' },
-                  { value: 'torus', label: 'T²' },
-                  { value: 'rp2', label: 'ℝP²' }
-                ],
-                value: 'rp2'
-              },
-              {
-                type: 'select',
-                id: 'highlightCell',
-                label: 'Highlight Cell',
-                options: [
-                  { value: 'e0', label: 'e⁰' },
-                  { value: 'e1', label: 'e¹' },
-                  { value: 'e2', label: 'e²' }
-                ],
-                value: 'e2'
-              },
-              {
-                type: 'checkbox',
-                id: 'showDegree',
-                label: 'Show Degree Calculation',
-                value: true
-              }
-            ]
+            }
+
+            // Controls: select (space)
+            var spaceLabel = document.createElement('label');
+            spaceLabel.style.color = '#c9d1d9';
+            spaceLabel.style.marginRight = '8px';
+            spaceLabel.textContent = 'Space: ';
+            controls.appendChild(spaceLabel);
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22'; spaceSelect.style.color = '#c9d1d9'; spaceSelect.style.border = '1px solid #30363d'; spaceSelect.style.padding = '4px 8px'; spaceSelect.style.borderRadius = '4px';
+            [{value:'sphere',label:'S\u00B2'},{value:'torus',label:'T\u00B2'},{value:'rp2',label:'\u211DP\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 'rp2';
+            spaceSelect.onchange = function() { state.space = spaceSelect.value; draw(); };
+            controls.appendChild(spaceSelect);
+
+            // Controls: select (highlightCell)
+            var hlLabel = document.createElement('label');
+            hlLabel.style.color = '#c9d1d9';
+            hlLabel.style.marginLeft = '15px';
+            hlLabel.style.marginRight = '8px';
+            hlLabel.textContent = 'Highlight Cell: ';
+            controls.appendChild(hlLabel);
+            var hlSelect = document.createElement('select');
+            hlSelect.style.background = '#161b22'; hlSelect.style.color = '#c9d1d9'; hlSelect.style.border = '1px solid #30363d'; hlSelect.style.padding = '4px 8px'; hlSelect.style.borderRadius = '4px';
+            [{value:'e0',label:'e\u2070'},{value:'e1',label:'e\u00B9'},{value:'e2',label:'e\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              hlSelect.appendChild(o);
+            });
+            hlSelect.value = 'e2';
+            hlSelect.onchange = function() { state.highlightCell = hlSelect.value; draw(); };
+            controls.appendChild(hlSelect);
+
+            // Controls: checkbox (showDegree)
+            var degContainer = document.createElement('label');
+            degContainer.style.color = '#c9d1d9';
+            degContainer.style.marginLeft = '15px';
+            degContainer.style.cursor = 'pointer';
+            var degCheckbox = document.createElement('input');
+            degCheckbox.type = 'checkbox';
+            degCheckbox.checked = true;
+            degCheckbox.onchange = function() { state.showDegree = degCheckbox.checked; draw(); };
+            degContainer.appendChild(degCheckbox);
+            degContainer.appendChild(document.createTextNode(' Show Degree Calculation'));
+            controls.appendChild(degContainer);
+
+            draw();
           }
         }
       ],
@@ -608,41 +660,48 @@ window.CHAPTERS.push({
           \\]
           Super easy computation!
         </div>
+
+        <div class="viz-placeholder" data-viz="cellular-singular-comparison"></div>
       `,
       visualizations: [
         {
           id: 'cellular-singular-comparison',
           title: 'Cellular vs Singular Homology Comparison',
           description: 'See that both methods give the same answer.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.8,
-            setup: (viz) => {
-              viz.state = {
-                space: 'rp2'
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.8);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              space: 'rp2'
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const examples = {
-                sphere: { name: 'S²', cells: '1+0+1=2', H0: 'ℤ', H1: '0', H2: 'ℤ' },
-                torus: { name: 'T²', cells: '1+2+1=4', H0: 'ℤ', H1: 'ℤ²', H2: 'ℤ' },
-                rp2: { name: 'ℝP²', cells: '1+1+1=3', H0: 'ℤ', H1: 'ℤ/2', H2: '0' },
-                cp2: { name: 'ℂP²', cells: '1+0+1+0+1=3', H0: 'ℤ', H2: 'ℤ', H4: 'ℤ' }
+              var examples = {
+                sphere: { name: 'S\u00B2', cells: '1+0+1=2', H0: '\u2124', H1: '0', H2: '\u2124' },
+                torus: { name: 'T\u00B2', cells: '1+2+1=4', H0: '\u2124', H1: '\u2124\u00B2', H2: '\u2124' },
+                rp2: { name: '\u211DP\u00B2', cells: '1+1+1=3', H0: '\u2124', H1: '\u2124/2', H2: '0' },
+                cp2: { name: '\u2102P\u00B2', cells: '1+0+1+0+1=3', H0: '\u2124', H2: '\u2124', H4: '\u2124' }
               };
 
-              const current = examples[viz.state.space];
+              var current = examples[state.space];
 
-              const leftX = width * 0.25;
-              const rightX = width * 0.75;
-              const centerY = height / 2;
+              var leftX = width * 0.25;
+              var rightX = width * 0.75;
+              var centerY = height / 2;
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`Space: ${current.name}`, width / 2, 30);
+              ctx.fillText('Space: ' + current.name, width / 2, 30);
 
               // Cellular side
               ctx.fillStyle = '#3498db';
@@ -652,18 +711,18 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'left';
-              const leftStart = leftX - 80;
-              ctx.fillText(`Total cells: ${current.cells}`, leftStart, 100);
+              var leftStart = leftX - 80;
+              ctx.fillText('Total cells: ' + current.cells, leftStart, 100);
               ctx.fillText('One generator per cell', leftStart, 120);
               ctx.fillText('Compute degree of attaching maps', leftStart, 140);
-              ctx.fillText('⟹ Small chain complex', leftStart, 160);
+              ctx.fillText('\u27F9 Small chain complex', leftStart, 160);
 
               // Chain complex boxes
-              const boxY = 190;
-              ['C₂', 'C₁', 'C₀'].forEach((label, i) => {
+              var boxY = 190;
+              ['\u0043\u2082', '\u0043\u2081', '\u0043\u2080'].forEach(function(label, i) {
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 2;
-                const y = boxY + i * 50;
+                var y = boxY + i * 50;
                 ctx.strokeRect(leftStart, y, 120, 35);
                 ctx.fillStyle = '#000';
                 ctx.textAlign = 'center';
@@ -674,13 +733,13 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#27ae60';
               ctx.font = 'bold 14px KaTeX_Main';
               ctx.textAlign = 'left';
-              const resY = boxY + 170;
+              var resY = boxY + 170;
               ctx.fillText('Results:', leftStart, resY);
               ctx.font = '13px KaTeX_Main';
-              ctx.fillText(`H₀ = ${current.H0}`, leftStart, resY + 20);
-              ctx.fillText(`H₁ = ${current.H1}`, leftStart, resY + 40);
-              if (current.H2) ctx.fillText(`H₂ = ${current.H2}`, leftStart, resY + 60);
-              if (current.H4) ctx.fillText(`H₄ = ${current.H4}`, leftStart, resY + 80);
+              ctx.fillText('H\u2080 = ' + current.H0, leftStart, resY + 20);
+              ctx.fillText('H\u2081 = ' + current.H1, leftStart, resY + 40);
+              if (current.H2) ctx.fillText('H\u2082 = ' + current.H2, leftStart, resY + 60);
+              if (current.H4) ctx.fillText('H\u2084 = ' + current.H4, leftStart, resY + 80);
 
               // Singular side
               ctx.fillStyle = '#9b59b6';
@@ -691,20 +750,20 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'left';
-              const rightStart = rightX - 80;
+              var rightStart = rightX - 80;
               ctx.fillText('Infinitely many generators', rightStart, 100);
-              ctx.fillText('(all continuous maps Δⁿ → X)', rightStart, 120);
+              ctx.fillText('(all continuous maps \u0394\u207F \u2192 X)', rightStart, 120);
               ctx.fillText('Hard to compute directly', rightStart, 140);
-              ctx.fillText('⟹ Need tools like MV, CW', rightStart, 160);
+              ctx.fillText('\u27F9 Need tools like MV, CW', rightStart, 160);
 
               // Singular complex (schematic)
-              const sBoxY = 200;
+              var sBoxY = 200;
               ctx.strokeStyle = '#9b59b6';
               ctx.lineWidth = 2;
               ctx.strokeRect(rightStart, sBoxY, 120, 80);
               ctx.fillStyle = '#000';
               ctx.textAlign = 'center';
-              ctx.fillText('C₂(X)', rightStart + 60, sBoxY + 25);
+              ctx.fillText('C\u2082(X)', rightStart + 60, sBoxY + 25);
               ctx.font = '11px KaTeX_Main';
               ctx.fillText('(free on all', rightStart + 60, sBoxY + 45);
               ctx.fillText('singular 2-simplices)', rightStart + 60, sBoxY + 60);
@@ -715,10 +774,10 @@ window.CHAPTERS.push({
               ctx.textAlign = 'left';
               ctx.fillText('Results:', rightStart, resY);
               ctx.font = '13px KaTeX_Main';
-              ctx.fillText(`H₀ = ${current.H0}`, rightStart, resY + 20);
-              ctx.fillText(`H₁ = ${current.H1}`, rightStart, resY + 40);
-              if (current.H2) ctx.fillText(`H₂ = ${current.H2}`, rightStart, resY + 60);
-              if (current.H4) ctx.fillText(`H₄ = ${current.H4}`, rightStart, resY + 80);
+              ctx.fillText('H\u2080 = ' + current.H0, rightStart, resY + 20);
+              ctx.fillText('H\u2081 = ' + current.H1, rightStart, resY + 40);
+              if (current.H2) ctx.fillText('H\u2082 = ' + current.H2, rightStart, resY + 60);
+              if (current.H4) ctx.fillText('H\u2084 = ' + current.H4, rightStart, resY + 80);
 
               // Equivalence arrow
               ctx.strokeStyle = '#f39c12';
@@ -744,22 +803,27 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 16px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText('≅', width / 2, centerY + 85);
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'space',
-                label: 'Space',
-                options: [
-                  { value: 'sphere', label: 'S²' },
-                  { value: 'torus', label: 'T²' },
-                  { value: 'rp2', label: 'ℝP²' },
-                  { value: 'cp2', label: 'ℂP²' }
-                ],
-                value: 'rp2'
-              }
-            ]
+              ctx.fillText('\u2245', width / 2, centerY + 85);
+            }
+
+            // Controls: select (space)
+            var spaceLabel = document.createElement('label');
+            spaceLabel.style.color = '#c9d1d9';
+            spaceLabel.style.marginRight = '8px';
+            spaceLabel.textContent = 'Space: ';
+            controls.appendChild(spaceLabel);
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22'; spaceSelect.style.color = '#c9d1d9'; spaceSelect.style.border = '1px solid #30363d'; spaceSelect.style.padding = '4px 8px'; spaceSelect.style.borderRadius = '4px';
+            [{value:'sphere',label:'S\u00B2'},{value:'torus',label:'T\u00B2'},{value:'rp2',label:'\u211DP\u00B2'},{value:'cp2',label:'\u2102P\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 'rp2';
+            spaceSelect.onchange = function() { state.space = spaceSelect.value; draw(); };
+            controls.appendChild(spaceSelect);
+
+            draw();
           }
         }
       ],
@@ -898,66 +962,70 @@ window.CHAPTERS.push({
           </ul>
           Compare this to simplicial complexes, which need many more simplices!
         </div>
+
+        <div class="viz-placeholder" data-viz="projective-builder"></div>
+        <div class="viz-placeholder" data-viz="degree-calculator"></div>
       `,
       visualizations: [
         {
           id: 'projective-builder',
           title: 'Projective Space Builder',
-          description: 'Build ℝPⁿ and ℂPⁿ and see their cellular homology.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.5,
-            setup: (viz) => {
-              viz.state = {
-                type: 'real', // 'real', 'complex'
-                dimension: 2,
-                showHomology: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          description: 'Build RPn and CPn and see their cellular homology.',
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              type: 'real',
+              dimension: 2,
+              showHomology: true
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const centerX = width / 2;
-              const isReal = viz.state.type === 'real';
-              const n = viz.state.dimension;
+              var centerX = width / 2;
+              var isReal = state.type === 'real';
+              var n = state.dimension;
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              const spaceName = isReal ? `ℝP${n}` : `ℂP${n}`;
-              ctx.fillText(`Cellular Structure: ${spaceName}`, centerX, 30);
+              var spaceName = isReal ? '\u211DP' + n : '\u2102P' + n;
+              ctx.fillText('Cellular Structure: ' + spaceName, centerX, 30);
 
               // Draw cells
-              const cellY = 100;
-              const cellSpacing = 100;
+              var cellY = 100;
+              var cellSpacing = 100;
 
               if (isReal) {
-                // ℝPⁿ: cells in all dimensions 0 to n
-                for (let k = 0; k <= n; k++) {
-                  const x = 50 + k * cellSpacing;
-                  const y = cellY;
+                for (var k = 0; k <= n; k++) {
+                  var x = 50 + k * cellSpacing;
+                  var y = cellY;
 
-                  // Cell
-                  const colors = ['#e74c3c', '#27ae60', '#3498db', '#9b59b6'];
+                  var colors = ['#e74c3c', '#27ae60', '#3498db', '#9b59b6'];
                   ctx.fillStyle = colors[k % colors.length] + '40';
                   ctx.strokeStyle = colors[k % colors.length];
                   ctx.lineWidth = 3;
-                  const size = 30 + k * 10;
+                  var size = 30 + k * 10;
                   ctx.beginPath();
                   ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
                   ctx.fill();
                   ctx.stroke();
 
-                  // Label
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(`e${k}`, x, y + 5);
+                  ctx.fillText('e' + k, x, y + 5);
 
-                  // Boundary arrow
                   if (k > 0) {
-                    const prevX = 50 + (k - 1) * cellSpacing;
+                    var prevX = 50 + (k - 1) * cellSpacing;
                     ctx.strokeStyle = '#e74c3c';
                     ctx.lineWidth = 2;
                     ctx.setLineDash([5, 5]);
@@ -967,25 +1035,23 @@ window.CHAPTERS.push({
                     ctx.stroke();
                     ctx.setLineDash([]);
 
-                    // Degree label
                     ctx.fillStyle = '#e74c3c';
                     ctx.font = '12px KaTeX_Main';
-                    const deg = k % 2 === 0 ? '×2' : '0';
+                    var deg = k % 2 === 0 ? '\u00D72' : '0';
                     ctx.fillText(deg, (prevX + x) / 2, cellY - 10);
                   }
                 }
               } else {
-                // ℂPⁿ: cells in even dimensions 0, 2, 4, ..., 2n
-                for (let k = 0; k <= n; k++) {
-                  const dim = 2 * k;
-                  const x = 50 + k * cellSpacing;
-                  const y = cellY;
+                for (var k = 0; k <= n; k++) {
+                  var dim = 2 * k;
+                  var x = 50 + k * cellSpacing;
+                  var y = cellY;
 
-                  const colors = ['#e74c3c', '#3498db', '#f39c12', '#9b59b6'];
+                  var colors = ['#e74c3c', '#3498db', '#f39c12', '#9b59b6'];
                   ctx.fillStyle = colors[k % colors.length] + '40';
                   ctx.strokeStyle = colors[k % colors.length];
                   ctx.lineWidth = 3;
-                  const size = 30 + k * 12;
+                  var size = 30 + k * 12;
                   ctx.beginPath();
                   ctx.arc(x, y, size / 2, 0, 2 * Math.PI);
                   ctx.fill();
@@ -994,10 +1060,10 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(`e${dim}`, x, y + 5);
+                  ctx.fillText('e' + dim, x, y + 5);
 
                   if (k > 0) {
-                    const prevX = 50 + (k - 1) * cellSpacing;
+                    var prevX = 50 + (k - 1) * cellSpacing;
                     ctx.strokeStyle = '#27ae60';
                     ctx.lineWidth = 2;
                     ctx.setLineDash([5, 5]);
@@ -1015,8 +1081,8 @@ window.CHAPTERS.push({
               }
 
               // Homology results
-              if (viz.state.showHomology) {
-                const resY = cellY + 120;
+              if (state.showHomology) {
+                var resY = cellY + 120;
                 ctx.fillStyle = '#000';
                 ctx.font = 'bold 15px KaTeX_Main';
                 ctx.textAlign = 'left';
@@ -1024,22 +1090,22 @@ window.CHAPTERS.push({
 
                 ctx.font = '13px KaTeX_Main';
                 if (isReal) {
-                  ctx.fillText(`H₀ = ℤ`, 40, resY + 25);
-                  for (let k = 1; k < n; k++) {
+                  ctx.fillText('H\u2080 = \u2124', 40, resY + 25);
+                  for (var k = 1; k < n; k++) {
                     if (k % 2 === 1) {
-                      ctx.fillText(`H${k} = ℤ/2`, 40, resY + 25 + k * 20);
+                      ctx.fillText('H' + k + ' = \u2124/2', 40, resY + 25 + k * 20);
                     } else {
-                      ctx.fillText(`H${k} = 0`, 40, resY + 25 + k * 20);
+                      ctx.fillText('H' + k + ' = 0', 40, resY + 25 + k * 20);
                     }
                   }
-                  const Hn = n % 2 === 1 ? 'ℤ' : '0';
-                  ctx.fillText(`H${n} = ${Hn}`, 40, resY + 25 + n * 20);
+                  var Hn = n % 2 === 1 ? '\u2124' : '0';
+                  ctx.fillText('H' + n + ' = ' + Hn, 40, resY + 25 + n * 20);
                 } else {
-                  for (let k = 0; k <= n; k++) {
-                    const dim = 2 * k;
-                    ctx.fillText(`H${dim} = ℤ`, 40, resY + 25 + k * 20);
+                  for (var k = 0; k <= n; k++) {
+                    var dim = 2 * k;
+                    ctx.fillText('H' + dim + ' = \u2124', 40, resY + 25 + k * 20);
                   }
-                  ctx.fillText('(all other Hₖ = 0)', 40, resY + 25 + (n + 1) * 20);
+                  ctx.fillText('(all other H\u2096 = 0)', 40, resY + 25 + (n + 1) * 20);
                 }
               }
 
@@ -1047,79 +1113,107 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#555';
               ctx.font = '12px KaTeX_Main';
               ctx.textAlign = 'center';
-              const info = isReal
-                ? 'ℝPⁿ has one cell per dimension, boundary degrees alternate 0, 2'
-                : 'ℂPⁿ has cells in even dimensions only, all boundaries zero';
+              var info = isReal
+                ? '\u211DP\u207F has one cell per dimension, boundary degrees alternate 0, 2'
+                : '\u2102P\u207F has cells in even dimensions only, all boundaries zero';
               ctx.fillText(info, centerX, height - 15);
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'type',
-                label: 'Projective Space',
-                options: [
-                  { value: 'real', label: 'Real (ℝPⁿ)' },
-                  { value: 'complex', label: 'Complex (ℂPⁿ)' }
-                ],
-                value: 'real'
-              },
-              {
-                type: 'slider',
-                id: 'dimension',
-                label: 'Dimension n',
-                min: 1,
-                max: 3,
-                step: 1,
-                value: 2
-              },
-              {
-                type: 'checkbox',
-                id: 'showHomology',
-                label: 'Show Homology',
-                value: true
-              }
-            ]
+            }
+
+            // Controls: select (type)
+            var typeLabel = document.createElement('label');
+            typeLabel.style.color = '#c9d1d9';
+            typeLabel.style.marginRight = '8px';
+            typeLabel.textContent = 'Projective Space: ';
+            controls.appendChild(typeLabel);
+            var typeSelect = document.createElement('select');
+            typeSelect.style.background = '#161b22'; typeSelect.style.color = '#c9d1d9'; typeSelect.style.border = '1px solid #30363d'; typeSelect.style.padding = '4px 8px'; typeSelect.style.borderRadius = '4px';
+            [{value:'real',label:'Real (\u211DP\u207F)'},{value:'complex',label:'Complex (\u2102P\u207F)'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              typeSelect.appendChild(o);
+            });
+            typeSelect.value = 'real';
+            typeSelect.onchange = function() { state.type = typeSelect.value; draw(); };
+            controls.appendChild(typeSelect);
+
+            // Controls: slider (dimension)
+            var dimLabel = document.createElement('label');
+            dimLabel.style.color = '#c9d1d9';
+            dimLabel.style.marginLeft = '15px';
+            dimLabel.style.marginRight = '8px';
+            dimLabel.textContent = 'Dimension n: 2';
+            controls.appendChild(dimLabel);
+            var dimSlider = document.createElement('input');
+            dimSlider.type = 'range';
+            dimSlider.min = 1; dimSlider.max = 3; dimSlider.step = 1; dimSlider.value = 2;
+            dimSlider.style.width = '200px';
+            dimSlider.oninput = function() {
+              state.dimension = parseInt(dimSlider.value);
+              dimLabel.textContent = 'Dimension n: ' + dimSlider.value;
+              draw();
+            };
+            controls.appendChild(dimSlider);
+
+            // Controls: checkbox (showHomology)
+            var homContainer = document.createElement('label');
+            homContainer.style.color = '#c9d1d9';
+            homContainer.style.marginLeft = '15px';
+            homContainer.style.cursor = 'pointer';
+            var homCheckbox = document.createElement('input');
+            homCheckbox.type = 'checkbox';
+            homCheckbox.checked = true;
+            homCheckbox.onchange = function() { state.showHomology = homCheckbox.checked; draw(); };
+            homContainer.appendChild(homCheckbox);
+            homContainer.appendChild(document.createTextNode(' Show Homology'));
+            controls.appendChild(homContainer);
+
+            draw();
           }
         },
         {
           id: 'degree-calculator',
           title: 'Attaching Map Degree Calculator',
-          description: 'Compute deg(φ: Sⁿ → Sⁿ) for attaching maps.',
-          canvas: {
-            type: 'interactive',
-            aspectRatio: 1.4,
-            setup: (viz) => {
-              viz.state = {
-                mapType: 'antipodal', // 'identity', 'antipodal', 'double', 'constant'
-                dimension: 1
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          description: 'Compute deg(phi: Sn -> Sn) for attaching maps.',
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.4);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+
+            var state = {
+              mapType: 'antipodal',
+              dimension: 1
+            };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
 
-              const maps = {
-                identity: { name: 'Identity: z ↦ z', degree: 1, description: 'Preserves orientation' },
-                antipodal: { name: 'Antipodal: z ↦ -z', degree: -1, description: 'Reverses orientation (reflection)' },
-                double: { name: 'Double cover: z ↦ z²', degree: 2, description: 'Wraps twice around (ℝP¹ quotient)' },
-                constant: { name: 'Constant: z ↦ 1', degree: 0, description: 'Collapses to a point' }
+              var maps = {
+                identity: { name: 'Identity: z \u21A6 z', degree: 1, description: 'Preserves orientation' },
+                antipodal: { name: 'Antipodal: z \u21A6 -z', degree: -1, description: 'Reverses orientation (reflection)' },
+                double: { name: 'Double cover: z \u21A6 z\u00B2', degree: 2, description: 'Wraps twice around (\u211DP\u00B9 quotient)' },
+                constant: { name: 'Constant: z \u21A6 1', degree: 0, description: 'Collapses to a point' }
               };
 
-              const current = maps[viz.state.mapType];
-              const n = viz.state.dimension;
+              var current = maps[state.mapType];
+              var n = state.dimension;
 
-              const centerX = width / 2;
-              const centerY = height / 2;
+              var centerX = width / 2;
+              var centerY = height / 2;
 
               // Title
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(`Degree of φ: S${n} → S${n}`, centerX, 30);
+              ctx.fillText('Degree of \u03C6: S' + n + ' \u2192 S' + n, centerX, 30);
 
               // Draw domain and codomain
-              const leftX = centerX - 150;
-              const rightX = centerX + 150;
-              const radius = 60;
+              var leftX = centerX - 150;
+              var rightX = centerX + 150;
+              var radius = 60;
 
               // Domain
               ctx.strokeStyle = '#3498db';
@@ -1129,7 +1223,7 @@ window.CHAPTERS.push({
               ctx.stroke();
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
-              ctx.fillText(`S${n}`, leftX, centerY - radius - 15);
+              ctx.fillText('S' + n, leftX, centerY - radius - 15);
               ctx.fillText('(domain)', leftX, centerY - radius - 0);
 
               // Codomain
@@ -1137,7 +1231,7 @@ window.CHAPTERS.push({
               ctx.beginPath();
               ctx.arc(rightX, centerY, radius, 0, 2 * Math.PI);
               ctx.stroke();
-              ctx.fillText(`S${n}`, rightX, centerY - radius - 15);
+              ctx.fillText('S' + n, rightX, centerY - radius - 15);
               ctx.fillText('(codomain)', rightX, centerY - radius - 0);
 
               // Arrow
@@ -1158,10 +1252,10 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText('φ', centerX, centerY - 10);
+              ctx.fillText('\u03C6', centerX, centerY - 10);
 
               // Map info
-              const infoY = height - 120;
+              var infoY = height - 120;
               ctx.fillStyle = '#000';
               ctx.font = 'bold 15px KaTeX_Main';
               ctx.fillText(current.name, centerX, infoY);
@@ -1174,31 +1268,45 @@ window.CHAPTERS.push({
               ctx.strokeRect(centerX - 80, infoY + 45, 160, 50);
               ctx.fillStyle = '#27ae60';
               ctx.font = 'bold 20px KaTeX_Main';
-              ctx.fillText(`deg(φ) = ${current.degree}`, centerX, infoY + 75);
-            },
-            controls: [
-              {
-                type: 'select',
-                id: 'mapType',
-                label: 'Map Type',
-                options: [
-                  { value: 'identity', label: 'Identity' },
-                  { value: 'antipodal', label: 'Antipodal' },
-                  { value: 'double', label: 'Double Cover' },
-                  { value: 'constant', label: 'Constant' }
-                ],
-                value: 'antipodal'
-              },
-              {
-                type: 'slider',
-                id: 'dimension',
-                label: 'Dimension n',
-                min: 1,
-                max: 3,
-                step: 1,
-                value: 1
-              }
-            ]
+              ctx.fillText('deg(\u03C6) = ' + current.degree, centerX, infoY + 75);
+            }
+
+            // Controls: select (mapType)
+            var mapLabel = document.createElement('label');
+            mapLabel.style.color = '#c9d1d9';
+            mapLabel.style.marginRight = '8px';
+            mapLabel.textContent = 'Map Type: ';
+            controls.appendChild(mapLabel);
+            var mapSelect = document.createElement('select');
+            mapSelect.style.background = '#161b22'; mapSelect.style.color = '#c9d1d9'; mapSelect.style.border = '1px solid #30363d'; mapSelect.style.padding = '4px 8px'; mapSelect.style.borderRadius = '4px';
+            [{value:'identity',label:'Identity'},{value:'antipodal',label:'Antipodal'},{value:'double',label:'Double Cover'},{value:'constant',label:'Constant'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value; o.textContent = opt.label;
+              mapSelect.appendChild(o);
+            });
+            mapSelect.value = 'antipodal';
+            mapSelect.onchange = function() { state.mapType = mapSelect.value; draw(); };
+            controls.appendChild(mapSelect);
+
+            // Controls: slider (dimension)
+            var dimLabel = document.createElement('label');
+            dimLabel.style.color = '#c9d1d9';
+            dimLabel.style.marginLeft = '15px';
+            dimLabel.style.marginRight = '8px';
+            dimLabel.textContent = 'Dimension n: 1';
+            controls.appendChild(dimLabel);
+            var dimSlider = document.createElement('input');
+            dimSlider.type = 'range';
+            dimSlider.min = 1; dimSlider.max = 3; dimSlider.step = 1; dimSlider.value = 1;
+            dimSlider.style.width = '200px';
+            dimSlider.oninput = function() {
+              state.dimension = parseInt(dimSlider.value);
+              dimLabel.textContent = 'Dimension n: ' + dimSlider.value;
+              draw();
+            };
+            controls.appendChild(dimSlider);
+
+            draw();
           }
         }
       ],

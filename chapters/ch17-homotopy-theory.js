@@ -79,30 +79,34 @@ window.CHAPTERS.push({
           \\]
           where \\(\\pi_k(X\\langle n \\rangle) = 0\\) for \\(k < n\\) and \\(\\pi_k(X\\langle n \\rangle) \\cong \\pi_k(X)\\) for \\(k \\geq n\\). The fibers of the Whitehead tower are also Eilenberg-MacLane spaces: \\(K(\\pi_{n-1}(X), n-1)\\).
         </div>
+      
+        <div class="viz-placeholder" data-viz="postnikov-tower-viz"></div>
       `,
       visualizations: [
         {
           id: 'postnikov-tower-viz',
           title: 'Postnikov Tower Visualizer',
           description: 'Explore how the Postnikov tower decomposes a space into layers, each adding one homotopy group at a time',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                space: 's2',
-                highlightLevel: -1,
-                animPhase: 0
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+            var state = { space: 's2', highlightLevel: -1, animPhase: 0 };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.015;
-              const t = viz.state.animPhase;
+              state.animPhase += 0.015;
+              var t = state.animPhase;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px KaTeX_Main, serif';
               ctx.textAlign = 'center';
 
-              const spaces = {
+              var spaces = {
                 's2': {
                   name: 'S\u00B2',
                   groups: [
@@ -138,49 +142,43 @@ window.CHAPTERS.push({
                 }
               };
 
-              const sp = spaces[viz.state.space];
+              var sp = spaces[state.space];
               ctx.fillText('Postnikov Tower of ' + sp.name, width / 2, 30);
 
-              const levels = sp.groups;
-              const numLevels = levels.length;
-              const boxW = Math.min(260, width * 0.5);
-              const boxH = 44;
-              const gap = 16;
-              const startY = height - 50;
-              const centerX = width * 0.38;
+              var levels = sp.groups;
+              var numLevels = levels.length;
+              var boxW = Math.min(260, width * 0.5);
+              var boxH = 44;
+              var gap = 16;
+              var startY = height - 50;
+              var centerX = width * 0.38;
 
-              for (let i = 0; i < numLevels; i++) {
-                const y = startY - i * (boxH + gap);
-                const isHighlighted = viz.state.highlightLevel === i;
-
-                const lvl = levels[i];
-                const boxColor = lvl.g === '0' ? 'rgba(149, 165, 166, 0.15)' : 'rgba(52, 152, 219, 0.12)';
+              for (var i = 0; i < numLevels; i++) {
+                var y = startY - i * (boxH + gap);
+                var isHighlighted = state.highlightLevel === i;
+                var lvl = levels[i];
+                var boxColor = lvl.g === '0' ? 'rgba(149, 165, 166, 0.15)' : 'rgba(52, 152, 219, 0.12)';
                 ctx.fillStyle = boxColor;
                 ctx.fillRect(centerX - boxW / 2, y - boxH / 2, boxW, boxH);
-
                 ctx.strokeStyle = isHighlighted ? '#e74c3c' : (lvl.g === '0' ? '#95a5a6' : '#3498db');
                 ctx.lineWidth = isHighlighted ? 3 : 1.5;
                 ctx.strokeRect(centerX - boxW / 2, y - boxH / 2, boxW, boxH);
-
                 ctx.fillStyle = '#2c3e50';
                 ctx.font = 'bold 15px KaTeX_Main, serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('X' + String.fromCharCode(0x2080 + lvl.n), centerX - boxW / 4, y + 5);
-
                 ctx.font = '14px KaTeX_Main, serif';
                 ctx.fillStyle = lvl.g === '0' ? '#95a5a6' : '#e67e22';
                 ctx.fillText('\u03C0' + String.fromCharCode(0x2080 + lvl.n) + ' = ' + lvl.g, centerX + boxW / 8, y + 5);
-
                 if (i > 0) {
-                  const fromY = startY - (i - 1) * (boxH + gap) - boxH / 2;
-                  const toY = y + boxH / 2;
+                  var fromY = startY - (i - 1) * (boxH + gap) - boxH / 2;
+                  var toY = y + boxH / 2;
                   ctx.strokeStyle = '#7f8c8d';
                   ctx.lineWidth = 1.5;
                   ctx.beginPath();
                   ctx.moveTo(centerX, fromY - 2);
                   ctx.lineTo(centerX, toY + 2);
                   ctx.stroke();
-
                   ctx.fillStyle = '#7f8c8d';
                   ctx.beginPath();
                   ctx.moveTo(centerX, toY + 2);
@@ -189,22 +187,20 @@ window.CHAPTERS.push({
                   ctx.closePath();
                   ctx.fill();
                 }
-
                 if (i > 0 && lvl.g !== '0') {
-                  const fiberY = (y + (startY - (i - 1) * (boxH + gap))) / 2;
+                  var fiberY = (y + (startY - (i - 1) * (boxH + gap))) / 2;
                   ctx.fillStyle = '#9b59b6';
                   ctx.font = '13px KaTeX_Main, serif';
                   ctx.textAlign = 'left';
                   ctx.fillText('fiber: K(' + lvl.g + ', ' + lvl.n + ')', centerX + boxW / 2 + 12, fiberY + 4);
                 }
-
                 if (i > 0 && i - 1 < sp.kInvariants.length) {
-                  const kY = (y + (startY - (i - 1) * (boxH + gap))) / 2;
+                  var kY = (y + (startY - (i - 1) * (boxH + gap))) / 2;
                   ctx.fillStyle = '#27ae60';
                   ctx.font = '12px KaTeX_Main, serif';
                   ctx.textAlign = 'right';
-                  const kText = 'k' + String.fromCharCode(0x2080 + lvl.n) + ': ' + sp.kInvariants[i - 1];
-                  const maxKWidth = centerX - boxW / 2 - 15;
+                  var kText = 'k' + String.fromCharCode(0x2080 + lvl.n) + ': ' + sp.kInvariants[i - 1];
+                  var maxKWidth = centerX - boxW / 2 - 15;
                   if (ctx.measureText(kText).width > maxKWidth) {
                     ctx.fillText('k' + String.fromCharCode(0x2080 + lvl.n), centerX - boxW / 2 - 8, kY - 4);
                     ctx.font = '11px KaTeX_Main, serif';
@@ -215,12 +211,11 @@ window.CHAPTERS.push({
                 }
               }
 
-              const topY = startY - numLevels * (boxH + gap);
+              var topY = startY - numLevels * (boxH + gap);
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 16px KaTeX_Main, serif';
               ctx.textAlign = 'center';
               ctx.fillText(sp.name, centerX - 50, topY + boxH / 2 + 5);
-
               ctx.strokeStyle = '#e74c3c';
               ctx.lineWidth = 2;
               ctx.setLineDash([5, 5]);
@@ -229,42 +224,50 @@ window.CHAPTERS.push({
               ctx.lineTo(centerX, startY - (numLevels - 1) * (boxH + gap) - boxH / 2 - 5);
               ctx.stroke();
               ctx.setLineDash([]);
-
               ctx.fillStyle = '#e74c3c';
               ctx.font = '13px KaTeX_Main, serif';
               ctx.fillText('p' + String.fromCharCode(0x2080 + numLevels), centerX - 15, topY + boxH / 2 + 25);
-
               ctx.fillStyle = '#7f8c8d';
               ctx.font = '12px KaTeX_Main, serif';
               ctx.textAlign = 'left';
               ctx.fillText('X \u2243 lim X_n', 12, height - 12);
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Space',
-                options: [
-                  { value: 's2', label: 'S\u00B2' },
-                  { value: 's3', label: 'S\u00B3' },
-                  { value: 'cp2', label: '\u2102P\u00B2' }
-                ],
-                action: (viz, value) => {
-                  viz.state.space = value;
-                  viz.state.highlightLevel = -1;
-                }
-              },
-              {
-                type: 'slider',
-                label: 'Highlight level',
-                min: -1,
-                max: 4,
-                step: 1,
-                initial: -1,
-                action: (viz, value) => {
-                  viz.state.highlightLevel = value;
-                }
-              }
-            ]
+            }
+
+            // Select: Space
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22';
+            spaceSelect.style.color = '#c9d1d9';
+            spaceSelect.style.border = '1px solid #30363d';
+            spaceSelect.style.padding = '4px 8px';
+            spaceSelect.style.borderRadius = '4px';
+            [{value:'s2',label:'S\u00B2'},{value:'s3',label:'S\u00B3'},{value:'cp2',label:'\u2102P\u00B2'}].forEach(function(opt) {
+              var o = document.createElement('option');
+              o.value = opt.value;
+              o.textContent = opt.label;
+              spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 's2';
+            spaceSelect.onchange = function() { state.space = spaceSelect.value; state.highlightLevel = -1; draw(); };
+            controls.appendChild(spaceSelect);
+
+            // Slider: Highlight level
+            var hlLabel = document.createElement('label');
+            hlLabel.style.color = '#c9d1d9';
+            hlLabel.style.marginLeft = '15px';
+            hlLabel.style.marginRight = '8px';
+            hlLabel.textContent = 'Highlight level: -1';
+            controls.appendChild(hlLabel);
+            var hlSlider = document.createElement('input');
+            hlSlider.type = 'range';
+            hlSlider.min = -1;
+            hlSlider.max = 4;
+            hlSlider.step = 1;
+            hlSlider.value = -1;
+            hlSlider.style.width = '200px';
+            hlSlider.oninput = function() { state.highlightLevel = parseInt(hlSlider.value); hlLabel.textContent = 'Highlight level: ' + hlSlider.value; draw(); };
+            controls.appendChild(hlSlider);
+
+            draw();
           }
         }
       ],
@@ -353,213 +356,140 @@ The \\(k\\)-invariants \\(k_1, k_2\\) are trivially zero (since \\(X_1\\) and \\
         <div class="env-block remark">
           <strong>Remark (Classifying Spaces):</strong> \\(K(G, 1) = BG\\) is the <em>classifying space</em> of the discrete group \\(G\\). More generally, for a topological group \\(G\\), the classifying space \\(BG\\) classifies principal \\(G\\)-bundles: \\([X, BG] \\cong \\{\\text{principal } G\\text{-bundles over } X\\}\\). When \\(G\\) is discrete, \\(BG = K(G,1)\\), and principal \\(G\\)-bundles are just covering spaces with structure group \\(G\\).
         </div>
+      
+        <div class="viz-placeholder" data-viz="eilenberg-maclane-viz"></div>
       `,
       visualizations: [
         {
           id: 'eilenberg-maclane-viz',
           title: 'Eilenberg-MacLane Space Gallery',
           description: 'Visualize the construction and homotopy groups of K(G,n) spaces with their loop space relationships',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                selectedSpace: 'kz1',
-                animPhase: 0,
-                showLoopRelation: false
-              };
-            },
-            draw: (viz, ctx, width, height) => {
-              ctx.clearRect(0, 0, width, height);
-              viz.state.animPhase += 0.02;
-              const t = viz.state.animPhase;
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+            var state = { selectedSpace: 'kz1', animPhase: 0, showLoopRelation: false };
 
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
+              ctx.clearRect(0, 0, width, height);
+              state.animPhase += 0.02;
+              var t = state.animPhase;
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 18px KaTeX_Main, serif';
               ctx.textAlign = 'center';
-
-              const cx = width / 2;
-              const cy = height / 2;
-
-              const info = {
-                'kz1': {
-                  title: 'K(\u2124, 1) = S\u00B9',
-                  desc: 'The circle: \u03C0\u2081 = \u2124, all higher groups vanish',
-                  geometric: 'circle'
-                },
-                'kz2': {
-                  title: 'K(\u2124, 2) = \u2102P\u221E',
-                  desc: 'Infinite complex projective space: \u03C0\u2082 = \u2124',
-                  geometric: 'cpinf'
-                },
-                'kz2_1': {
-                  title: 'K(\u2124/2, 1) = \u211DP\u221E',
-                  desc: 'Infinite real projective space: \u03C0\u2081 = \u2124/2',
-                  geometric: 'rpinf'
-                }
+              var cx = width / 2;
+              var cy = height / 2;
+              var info = {
+                'kz1': { title: 'K(\u2124, 1) = S\u00B9', desc: 'The circle: \u03C0\u2081 = \u2124, all higher groups vanish', geometric: 'circle' },
+                'kz2': { title: 'K(\u2124, 2) = \u2102P\u221E', desc: 'Infinite complex projective space: \u03C0\u2082 = \u2124', geometric: 'cpinf' },
+                'kz2_1': { title: 'K(\u2124/2, 1) = \u211DP\u221E', desc: 'Infinite real projective space: \u03C0\u2081 = \u2124/2', geometric: 'rpinf' }
               };
-
-              const sp = info[viz.state.selectedSpace];
+              var sp = info[state.selectedSpace];
               ctx.fillText(sp.title, cx, 30);
               ctx.font = '14px KaTeX_Main, serif';
               ctx.fillStyle = '#7f8c8d';
               ctx.fillText(sp.desc, cx, 52);
 
               if (sp.geometric === 'circle') {
-                const R = Math.min(width, height) * 0.16;
-
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(cx, cy + 40, R, 0, Math.PI * 2);
-                ctx.stroke();
-
-                const angle = t * 1.2;
-                const px = cx + R * Math.cos(angle);
-                const py = cy + 40 + R * Math.sin(angle);
-                ctx.fillStyle = '#e74c3c';
-                ctx.beginPath();
-                ctx.arc(px, py, 6, 0, Math.PI * 2);
-                ctx.fill();
-
-                const windingNum = Math.floor(angle / (2 * Math.PI));
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = 'bold 14px KaTeX_Main, serif';
-                ctx.textAlign = 'center';
+                var R = Math.min(width, height) * 0.16;
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(cx, cy + 40, R, 0, Math.PI * 2); ctx.stroke();
+                var angle = t * 1.2;
+                var px = cx + R * Math.cos(angle);
+                var py = cy + 40 + R * Math.sin(angle);
+                ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
+                var windingNum = Math.floor(angle / (2 * Math.PI));
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 14px KaTeX_Main, serif'; ctx.textAlign = 'center';
                 ctx.fillText('Winding number: ' + windingNum, cx, cy + 40 + R + 35);
-
-                const tableX = cx - 100;
-                const tableY = cy - R - 60;
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '14px KaTeX_Main, serif';
-                ctx.textAlign = 'left';
+                var tableX = cx - 100; var tableY = cy - R - 60;
+                ctx.fillStyle = '#2c3e50'; ctx.font = '14px KaTeX_Main, serif'; ctx.textAlign = 'left';
                 ctx.fillText('\u03C0\u2081(S\u00B9) = \u2124 (winding numbers)', tableX, tableY);
                 ctx.fillStyle = '#95a5a6';
                 ctx.fillText('\u03C0\u2082(S\u00B9) = 0', tableX, tableY + 20);
                 ctx.fillText('\u03C0\u2083(S\u00B9) = 0', tableX, tableY + 40);
                 ctx.fillText('\u03C0\u2099(S\u00B9) = 0 for all n \u2265 2', tableX, tableY + 60);
-
               } else if (sp.geometric === 'cpinf') {
-                const maxR = Math.min(width, height) * 0.2;
-                const levels = 5;
-
-                for (let i = 0; i < levels; i++) {
-                  const r = maxR * (1 - i * 0.17);
-                  const alpha = 0.3 - i * 0.04;
-                  ctx.strokeStyle = `rgba(52, 152, 219, ${Math.max(alpha, 0.08)})`;
+                var maxR = Math.min(width, height) * 0.2;
+                var levels = 5;
+                for (var i = 0; i < levels; i++) {
+                  var r = maxR * (1 - i * 0.17);
+                  var alpha = 0.3 - i * 0.04;
+                  ctx.strokeStyle = 'rgba(52, 152, 219, ' + Math.max(alpha, 0.08) + ')';
                   ctx.lineWidth = 3 - i * 0.4;
-                  ctx.beginPath();
-                  ctx.ellipse(cx, cy + 10, r, r * 0.5, 0, 0, Math.PI * 2);
-                  ctx.stroke();
-
+                  ctx.beginPath(); ctx.ellipse(cx, cy + 10, r, r * 0.5, 0, 0, Math.PI * 2); ctx.stroke();
                   if (i < 4) {
-                    ctx.fillStyle = `rgba(44, 62, 80, ${0.7 - i * 0.15})`;
-                    ctx.font = '12px KaTeX_Main, serif';
-                    ctx.textAlign = 'right';
+                    ctx.fillStyle = 'rgba(44, 62, 80, ' + (0.7 - i * 0.15) + ')';
+                    ctx.font = '12px KaTeX_Main, serif'; ctx.textAlign = 'right';
                     ctx.fillText('\u2102P' + (i + 1 < 4 ? String.fromCharCode(0x00B9 + i) : '\u00B3'), cx - r - 8, cy + 10);
                   }
                 }
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '14px KaTeX_Main, serif';
-                ctx.textAlign = 'center';
+                ctx.fillStyle = '#2c3e50'; ctx.font = '14px KaTeX_Main, serif'; ctx.textAlign = 'center';
                 ctx.fillText('\u2102P\u00B9 \u2282 \u2102P\u00B2 \u2282 \u2102P\u00B3 \u2282 \u22EF \u2282 \u2102P\u221E', cx, cy + 10 + maxR * 0.5 + 30);
-
-                const tableX = cx - 110;
-                const tableY = cy - maxR * 0.5 - 70;
+                var tableX2 = cx - 110; var tableY2 = cy - maxR * 0.5 - 70;
                 ctx.textAlign = 'left';
+                ctx.fillStyle = '#95a5a6'; ctx.fillText('\u03C0\u2081(\u2102P\u221E) = 0', tableX2, tableY2);
+                ctx.fillStyle = '#2c3e50'; ctx.fillText('\u03C0\u2082(\u2102P\u221E) = \u2124', tableX2, tableY2 + 20);
                 ctx.fillStyle = '#95a5a6';
-                ctx.fillText('\u03C0\u2081(\u2102P\u221E) = 0', tableX, tableY);
-                ctx.fillStyle = '#2c3e50';
-                ctx.fillText('\u03C0\u2082(\u2102P\u221E) = \u2124', tableX, tableY + 20);
-                ctx.fillStyle = '#95a5a6';
-                ctx.fillText('\u03C0\u2083(\u2102P\u221E) = 0', tableX, tableY + 40);
-                ctx.fillText('\u03C0\u2099(\u2102P\u221E) = 0 for n \u2260 2', tableX, tableY + 60);
-
+                ctx.fillText('\u03C0\u2083(\u2102P\u221E) = 0', tableX2, tableY2 + 40);
+                ctx.fillText('\u03C0\u2099(\u2102P\u221E) = 0 for n \u2260 2', tableX2, tableY2 + 60);
               } else if (sp.geometric === 'rpinf') {
-                const R = Math.min(width, height) * 0.16;
-
-                ctx.strokeStyle = '#9b59b6';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(cx, cy + 10, R, 0, Math.PI * 2);
-                ctx.stroke();
-
-                for (let i = 0; i < 4; i++) {
-                  const a = (i / 4) * Math.PI + t * 0.4;
-                  const x1 = cx + R * Math.cos(a);
-                  const y1 = cy + 10 + R * Math.sin(a);
-                  const x2 = cx - R * Math.cos(a);
-                  const y2 = cy + 10 - R * Math.sin(a);
-
-                  ctx.strokeStyle = 'rgba(231, 76, 60, 0.3)';
-                  ctx.lineWidth = 1;
-                  ctx.setLineDash([4, 4]);
-                  ctx.beginPath();
-                  ctx.moveTo(x1, y1);
-                  ctx.lineTo(x2, y2);
-                  ctx.stroke();
-                  ctx.setLineDash([]);
-
+                var R2 = Math.min(width, height) * 0.16;
+                ctx.strokeStyle = '#9b59b6'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(cx, cy + 10, R2, 0, Math.PI * 2); ctx.stroke();
+                for (var ii = 0; ii < 4; ii++) {
+                  var a = (ii / 4) * Math.PI + t * 0.4;
+                  var x1 = cx + R2 * Math.cos(a); var y1 = cy + 10 + R2 * Math.sin(a);
+                  var x2 = cx - R2 * Math.cos(a); var y2 = cy + 10 - R2 * Math.sin(a);
+                  ctx.strokeStyle = 'rgba(231, 76, 60, 0.3)'; ctx.lineWidth = 1;
+                  ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); ctx.setLineDash([]);
                   ctx.fillStyle = '#e74c3c';
-                  ctx.beginPath();
-                  ctx.arc(x1, y1, 4, 0, Math.PI * 2);
-                  ctx.fill();
-                  ctx.beginPath();
-                  ctx.arc(x2, y2, 4, 0, Math.PI * 2);
-                  ctx.fill();
+                  ctx.beginPath(); ctx.arc(x1, y1, 4, 0, Math.PI * 2); ctx.fill();
+                  ctx.beginPath(); ctx.arc(x2, y2, 4, 0, Math.PI * 2); ctx.fill();
                 }
-
-                ctx.fillStyle = '#9b59b6';
-                ctx.font = '14px KaTeX_Main, serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('Identify antipodal points: x ~ -x', cx, cy + 10 + R + 30);
-
-                const tableX = cx - 110;
-                const tableY = cy - R - 60;
+                ctx.fillStyle = '#9b59b6'; ctx.font = '14px KaTeX_Main, serif'; ctx.textAlign = 'center';
+                ctx.fillText('Identify antipodal points: x ~ -x', cx, cy + 10 + R2 + 30);
+                var tableX3 = cx - 110; var tableY3 = cy - R2 - 60;
                 ctx.textAlign = 'left';
-                ctx.fillStyle = '#2c3e50';
-                ctx.fillText('\u03C0\u2081(\u211DP\u221E) = \u2124/2', tableX, tableY);
+                ctx.fillStyle = '#2c3e50'; ctx.fillText('\u03C0\u2081(\u211DP\u221E) = \u2124/2', tableX3, tableY3);
                 ctx.fillStyle = '#95a5a6';
-                ctx.fillText('\u03C0\u2082(\u211DP\u221E) = 0', tableX, tableY + 20);
-                ctx.fillText('\u03C0\u2099(\u211DP\u221E) = 0 for n \u2265 2', tableX, tableY + 40);
+                ctx.fillText('\u03C0\u2082(\u211DP\u221E) = 0', tableX3, tableY3 + 20);
+                ctx.fillText('\u03C0\u2099(\u211DP\u221E) = 0 for n \u2265 2', tableX3, tableY3 + 40);
               }
 
-              if (viz.state.showLoopRelation) {
-                const boxY = height - 60;
-                ctx.fillStyle = 'rgba(46, 204, 113, 0.08)';
-                ctx.fillRect(10, boxY - 5, width - 20, 50);
-                ctx.strokeStyle = '#27ae60';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(10, boxY - 5, width - 20, 50);
-                ctx.fillStyle = '#27ae60';
-                ctx.font = 'bold 15px KaTeX_Main, serif';
-                ctx.textAlign = 'center';
+              if (state.showLoopRelation) {
+                var boxY = height - 60;
+                ctx.fillStyle = 'rgba(46, 204, 113, 0.08)'; ctx.fillRect(10, boxY - 5, width - 20, 50);
+                ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 1; ctx.strokeRect(10, boxY - 5, width - 20, 50);
+                ctx.fillStyle = '#27ae60'; ctx.font = 'bold 15px KaTeX_Main, serif'; ctx.textAlign = 'center';
                 ctx.fillText('\u03A9 K(G, n+1) \u2243 K(G, n)', cx, boxY + 15);
-                ctx.font = '13px KaTeX_Main, serif';
-                ctx.fillStyle = '#2c3e50';
+                ctx.font = '13px KaTeX_Main, serif'; ctx.fillStyle = '#2c3e50';
                 ctx.fillText('Looping decreases dimension: \u03C0\u2096(\u03A9Y) \u2245 \u03C0\u2096\u208A\u2081(Y)', cx, boxY + 35);
               }
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Space',
-                options: [
-                  { value: 'kz1', label: 'K(\u2124, 1) = S\u00B9' },
-                  { value: 'kz2', label: 'K(\u2124, 2) = \u2102P\u221E' },
-                  { value: 'kz2_1', label: 'K(\u2124/2, 1) = \u211DP\u221E' }
-                ],
-                action: (viz, value) => {
-                  viz.state.selectedSpace = value;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Loop Relation',
-                action: (viz) => {
-                  viz.state.showLoopRelation = !viz.state.showLoopRelation;
-                }
-              }
-            ]
+            }
+
+            var spaceSelect = document.createElement('select');
+            spaceSelect.style.background = '#161b22'; spaceSelect.style.color = '#c9d1d9';
+            spaceSelect.style.border = '1px solid #30363d'; spaceSelect.style.padding = '4px 8px'; spaceSelect.style.borderRadius = '4px';
+            [{value:'kz1',label:'K(\u2124, 1) = S\u00B9'},{value:'kz2',label:'K(\u2124, 2) = \u2102P\u221E'},{value:'kz2_1',label:'K(\u2124/2, 1) = \u211DP\u221E'}].forEach(function(opt) {
+              var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; spaceSelect.appendChild(o);
+            });
+            spaceSelect.value = 'kz1';
+            spaceSelect.onchange = function() { state.selectedSpace = spaceSelect.value; draw(); };
+            controls.appendChild(spaceSelect);
+
+            var loopBtn = document.createElement('button');
+            loopBtn.textContent = 'Toggle Loop Relation';
+            loopBtn.style.marginLeft = '10px'; loopBtn.style.padding = '4px 12px';
+            loopBtn.style.background = '#21262d'; loopBtn.style.color = '#c9d1d9';
+            loopBtn.style.border = '1px solid #30363d'; loopBtn.style.borderRadius = '4px'; loopBtn.style.cursor = 'pointer';
+            loopBtn.onclick = function() { state.showLoopRelation = !state.showLoopRelation; draw(); };
+            controls.appendChild(loopBtn);
+
+            draw();
           }
         }
       ],
@@ -647,6 +577,7 @@ This is exactly \\(K(\\mathbb{Z}, 2)\\). \\(\\checkmark\\)`
           <strong>Remark (Higher Obstructions and Indeterminacy):</strong> When \\(Y\\) has multiple nonvanishing homotopy groups, there may be a <em>sequence</em> of obstructions \\(o_{n+1}, o_{n+2}, \\ldots\\), each defined only when the previous one vanishes. Moreover, each successive obstruction is defined only up to an <em>indeterminacy</em> subgroup, making computations progressively more difficult. This subtlety is one reason why stable homotopy theory (where obstructions stabilize) is more tractable than unstable homotopy theory.
         </div>
       `,
+      visualizations: [],
       exercises: [
         {
           id: 'obstruction-ex1',
@@ -745,32 +676,34 @@ Since \\(\\pi_1(S^2) = 0\\), the coefficient group is trivial, so the obstructio
         <div class="env-block remark">
           <strong>Remark (The Stable Homotopy Category):</strong> The <em>stable homotopy category</em> \\(\\mathbf{SHC}\\) has spectra as objects and stable maps as morphisms. It is a triangulated category with a symmetric monoidal structure given by the smash product \\(\\wedge\\). This category unifies many areas of topology and algebra: ordinary cohomology, K-theory, cobordism, and more are all spectra in this category.
         </div>
+      
+        <div class="viz-placeholder" data-viz="stable-homotopy-table-viz"></div>
       `,
       visualizations: [
         {
           id: 'stable-homotopy-table-viz',
           title: 'Stable Homotopy Groups of Spheres',
           description: 'Explore the table of \u03C0_{n+k}(S^n) and see how groups stabilize as n increases',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                highlightStem: 1,
-                showStable: true,
-                maxN: 8,
-                maxK: 7
-              };
-            },
-            draw: (viz, ctx, width, height) => {
+          setup: function(body, controls) {
+            var canvas = document.createElement('canvas');
+            canvas.width = body.clientWidth;
+            canvas.height = Math.round(body.clientWidth / 1.5);
+            body.appendChild(canvas);
+            var ctx = canvas.getContext('2d');
+            var state = { highlightStem: 1, showStable: true, maxN: 8, maxK: 7 };
+
+            function draw() {
+              var width = canvas.width;
+              var height = canvas.height;
               ctx.clearRect(0, 0, width, height);
-              const maxN = viz.state.maxN;
-              const maxK = viz.state.maxK;
+              var maxN = state.maxN;
+              var maxK = state.maxK;
 
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 16px KaTeX_Main, serif';
               ctx.fillText('Table of \u03C0_{n+k}(S\u207F)', 20, 25);
 
-              // Table of pi_{n+k}(S^n) data
-              const data = {
+              var data = {
                 1: ['Z', '0', '0', '0', '0', '0', '0', '0'],
                 2: ['Z', 'Z', 'Z/2', 'Z/2', 'Z/12', 'Z/2', 'Z/2', 'Z/3'],
                 3: ['Z', 'Z/2', 'Z/2', 'Z/12', 'Z/2', 'Z/2', 'Z/3', 'Z/15'],
@@ -780,106 +713,93 @@ Since \\(\\pi_1(S^2) = 0\\), the coefficient group is trivial, so the obstructio
                 7: ['Z', 'Z/2', 'Z/2', 'Z/24', '0', '0', 'Z/2', 'Z/240'],
                 8: ['Z', 'Z/2', 'Z/2', 'Z/24', '0', '0', 'Z/2', 'Z/240']
               };
+              var stable = ['Z', 'Z/2', 'Z/2', 'Z/24', '0', '0', 'Z/2', 'Z/240'];
 
-              const stable = ['Z', 'Z/2', 'Z/2', 'Z/24', '0', '0', 'Z/2', 'Z/240'];
-
-              const tableLeft = 70;
-              const tableTop = 50;
-              const cellW = Math.min(85, (width - tableLeft - 30) / (maxK + 1));
-              const cellH = 28;
+              var tableLeft = 70;
+              var tableTop = 50;
+              var cellW = Math.min(85, (width - tableLeft - 30) / (maxK + 1));
+              var cellH = 28;
 
               ctx.fillStyle = '#7f8c8d';
               ctx.font = 'bold 12px KaTeX_Main, serif';
               ctx.textAlign = 'center';
               ctx.fillText('k \u2193 / n \u2192', 35, tableTop + 10);
-              for (let n = 1; n <= maxN; n++) {
+              for (var n = 1; n <= maxN; n++) {
                 ctx.fillText('n=' + n, tableLeft + (n - 1) * cellW + cellW / 2, tableTop - 5);
               }
 
               ctx.textAlign = 'right';
-              for (let k = 0; k <= maxK; k++) {
-                ctx.fillStyle = viz.state.highlightStem === k ? '#e74c3c' : '#7f8c8d';
+              for (var k = 0; k <= maxK; k++) {
+                ctx.fillStyle = state.highlightStem === k ? '#e74c3c' : '#7f8c8d';
                 ctx.fillText('k=' + k, tableLeft - 8, tableTop + 18 + k * cellH);
               }
 
-              for (let k = 0; k <= maxK; k++) {
-                for (let n = 1; n <= maxN; n++) {
-                  const cx = tableLeft + (n - 1) * cellW;
-                  const cy = tableTop + 4 + k * cellH;
-                  const val = data[n] ? (data[n][k] || '?') : '?';
-
-                  const isStable = n >= k + 2;
-                  const isStemHighlight = viz.state.highlightStem === k;
-
+              for (var k2 = 0; k2 <= maxK; k2++) {
+                for (var n2 = 1; n2 <= maxN; n2++) {
+                  var tcx = tableLeft + (n2 - 1) * cellW;
+                  var tcy = tableTop + 4 + k2 * cellH;
+                  var val = data[n2] ? (data[n2][k2] || '?') : '?';
+                  var isStable = n2 >= k2 + 2;
+                  var isStemHighlight = state.highlightStem === k2;
                   if (isStemHighlight) {
                     ctx.fillStyle = isStable ? '#27ae6033' : '#e74c3c22';
                   } else {
                     ctx.fillStyle = isStable ? '#f0f8f0' : '#fafafa';
                   }
-                  ctx.fillRect(cx + 1, cy, cellW - 2, cellH - 2);
-
+                  ctx.fillRect(tcx + 1, tcy, cellW - 2, cellH - 2);
                   ctx.strokeStyle = isStable ? '#27ae60' : '#ddd';
                   ctx.lineWidth = isStemHighlight ? 2 : 0.5;
-                  ctx.strokeRect(cx + 1, cy, cellW - 2, cellH - 2);
-
+                  ctx.strokeRect(tcx + 1, tcy, cellW - 2, cellH - 2);
                   ctx.fillStyle = isStable ? '#27ae60' : '#2c3e50';
                   ctx.font = (isStemHighlight ? 'bold ' : '') + '11px KaTeX_Main, serif';
                   ctx.textAlign = 'center';
-                  ctx.fillText(val, cx + cellW / 2, cy + cellH / 2 + 4);
+                  ctx.fillText(val, tcx + cellW / 2, tcy + cellH / 2 + 4);
                 }
               }
 
-              if (viz.state.showStable) {
-                const stableX = tableLeft + maxN * cellW + 15;
+              if (state.showStable) {
+                var stableX = tableLeft + maxN * cellW + 15;
                 ctx.fillStyle = '#27ae60';
                 ctx.font = 'bold 12px KaTeX_Main, serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('\u03C0\u2096\u02E2', stableX + cellW / 2, tableTop - 5);
-
-                for (let k = 0; k <= maxK; k++) {
-                  const cy = tableTop + 4 + k * cellH;
-                  const isStemHighlight = viz.state.highlightStem === k;
-
-                  ctx.fillStyle = isStemHighlight ? '#27ae6044' : '#e8f5e9';
-                  ctx.fillRect(stableX + 1, cy, cellW - 2, cellH - 2);
+                for (var k3 = 0; k3 <= maxK; k3++) {
+                  var cy2 = tableTop + 4 + k3 * cellH;
+                  var isSH = state.highlightStem === k3;
+                  ctx.fillStyle = isSH ? '#27ae6044' : '#e8f5e9';
+                  ctx.fillRect(stableX + 1, cy2, cellW - 2, cellH - 2);
                   ctx.strokeStyle = '#27ae60';
-                  ctx.lineWidth = isStemHighlight ? 2 : 1;
-                  ctx.strokeRect(stableX + 1, cy, cellW - 2, cellH - 2);
-
+                  ctx.lineWidth = isSH ? 2 : 1;
+                  ctx.strokeRect(stableX + 1, cy2, cellW - 2, cellH - 2);
                   ctx.fillStyle = '#27ae60';
-                  ctx.font = (isStemHighlight ? 'bold ' : '') + '12px KaTeX_Main, serif';
-                  ctx.fillText(stable[k], stableX + cellW / 2, cy + cellH / 2 + 4);
+                  ctx.font = (isSH ? 'bold ' : '') + '12px KaTeX_Main, serif';
+                  ctx.fillText(stable[k3], stableX + cellW / 2, cy2 + cellH / 2 + 4);
                 }
               }
 
-              // Legend at bottom
-              const legendY = tableTop + 18 + (maxK + 1) * cellH;
+              var legendY = tableTop + 18 + (maxK + 1) * cellH;
               ctx.textAlign = 'left';
               ctx.fillStyle = '#27ae60';
               ctx.fillRect(20, legendY, 14, 14);
               ctx.fillStyle = '#2c3e50';
               ctx.font = '12px KaTeX_Main, serif';
               ctx.fillText('= stable range (n \u2265 k+2)', 40, legendY + 12);
-
               ctx.fillStyle = '#fafafa';
-              ctx.strokeStyle = '#ddd';
-              ctx.lineWidth = 1;
+              ctx.strokeStyle = '#ddd'; ctx.lineWidth = 1;
               ctx.fillRect(250, legendY, 14, 14);
               ctx.strokeRect(250, legendY, 14, 14);
               ctx.fillStyle = '#2c3e50';
               ctx.fillText('= unstable range', 270, legendY + 12);
 
-              // Freudenthal boundary diagonal
-              ctx.strokeStyle = '#e74c3c';
-              ctx.lineWidth = 2;
+              ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
               ctx.setLineDash([6, 4]);
               ctx.beginPath();
-              for (let k = 0; k <= maxK; k++) {
-                const stableN = k + 2;
+              for (var k4 = 0; k4 <= maxK; k4++) {
+                var stableN = k4 + 2;
                 if (stableN <= maxN) {
-                  const x = tableLeft + (stableN - 1) * cellW;
-                  const y = tableTop + 4 + k * cellH;
-                  if (k === 0) ctx.moveTo(x, y);
+                  var x = tableLeft + (stableN - 1) * cellW;
+                  var y = tableTop + 4 + k4 * cellH;
+                  if (k4 === 0) ctx.moveTo(x, y);
                   else ctx.lineTo(x, y);
                 }
               }
@@ -888,39 +808,31 @@ Since \\(\\pi_1(S^2) = 0\\), the coefficient group is trivial, so the obstructio
               ctx.fillStyle = '#e74c3c';
               ctx.font = '11px KaTeX_Main, serif';
               ctx.fillText('Freudenthal boundary', 20, legendY + 32);
-
               ctx.fillStyle = '#2c3e50';
               ctx.font = '13px KaTeX_Main, serif';
-              ctx.fillText('Highlighted stem k=' + viz.state.highlightStem +
-                ': stable value \u03C0\u2096\u02E2 = ' + stable[viz.state.highlightStem],
-                20, height - 12);
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Highlight Stem k',
-                options: [
-                  { value: '0', label: 'k=0 (\u03C0\u2080\u02E2=Z)' },
-                  { value: '1', label: 'k=1 (\u03C0\u2081\u02E2=Z/2)' },
-                  { value: '2', label: 'k=2 (\u03C0\u2082\u02E2=Z/2)' },
-                  { value: '3', label: 'k=3 (\u03C0\u2083\u02E2=Z/24)' },
-                  { value: '4', label: 'k=4 (\u03C0\u2084\u02E2=0)' },
-                  { value: '5', label: 'k=5 (\u03C0\u2085\u02E2=0)' },
-                  { value: '6', label: 'k=6 (\u03C0\u2086\u02E2=Z/2)' },
-                  { value: '7', label: 'k=7 (\u03C0\u2087\u02E2=Z/240)' }
-                ],
-                action: (viz, value) => {
-                  viz.state.highlightStem = parseInt(value);
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Stable Column',
-                action: (viz) => {
-                  viz.state.showStable = !viz.state.showStable;
-                }
-              }
-            ]
+              ctx.fillText('Highlighted stem k=' + state.highlightStem + ': stable value \u03C0\u2096\u02E2 = ' + stable[state.highlightStem], 20, height - 12);
+            }
+
+            // Select: Highlight Stem k
+            var stemSelect = document.createElement('select');
+            stemSelect.style.background = '#161b22'; stemSelect.style.color = '#c9d1d9';
+            stemSelect.style.border = '1px solid #30363d'; stemSelect.style.padding = '4px 8px'; stemSelect.style.borderRadius = '4px';
+            [{value:'0',label:'k=0 (\u03C0\u2080\u02E2=Z)'},{value:'1',label:'k=1 (\u03C0\u2081\u02E2=Z/2)'},{value:'2',label:'k=2 (\u03C0\u2082\u02E2=Z/2)'},{value:'3',label:'k=3 (\u03C0\u2083\u02E2=Z/24)'},{value:'4',label:'k=4 (\u03C0\u2084\u02E2=0)'},{value:'5',label:'k=5 (\u03C0\u2085\u02E2=0)'},{value:'6',label:'k=6 (\u03C0\u2086\u02E2=Z/2)'},{value:'7',label:'k=7 (\u03C0\u2087\u02E2=Z/240)'}].forEach(function(opt) {
+              var o = document.createElement('option'); o.value = opt.value; o.textContent = opt.label; stemSelect.appendChild(o);
+            });
+            stemSelect.value = '1';
+            stemSelect.onchange = function() { state.highlightStem = parseInt(stemSelect.value); draw(); };
+            controls.appendChild(stemSelect);
+
+            var stableBtn = document.createElement('button');
+            stableBtn.textContent = 'Toggle Stable Column';
+            stableBtn.style.marginLeft = '10px'; stableBtn.style.padding = '4px 12px';
+            stableBtn.style.background = '#21262d'; stableBtn.style.color = '#c9d1d9';
+            stableBtn.style.border = '1px solid #30363d'; stableBtn.style.borderRadius = '4px'; stableBtn.style.cursor = 'pointer';
+            stableBtn.onclick = function() { state.showStable = !state.showStable; draw(); };
+            controls.appendChild(stableBtn);
+
+            draw();
           }
         }
       ],
