@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'kunneth-formula',
+  id: 'ch14',
   number: 14,
   title: 'Künneth Formula',
   subtitle: 'Homology and Cohomology of Product Spaces',

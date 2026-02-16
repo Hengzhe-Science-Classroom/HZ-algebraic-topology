@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'fiber-bundles',
+  id: 'ch15',
   number: 15,
   title: 'Fiber Bundles & Spectral Sequences',
   subtitle: 'Twisted Products and the Leray-Serre Machine',

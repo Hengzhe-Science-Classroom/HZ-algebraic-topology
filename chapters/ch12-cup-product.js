@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'cup-product',
+  id: 'ch12',
   number: 12,
   title: 'Cup Product',
   subtitle: 'Ring Structure on Cohomology',

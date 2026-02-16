@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'applications-frontiers',
+  id: 'ch18',
   number: 18,
   title: 'Applications and Frontiers',
   subtitle: 'From Fixed Points to Modern Topology',

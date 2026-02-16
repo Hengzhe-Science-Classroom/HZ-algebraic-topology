@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'poincare-duality',
+  id: 'ch13',
   number: 13,
   title: 'Poincar\u00e9 Duality',
   subtitle: 'The Deep Symmetry of Manifolds',

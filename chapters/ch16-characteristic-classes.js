@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'characteristic-classes',
+  id: 'ch16',
   number: 16,
   title: 'Characteristic Classes',
   subtitle: 'Measuring the Twisting of Vector Bundles',

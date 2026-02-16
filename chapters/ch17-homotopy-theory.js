@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'homotopy-theory',
+  id: 'ch17',
   number: 17,
   title: 'Homotopy Theory Preview',
   subtitle: 'Postnikov Towers, Eilenberg-MacLane Spaces, and Obstruction Theory',
