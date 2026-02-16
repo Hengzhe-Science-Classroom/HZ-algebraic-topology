@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'cellular-homology',
+  id: 'ch10',
   number: 10,
   title: 'Cellular Homology',
   subtitle: 'Efficient Computation via CW Structures',

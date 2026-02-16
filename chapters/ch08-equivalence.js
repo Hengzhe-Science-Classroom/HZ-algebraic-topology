@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'equivalence',
+  id: 'ch08',
   number: 8,
   title: 'Equivalence of Theories',
   subtitle: 'Simplicial and Singular Homology Agree',

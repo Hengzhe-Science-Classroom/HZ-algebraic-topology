@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'mayer-vietoris',
+  id: 'ch09',
   number: 9,
   title: 'Mayer-Vietoris Sequence',
   subtitle: 'Computing Homology by Decomposition',

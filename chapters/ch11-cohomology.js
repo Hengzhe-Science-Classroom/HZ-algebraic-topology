@@ -1,5 +1,5 @@
 window.CHAPTERS.push({
-  id: 'cohomology',
+  id: 'ch11',
   number: 11,
   title: 'Cohomology Groups',
   subtitle: 'Dual Theory with Extra Structure',
