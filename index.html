@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algebraic Topology — Interactive Course</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <button id="sidebar-toggle" aria-label="Toggle sidebar">&#9776;</button>
+        <aside id="sidebar">
+            <div id="sidebar-header">
+                <h1>Algebraic Topology</h1>
+                <p class="author">Allen Hatcher / Massey</p>
+                <div id="progress-container">
+                    <div id="progress-bar"><div id="progress-fill"></div></div>
+                    <span id="progress-text">0%</span>
+                </div>
+            </div>
+            <div id="search-container">
+                <input type="text" id="search-input" placeholder="Search topics...">
+            </div>
+            <nav id="chapter-nav"></nav>
+            <div id="sidebar-footer">
+                <button id="reset-progress">Reset Progress</button>
+            </div>
+        </aside>
+        <main id="main-content">
+            <div id="welcome-screen">
+                <div class="welcome-hero">
+                    <h1>代数拓扑</h1>
+                    <h2>Algebraic Topology · Interactive</h2>
+                    <p class="welcome-description">
+                        From homotopy and the fundamental group to homology, cohomology, and beyond.
+                        A rigorous journey through the algebraic structures that classify topological spaces.
+                    </p>
+                </div>
+                <div class="roadmap">
+                    <h3>Course Roadmap</h3>
+                    <div class="roadmap-parts">
+                        <div class="roadmap-part">
+                            <h4>Part A: Fundamental Group</h4>
+                            <ul>
+                                <li>Ch 0: Topological Foundations Review</li>
+                                <li>Ch 1: Homotopy and the Fundamental Group</li>
+                                <li>Ch 2: Van Kampen's Theorem</li>
+                                <li>Ch 3: Covering Spaces</li>
+                                <li>Ch 4: Higher Homotopy Groups (Introduction)</li>
+                            </ul>
+                        </div>
+                        <div class="roadmap-part">
+                            <h4>Part B: Homology Theory</h4>
+                            <ul>
+                                <li>Ch 5: Simplicial Complexes</li>
+                                <li>Ch 6: Simplicial Homology</li>
+                                <li>Ch 7: Singular Homology</li>
+                                <li>Ch 8: Equivalence of Theories</li>
+                                <li>Ch 9: Mayer-Vietoris Sequence</li>
+                                <li>Ch 10: Cellular Homology</li>
+                            </ul>
+                        </div>
+                        <div class="roadmap-part">
+                            <h4>Part C: Cohomology</h4>
+                            <ul>
+                                <li>Ch 11: Cohomology Groups</li>
+                                <li>Ch 12: Cup Product</li>
+                                <li>Ch 13: Poincaré Duality</li>
+                                <li>Ch 14: Künneth Formula</li>
+                            </ul>
+                        </div>
+                        <div class="roadmap-part">
+                            <h4>Part D: Advanced Topics</h4>
+                            <ul>
+                                <li>Ch 15: Fiber Bundles &amp; Spectral Sequences</li>
+                                <li>Ch 16: Characteristic Classes (Introduction)</li>
+                                <li>Ch 17: Homotopy Theory Preview</li>
+                                <li>Ch 18: Applications and Frontiers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <p class="welcome-start">Select a chapter from the sidebar to begin.</p>
+            </div>
+            <div id="chapter-content" style="display:none;">
+                <div id="chapter-header">
+                    <div id="chapter-number-badge"></div>
+                    <h1 id="chapter-title"></h1>
+                    <p id="chapter-subtitle"></p>
+                </div>
+                <div id="section-tabs"></div>
+                <article id="section-content"></article>
+                <div id="exercises-panel" style="display:none;">
+                    <h3>Exercises</h3>
+                    <div id="exercises-list"></div>
+                </div>
+                <div id="chapter-nav-buttons">
+                    <button id="prev-btn" disabled>&larr; Previous</button>
+                    <span id="section-indicator"></span>
+                    <button id="next-btn">Next &rarr;</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="viz-engine.js"></script>
+
+    <!-- Chapter manifest for lazy loading -->
+    <script>
+    window.CHAPTER_MANIFEST = [
+        {number:0,  id:'ch00', title:'Topological Foundations Review',           file:'ch00-foundations'},
+        {number:1,  id:'ch01', title:'Homotopy and the Fundamental Group',       file:'ch01-fundamental-group'},
+        {number:2,  id:'ch02', title:'Van Kampen\'s Theorem',                    file:'ch02-van-kampen'},
+        {number:3,  id:'ch03', title:'Covering Spaces',                          file:'ch03-covering-spaces'},
+        {number:4,  id:'ch04', title:'Higher Homotopy Groups',                   file:'ch04-higher-homotopy'},
+        {number:5,  id:'ch05', title:'Simplicial Complexes',                     file:'ch05-simplicial-complexes'},
+        {number:6,  id:'ch06', title:'Simplicial Homology',                      file:'ch06-simplicial-homology'},
+        {number:7,  id:'ch07', title:'Singular Homology',                        file:'ch07-singular-homology'},
+        {number:8,  id:'ch08', title:'Equivalence of Theories',                  file:'ch08-equivalence'},
+        {number:9,  id:'ch09', title:'Mayer-Vietoris Sequence',                  file:'ch09-mayer-vietoris'},
+        {number:10, id:'ch10', title:'Cellular Homology',                        file:'ch10-cellular-homology'},
+        {number:11, id:'ch11', title:'Cohomology Groups',                        file:'ch11-cohomology'},
+        {number:12, id:'ch12', title:'Cup Product',                              file:'ch12-cup-product'},
+        {number:13, id:'ch13', title:'Poincaré Duality',                         file:'ch13-poincare-duality'},
+        {number:14, id:'ch14', title:'Künneth Formula',                          file:'ch14-kunneth'},
+        {number:15, id:'ch15', title:'Fiber Bundles & Spectral Sequences',       file:'ch15-fiber-bundles'},
+        {number:16, id:'ch16', title:'Characteristic Classes',                   file:'ch16-characteristic-classes'},
+        {number:17, id:'ch17', title:'Homotopy Theory Preview',                  file:'ch17-homotopy-theory'},
+        {number:18, id:'ch18', title:'Applications and Frontiers',               file:'ch18-applications'}
+    ];
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>
