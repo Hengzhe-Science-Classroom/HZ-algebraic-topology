@@ -27,15 +27,15 @@ Part of [Hengzhe's Science Classroom](https://hengzhe-science-classroom.github.i
 | 10 | Cellular Homology | CW structure, efficient computation | 3 | 5 |
 | **Part C** | **Cohomology** | | | |
 | 11 | Cohomology Groups | Cochain complex, dual theory, UCT | 3 | 5 |
-| 12 | Cup Product | Ring structure on H*(X) | 3 | 5 |
-| 13 | Poincaré Duality | Hₖ(M) ≅ Hⁿ⁻ᵏ(M) for manifolds | 4 | 4 |
-| 14 | Künneth Formula | H*(X × Y) from H*(X) and H*(Y) | 3 | 5 |
+| 12 | Cup Product | Ring structure on H*(X) | 7 | 6 |
+| 13 | Poincaré Duality | Hₖ(M) ≅ Hⁿ⁻ᵏ(M) for manifolds | 6 | 4 |
+| 14 | Künneth Formula | H*(X × Y) from H*(X) and H*(Y) | 5 | 7 |
 | **Part D** | **Advanced Topics** | | | |
-| 15 | Fiber Bundles & Spectral Sequences | Leray-Serre SS, Hopf fibration | 4 | 4 |
+| 15 | Fiber Bundles & Spectral Sequences | Leray-Serre SS, Hopf fibration | 7 | 5 |
 | 16 | Characteristic Classes (Introduction) | Stiefel-Whitney, Chern classes | 3 | 4 |
 | 17 | Homotopy Theory Preview | Postnikov towers, K(G,n) spaces | 3 | 4 |
-| 18 | Applications and Frontiers | Fixed point theorems, degree theory, modern directions | 3 | 5 |
-| | **Total** | | **~55** | **~80** |
+| 18 | Applications and Frontiers | Fixed point theorems, degree theory, modern directions | 3 | 6 |
+| | **Total** | | **77** | **95** |
 
 ---
 
