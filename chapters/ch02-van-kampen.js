@@ -678,8 +678,7 @@ window.CHAPTERS.push({
             ],
             exercises: [
                 {
-                    question: 'Show that the fundamental group of a genus-\\(g\\) surface is
-                    \\[\\pi_1(\\Sigma_g) \\cong \\langle a_1, b_1, \\ldots, a_g, b_g \\mid [a_1, b_1] \\cdots [a_g, b_g] = 1 \\rangle.\\]',
+                    question: 'Show that the fundamental group of a genus-\\(g\\) surface is \\[\\pi_1(\\Sigma_g) \\cong \\langle a_1, b_1, \\ldots, a_g, b_g \\mid [a_1, b_1] \\cdots [a_g, b_g] = 1 \\rangle.\\]',
                     hint: 'Build \\(\\Sigma_g\\) as a \\(4g\\)-gon with edges identified in the pattern \\(a_1 b_1 a_1^{-1} b_1^{-1} \\cdots a_g b_g a_g^{-1} b_g^{-1}\\). Use CW complex structure.',
                     solution: 'The \\(4g\\)-gon with one vertex, \\(2g\\) edges (identified in pairs), and one 2-cell gives the CW structure. The 1-skeleton is a wedge of \\(2g\\) circles, so \\(\\pi_1(\\Sigma_g^{(1)}) \\cong F_{2g}\\). The 2-cell is attached via the boundary word \\([a_1, b_1] \\cdots [a_g, b_g]\\), giving the stated presentation.'
                 },

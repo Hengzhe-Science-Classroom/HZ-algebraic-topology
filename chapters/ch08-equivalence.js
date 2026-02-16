@@ -147,15 +147,15 @@ window.CHAPTERS.push({
                 ctx.fill();
                 ctx.fillStyle = '#000';
                 ctx.font = '16px KaTeX_Main';
-                ctx.fillText(\`v\${i}\`, v.x + 10, v.y - 10);
+                ctx.fillText(`v${i}`, v.x + 10, v.y - 10);
               });
 
               // Info text
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
-              ctx.fillText(\`Subdivision level: \${viz.state.level}\`, 10, 20);
-              ctx.fillText(\`Triangles: \${triangles.length}\`, 10, 40);
-              ctx.fillText(\`Homology: H₀ = ℤ, H₁ = 0, H₂ = 0 (unchanged)\`, 10, height - 10);
+              ctx.fillText(`Subdivision level: ${viz.state.level}`, 10, 20);
+              ctx.fillText(`Triangles: ${triangles.length}`, 10, 40);
+              ctx.fillText(`Homology: H₀ = ℤ, H₁ = 0, H₂ = 0 (unchanged)`, 10, height - 10);
             },
             controls: [
               {
@@ -465,7 +465,7 @@ window.CHAPTERS.push({
 
                 ctx.fillStyle = '#000';
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(\`Space: \${current.name}\`, leftX, 60);
+                ctx.fillText(`Space: ${current.name}`, leftX, 60);
 
                 // Chain complex
                 const y0 = 100;
@@ -476,7 +476,7 @@ window.CHAPTERS.push({
                   const y = y0 + i * spacing;
                   ctx.strokeRect(leftX - 40, y - 15, 80, 30);
                   ctx.fillStyle = '#000';
-                  ctx.fillText(\`\${label}ᐃ(X)\`, leftX, y + 5);
+                  ctx.fillText(`${label}ᐃ(X)`, leftX, y + 5);
 
                   if (i < 2) {
                     ctx.strokeStyle = '#e74c3c';
@@ -503,9 +503,9 @@ window.CHAPTERS.push({
                 const resY = y0 + 180;
                 ctx.fillText('Results:', leftX, resY);
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(\`H₀ = \${current.H0}\`, leftX, resY + 25);
-                ctx.fillText(\`H₁ = \${current.H1}\`, leftX, resY + 45);
-                ctx.fillText(\`H₂ = \${current.H2}\`, leftX, resY + 65);
+                ctx.fillText(`H₀ = ${current.H0}`, leftX, resY + 25);
+                ctx.fillText(`H₁ = ${current.H1}`, leftX, resY + 45);
+                ctx.fillText(`H₂ = ${current.H2}`, leftX, resY + 65);
               }
 
               // Singular side
@@ -517,7 +517,7 @@ window.CHAPTERS.push({
 
                 ctx.fillStyle = '#000';
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(\`Space: \${current.name}\`, rightX, 60);
+                ctx.fillText(`Space: ${current.name}`, rightX, 60);
 
                 // Chain complex
                 const y0 = 100;
@@ -528,7 +528,7 @@ window.CHAPTERS.push({
                   const y = y0 + i * spacing;
                   ctx.strokeRect(rightX - 40, y - 15, 80, 30);
                   ctx.fillStyle = '#000';
-                  ctx.fillText(\`\${label}(X)\`, rightX, y + 5);
+                  ctx.fillText(`${label}(X)`, rightX, y + 5);
 
                   if (i < 2) {
                     ctx.strokeStyle = '#e74c3c';
@@ -554,9 +554,9 @@ window.CHAPTERS.push({
                 const resY = y0 + 180;
                 ctx.fillText('Results:', rightX, resY);
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(\`H₀ = \${current.H0}\`, rightX, resY + 25);
-                ctx.fillText(\`H₁ = \${current.H1}\`, rightX, resY + 45);
-                ctx.fillText(\`H₂ = \${current.H2}\`, rightX, resY + 65);
+                ctx.fillText(`H₀ = ${current.H0}`, rightX, resY + 25);
+                ctx.fillText(`H₁ = ${current.H1}`, rightX, resY + 45);
+                ctx.fillText(`H₂ = ${current.H2}`, rightX, resY + 65);
               }
 
               // Equivalence arrow
@@ -798,7 +798,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 20px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`CW Structure: \${current.name}\`, centerX, 30);
+              ctx.fillText(`CW Structure: ${current.name}`, centerX, 30);
               ctx.font = '14px KaTeX_Main';
               ctx.fillText(current.description, centerX, 55);
 
@@ -867,9 +867,9 @@ window.CHAPTERS.push({
               const cells0 = current.cells.filter(c => c.dim === 0).length;
               const cells1 = current.cells.filter(c => c.dim === 1).length;
               const cells2 = current.cells.filter(c => c.dim === 2).length;
-              ctx.fillText(\`0-cells: \${cells0}\`, 10, height - 60);
-              ctx.fillText(\`1-cells: \${cells1}\`, 10, height - 40);
-              ctx.fillText(\`2-cells: \${cells2}\`, 10, height - 20);
+              ctx.fillText(`0-cells: ${cells0}`, 10, height - 60);
+              ctx.fillText(`1-cells: ${cells1}`, 10, height - 40);
+              ctx.fillText(`2-cells: ${cells2}`, 10, height - 20);
             },
             controls: [
               {

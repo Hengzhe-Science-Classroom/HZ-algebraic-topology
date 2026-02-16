@@ -180,7 +180,7 @@ window.CHAPTERS.push({
               // Draw A
               if (viz.state.showA) {
                 const alpha = viz.state.highlightRegion === 'A' ? 0.7 : 0.3;
-                ctx.fillStyle = \`rgba(231, 76, 60, \${alpha})\`;
+                ctx.fillStyle = `rgba(231, 76, 60, ${alpha})`;
                 ctx.strokeStyle = '#e74c3c';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
@@ -195,7 +195,7 @@ window.CHAPTERS.push({
               // Draw B
               if (viz.state.showB) {
                 const alpha = viz.state.highlightRegion === 'B' ? 0.7 : 0.3;
-                ctx.fillStyle = \`rgba(52, 152, 219, \${alpha})\`;
+                ctx.fillStyle = `rgba(52, 152, 219, ${alpha})`;
                 ctx.strokeStyle = '#3498db';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
@@ -211,7 +211,7 @@ window.CHAPTERS.push({
               if (viz.state.showIntersection) {
                 if (viz.state.space === 'sphere') {
                   const alpha = viz.state.highlightRegion === 'intersection' ? 1.0 : 0.6;
-                  ctx.strokeStyle = \`rgba(39, 174, 96, \${alpha})\`;
+                  ctx.strokeStyle = `rgba(39, 174, 96, ${alpha})`;
                   ctx.lineWidth = 4;
                   ctx.beginPath();
                   ctx.ellipse(centerX, centerY, radius * 1.1, radius * 0.3, 0, 0, 2 * Math.PI);
@@ -221,7 +221,7 @@ window.CHAPTERS.push({
                   ctx.fillText('A ∩ B', centerX + radius + 20, centerY);
                 } else if (viz.state.space === 'wedge') {
                   const alpha = viz.state.highlightRegion === 'intersection' ? 1.0 : 0.8;
-                  ctx.fillStyle = \`rgba(39, 174, 96, \${alpha})\`;
+                  ctx.fillStyle = `rgba(39, 174, 96, ${alpha})`;
                   ctx.beginPath();
                   ctx.arc(centerX, centerY, 6, 0, 2 * Math.PI);
                   ctx.fill();
@@ -266,7 +266,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '12px KaTeX_Main';
               ctx.textAlign = 'left';
-              ctx.fillText(\`A ∩ B: \${current.intersection}\`, 10, height - 10);
+              ctx.fillText(`A ∩ B: ${current.intersection}`, 10, height - 10);
             },
             controls: [
               {
@@ -467,18 +467,18 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 16px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Mayer-Vietoris Sequence (degree \${n})\`, width / 2, 30);
+              ctx.fillText(`Mayer-Vietoris Sequence (degree ${n})`, width / 2, 30);
 
               const y = height / 2;
               const terms = [
-                \`H\${n}(A∩B)\`,
-                \`H\${n}(A)⊕H\${n}(B)\`,
-                \`H\${n}(X)\`,
-                \`H\${n - 1}(A∩B)\`
+                `H${n}(A∩B)`,
+                `H${n}(A)⊕H${n}(B)`,
+                `H${n}(X)`,
+                `H${n - 1}(A∩B)`
               ];
               const values = [
                 HnI,
-                \`\${HnA}⊕\${HnB}\`,
+                `${HnA}⊕${HnB}`,
                 HnX,
                 Hn1I
               ];
@@ -523,7 +523,7 @@ window.CHAPTERS.push({
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'left';
               ctx.fillText('Exactness gives: im(Φ) = ker(Ψ), im(Ψ) = ker(∂)', 10, height - 40);
-              ctx.fillText(\`Example: If A, B contractible and A∩B = S¹, then H₁(X) ≅ ℤ\`, 10, height - 20);
+              ctx.fillText(`Example: If A, B contractible and A∩B = S¹, then H₁(X) ≅ ℤ`, 10, height - 20);
             },
             controls: [
               {
@@ -592,15 +592,15 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Computing H*(S\${n}) via Mayer-Vietoris\`, centerX, 30);
+              ctx.fillText(`Computing H*(S${n}) via Mayer-Vietoris`, centerX, 30);
 
               if (viz.state.step >= 0) {
                 ctx.font = '14px KaTeX_Main';
                 ctx.textAlign = 'left';
-                ctx.fillText(\`Step 1: Decompose S\${n} = U ∪ V\`, 20, 70);
+                ctx.fillText(`Step 1: Decompose S${n} = U ∪ V`, 20, 70);
                 ctx.fillText('U = upper hemisphere (contractible)', 40, 90);
                 ctx.fillText('V = lower hemisphere (contractible)', 40, 110);
-                ctx.fillText(\`U ∩ V ≃ S\${n - 1} (equator)\`, 40, 130);
+                ctx.fillText(`U ∩ V ≃ S${n - 1} (equator)`, 40, 130);
 
                 // Draw decomposition
                 const radius = 80;
@@ -633,13 +633,13 @@ window.CHAPTERS.push({
                 ctx.fillStyle = '#000';
                 ctx.font = '14px KaTeX_Main';
                 ctx.textAlign = 'left';
-                ctx.fillText(\`Step 2: Mayer-Vietoris sequence (k ≥ 1):\`, 20, 280);
+                ctx.fillText(`Step 2: Mayer-Vietoris sequence (k ≥ 1):`, 20, 280);
                 ctx.font = '13px KaTeX_Main';
-                ctx.fillText(\`Hₖ(S\${n-1}) → Hₖ(U)⊕Hₖ(V) → Hₖ(S\${n}) → Hₖ₋₁(S\${n-1})\`, 40, 300);
+                ctx.fillText(`Hₖ(S${n-1}) → Hₖ(U)⊕Hₖ(V) → Hₖ(S${n}) → Hₖ₋₁(S${n-1})`, 40, 300);
                 ctx.fillText('Since U, V contractible: Hₖ(U) = Hₖ(V) = 0 for k > 0', 40, 320);
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = 'bold 14px KaTeX_Main';
-                ctx.fillText(\`∴ Hₖ(S\${n}) ≅ Hₖ₋₁(S\${n-1})\`, 40, 345);
+                ctx.fillText(`∴ Hₖ(S${n}) ≅ Hₖ₋₁(S${n-1})`, 40, 345);
               }
 
               if (viz.state.step >= 2) {
@@ -649,13 +649,13 @@ window.CHAPTERS.push({
                 ctx.fillText('Step 3: Induction from S⁰ = {two points}:', 20, 380);
                 ctx.font = '13px KaTeX_Main';
                 ctx.fillText('H₀(S⁰) = ℤ², reduced: H̃₀(S⁰) = ℤ', 40, 400);
-                ctx.fillText(\`H₁(S¹) ≅ H̃₀(S⁰) = ℤ\`, 40, 420);
+                ctx.fillText(`H₁(S¹) ≅ H̃₀(S⁰) = ℤ`, 40, 420);
                 if (n >= 2) {
-                  ctx.fillText(\`H₂(S²) ≅ H₁(S¹) = ℤ\`, 40, 440);
+                  ctx.fillText(`H₂(S²) ≅ H₁(S¹) = ℤ`, 40, 440);
                 }
                 if (n >= 3) {
                   ctx.fillText('⋮', 40, 460);
-                  ctx.fillText(\`Hₙ(Sⁿ) = ℤ, Hₖ(Sⁿ) = 0 for 0 < k < n\`, 40, 480);
+                  ctx.fillText(`Hₙ(Sⁿ) = ℤ, Hₖ(Sⁿ) = 0 for 0 < k < n`, 40, 480);
                 }
 
                 // Result box
@@ -665,9 +665,9 @@ window.CHAPTERS.push({
                 ctx.fillStyle = '#27ae60';
                 ctx.font = 'bold 16px KaTeX_Main';
                 ctx.textAlign = 'center';
-                ctx.fillText(\`H*(S\${n}):\`, width - 130, height - 55);
+                ctx.fillText(`H*(S${n}):`, width - 130, height - 55);
                 ctx.font = '14px KaTeX_Main';
-                ctx.fillText(\`Hₖ = ℤ·δₖ,₀ + ℤ·δₖ,\${n}\`, width - 130, height - 30);
+                ctx.fillText(`Hₖ = ℤ·δₖ,₀ + ℤ·δₖ,${n}`, width - 130, height - 30);
               }
             },
             controls: [
@@ -790,7 +790,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Wedge Sum: \${X.name} ∨ \${Y.name}\`, centerX, 30);
+              ctx.fillText(`Wedge Sum: ${X.name} ∨ ${Y.name}`, centerX, 30);
 
               // Draw wedge
               const radius = 60;
@@ -832,7 +832,7 @@ window.CHAPTERS.push({
               const rows = [
                 [X.name, X.H0, X.H1, X.H2],
                 [Y.name, Y.H0, Y.H1, Y.H2],
-                [\`\${X.name}∨\${Y.name}\`, X.H0, \`\${X.H1}⊕\${Y.H1}\`, \`\${X.H2}⊕\${Y.H2}\`]
+                [`${X.name}∨${Y.name}`, X.H0, `${X.H1}⊕${Y.H1}`, `${X.H2}⊕${Y.H2}`]
               ];
 
               const colWidth = 80;

@@ -119,7 +119,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Cochain Complex with coefficients in \${G.name}\`, centerX, 30);
+              ctx.fillText(`Cochain Complex with coefficients in ${G.name}`, centerX, 30);
 
               // Chains (left)
               ctx.fillStyle = '#3498db';
@@ -217,9 +217,9 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'left';
-              ctx.fillText(\`Cⁿ(X; \${G.name}) = Hom(Cₙ(X), \${G.name})\`, 10, height - 50);
+              ctx.fillText(`Cⁿ(X; ${G.name}) = Hom(Cₙ(X), ${G.name})`, 10, height - 50);
               ctx.fillText('Coboundary: (δφ)(c) = φ(∂c)', 10, height - 30);
-              ctx.fillText(\`Cohomology: Hⁿ(X; \${G.name}) = ker(δ) / im(δ)\`, 10, height - 10);
+              ctx.fillText(`Cohomology: Hⁿ(X; ${G.name}) = ker(δ) / im(δ)`, 10, height - 10);
             },
             controls: [
               {
@@ -718,8 +718,8 @@ window.CHAPTERS.push({
 
               // Input groups
               ctx.font = '15px KaTeX_Main';
-              ctx.fillText(\`A = \${A.name}\`, centerX - 150, 80);
-              ctx.fillText(\`G = \${G.name}\`, centerX + 150, 80);
+              ctx.fillText(`A = ${A.name}`, centerX - 150, 80);
+              ctx.fillText(`G = ${G.name}`, centerX + 150, 80);
 
               // Formulas
               const formulaY = centerY - 60;
@@ -832,7 +832,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Cohomology of \${current.name} with different coefficients\`, centerX, 30);
+              ctx.fillText(`Cohomology of ${current.name} with different coefficients`, centerX, 30);
 
               // Table
               const tableY = 80;
@@ -1080,7 +1080,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Comparison for \${current.name}\`, width / 2, 30);
+              ctx.fillText(`Comparison for ${current.name}`, width / 2, 30);
 
               const leftX = width * 0.3;
               const rightX = width * 0.7;
@@ -1101,7 +1101,7 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(\`H\${i} = \${group}\`, leftX, y);
+                  ctx.fillText(`H${i} = ${group}`, leftX, y);
                 });
               }
 
@@ -1120,7 +1120,7 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(\`H\${i} = \${group}\`, rightX, y);
+                  ctx.fillText(`H${i} = ${group}`, rightX, y);
                 });
               }
 

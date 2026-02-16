@@ -119,9 +119,9 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`CW Structure: \${current.name}\`, centerX, 25);
+              ctx.fillText(`CW Structure: ${current.name}`, centerX, 25);
               ctx.font = '14px KaTeX_Main';
-              ctx.fillText(\`Showing \${viz.state.skeleton}-skeleton\`, centerX, 50);
+              ctx.fillText(`Showing ${viz.state.skeleton}-skeleton`, centerX, 50);
 
               // Draw cells up to current skeleton
               for (let dim = 0; dim <= viz.state.skeleton; dim++) {
@@ -187,7 +187,7 @@ window.CHAPTERS.push({
               const c0 = (current.cells[0] || []).length;
               const c1 = (current.cells[1] || []).length;
               const c2 = (current.cells[2] || []).length;
-              ctx.fillText(\`Cells: c₀ = \${c0}, c₁ = \${c1}, c₂ = \${c2}\`, 10, height - 20);
+              ctx.fillText(`Cells: c₀ = ${c0}, c₁ = ${c1}, c₂ = ${c2}`, 10, height - 20);
             },
             controls: [
               {
@@ -370,7 +370,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Cellular Boundary: \${current.name}\`, width / 2, 30);
+              ctx.fillText(`Cellular Boundary: ${current.name}`, width / 2, 30);
 
               // Draw cells
               Object.keys(current.diagram).forEach(key => {
@@ -424,7 +424,7 @@ window.CHAPTERS.push({
                 ctx.fillStyle = '#9b59b6';
                 ctx.font = 'bold 15px KaTeX_Main';
                 ctx.textAlign = 'left';
-                ctx.fillText(\`d₂(e²) = \${boundaryText}\`, 20, height - 60);
+                ctx.fillText(`d₂(e²) = ${boundaryText}`, 20, height - 60);
 
                 if (viz.state.space === 'rp2') {
                   ctx.font = '13px KaTeX_Main';
@@ -464,7 +464,7 @@ window.CHAPTERS.push({
                   ctx.closePath();
                   ctx.fill();
                   ctx.fillStyle = '#000';
-                  ctx.fillText(\`d\${2 - i}\`, (x + x + spacing) / 2, chainY + 20);
+                  ctx.fillText(`d${2 - i}`, (x + x + spacing) / 2, chainY + 20);
                 }
               });
             },
@@ -641,7 +641,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Space: \${current.name}\`, width / 2, 30);
+              ctx.fillText(`Space: ${current.name}`, width / 2, 30);
 
               // Cellular side
               ctx.fillStyle = '#3498db';
@@ -652,7 +652,7 @@ window.CHAPTERS.push({
               ctx.font = '13px KaTeX_Main';
               ctx.textAlign = 'left';
               const leftStart = leftX - 80;
-              ctx.fillText(\`Total cells: \${current.cells}\`, leftStart, 100);
+              ctx.fillText(`Total cells: ${current.cells}`, leftStart, 100);
               ctx.fillText('One generator per cell', leftStart, 120);
               ctx.fillText('Compute degree of attaching maps', leftStart, 140);
               ctx.fillText('⟹ Small chain complex', leftStart, 160);
@@ -676,10 +676,10 @@ window.CHAPTERS.push({
               const resY = boxY + 170;
               ctx.fillText('Results:', leftStart, resY);
               ctx.font = '13px KaTeX_Main';
-              ctx.fillText(\`H₀ = \${current.H0}\`, leftStart, resY + 20);
-              ctx.fillText(\`H₁ = \${current.H1}\`, leftStart, resY + 40);
-              if (current.H2) ctx.fillText(\`H₂ = \${current.H2}\`, leftStart, resY + 60);
-              if (current.H4) ctx.fillText(\`H₄ = \${current.H4}\`, leftStart, resY + 80);
+              ctx.fillText(`H₀ = ${current.H0}`, leftStart, resY + 20);
+              ctx.fillText(`H₁ = ${current.H1}`, leftStart, resY + 40);
+              if (current.H2) ctx.fillText(`H₂ = ${current.H2}`, leftStart, resY + 60);
+              if (current.H4) ctx.fillText(`H₄ = ${current.H4}`, leftStart, resY + 80);
 
               // Singular side
               ctx.fillStyle = '#9b59b6';
@@ -714,10 +714,10 @@ window.CHAPTERS.push({
               ctx.textAlign = 'left';
               ctx.fillText('Results:', rightStart, resY);
               ctx.font = '13px KaTeX_Main';
-              ctx.fillText(\`H₀ = \${current.H0}\`, rightStart, resY + 20);
-              ctx.fillText(\`H₁ = \${current.H1}\`, rightStart, resY + 40);
-              if (current.H2) ctx.fillText(\`H₂ = \${current.H2}\`, rightStart, resY + 60);
-              if (current.H4) ctx.fillText(\`H₄ = \${current.H4}\`, rightStart, resY + 80);
+              ctx.fillText(`H₀ = ${current.H0}`, rightStart, resY + 20);
+              ctx.fillText(`H₁ = ${current.H1}`, rightStart, resY + 40);
+              if (current.H2) ctx.fillText(`H₂ = ${current.H2}`, rightStart, resY + 60);
+              if (current.H4) ctx.fillText(`H₄ = ${current.H4}`, rightStart, resY + 80);
 
               // Equivalence arrow
               ctx.strokeStyle = '#f39c12';
@@ -924,8 +924,8 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              const spaceName = isReal ? \`ℝP\${n}\` : \`ℂP\${n}\`;
-              ctx.fillText(\`Cellular Structure: \${spaceName}\`, centerX, 30);
+              const spaceName = isReal ? `ℝP${n}` : `ℂP${n}`;
+              ctx.fillText(`Cellular Structure: ${spaceName}`, centerX, 30);
 
               // Draw cells
               const cellY = 100;
@@ -952,7 +952,7 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(\`e\${k}\`, x, y + 5);
+                  ctx.fillText(`e${k}`, x, y + 5);
 
                   // Boundary arrow
                   if (k > 0) {
@@ -993,7 +993,7 @@ window.CHAPTERS.push({
                   ctx.fillStyle = '#000';
                   ctx.font = '14px KaTeX_Main';
                   ctx.textAlign = 'center';
-                  ctx.fillText(\`e\${dim}\`, x, y + 5);
+                  ctx.fillText(`e${dim}`, x, y + 5);
 
                   if (k > 0) {
                     const prevX = 50 + (k - 1) * cellSpacing;
@@ -1023,20 +1023,20 @@ window.CHAPTERS.push({
 
                 ctx.font = '13px KaTeX_Main';
                 if (isReal) {
-                  ctx.fillText(\`H₀ = ℤ\`, 40, resY + 25);
+                  ctx.fillText(`H₀ = ℤ`, 40, resY + 25);
                   for (let k = 1; k < n; k++) {
                     if (k % 2 === 1) {
-                      ctx.fillText(\`H\${k} = ℤ/2\`, 40, resY + 25 + k * 20);
+                      ctx.fillText(`H${k} = ℤ/2`, 40, resY + 25 + k * 20);
                     } else {
-                      ctx.fillText(\`H\${k} = 0\`, 40, resY + 25 + k * 20);
+                      ctx.fillText(`H${k} = 0`, 40, resY + 25 + k * 20);
                     }
                   }
                   const Hn = n % 2 === 1 ? 'ℤ' : '0';
-                  ctx.fillText(\`H\${n} = \${Hn}\`, 40, resY + 25 + n * 20);
+                  ctx.fillText(`H${n} = ${Hn}`, 40, resY + 25 + n * 20);
                 } else {
                   for (let k = 0; k <= n; k++) {
                     const dim = 2 * k;
-                    ctx.fillText(\`H\${dim} = ℤ\`, 40, resY + 25 + k * 20);
+                    ctx.fillText(`H${dim} = ℤ`, 40, resY + 25 + k * 20);
                   }
                   ctx.fillText('(all other Hₖ = 0)', 40, resY + 25 + (n + 1) * 20);
                 }
@@ -1113,7 +1113,7 @@ window.CHAPTERS.push({
               ctx.fillStyle = '#000';
               ctx.font = 'bold 18px KaTeX_Main';
               ctx.textAlign = 'center';
-              ctx.fillText(\`Degree of φ: S\${n} → S\${n}\`, centerX, 30);
+              ctx.fillText(`Degree of φ: S${n} → S${n}`, centerX, 30);
 
               // Draw domain and codomain
               const leftX = centerX - 150;
@@ -1128,7 +1128,7 @@ window.CHAPTERS.push({
               ctx.stroke();
               ctx.fillStyle = '#000';
               ctx.font = '14px KaTeX_Main';
-              ctx.fillText(\`S\${n}\`, leftX, centerY - radius - 15);
+              ctx.fillText(`S${n}`, leftX, centerY - radius - 15);
               ctx.fillText('(domain)', leftX, centerY - radius - 0);
 
               // Codomain
@@ -1136,7 +1136,7 @@ window.CHAPTERS.push({
               ctx.beginPath();
               ctx.arc(rightX, centerY, radius, 0, 2 * Math.PI);
               ctx.stroke();
-              ctx.fillText(\`S\${n}\`, rightX, centerY - radius - 15);
+              ctx.fillText(`S${n}`, rightX, centerY - radius - 15);
               ctx.fillText('(codomain)', rightX, centerY - radius - 0);
 
               // Arrow
@@ -1173,7 +1173,7 @@ window.CHAPTERS.push({
               ctx.strokeRect(centerX - 80, infoY + 45, 160, 50);
               ctx.fillStyle = '#27ae60';
               ctx.font = 'bold 20px KaTeX_Main';
-              ctx.fillText(\`deg(φ) = \${current.degree}\`, centerX, infoY + 75);
+              ctx.fillText(`deg(φ) = ${current.degree}`, centerX, infoY + 75);
             },
             controls: [
               {
