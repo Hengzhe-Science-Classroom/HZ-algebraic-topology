@@ -1,1221 +1,533 @@
 window.CHAPTERS.push({
   id: 'poincare-duality',
   number: 13,
-  title: 'Poincaré Duality',
-  subtitle: 'Duality Between Homology and Cohomology',
+  title: 'Poincar\u00e9 Duality',
+  subtitle: 'The Deep Symmetry of Manifolds',
   sections: [
+    // ============================================================
+    // Section 1: Orientation and the Fundamental Class
+    // ============================================================
     {
-      id: 'orientability-fundamental-class',
-      title: 'Orientability and Fundamental Class',
+      id: 'orientation-fundamental-class',
+      title: 'Orientation and the Fundamental Class',
       content: `
-        <div class="env-block definition">
-          <p><strong>Definition (Orientability):</strong> An \\(n\\)-manifold \\(M\\) is <em>orientable</em> if there exists a consistent choice of orientation on each tangent space \\(T_p M\\) that varies continuously with \\(p \\in M\\).</p>
-          <p>Equivalently, \\(M\\) is orientable if and only if \\(H_n(M; \\mathbb{Z}) \\cong \\mathbb{Z}\\) (for closed \\(M\\)).</p>
-        </div>
-
-        <div class="env-block definition">
-          <p><strong>Definition (Fundamental Class):</strong> Let \\(M\\) be a closed, connected, orientable \\(n\\)-manifold. The <em>fundamental class</em> \\([M] \\in H_n(M; \\mathbb{Z})\\) is a generator of \\(H_n(M; \\mathbb{Z}) \\cong \\mathbb{Z}\\).</p>
-          <p>Choosing an orientation of \\(M\\) determines which of the two generators \\(\\pm[M]\\) to call "positive."</p>
-        </div>
-
         <div class="env-block intuition">
-          <p><strong>Geometric Picture:</strong> Think of the fundamental class as "the whole manifold, with orientation." For example:</p>
-          <ul>
-            <li>\\([S^n]\\) is the sphere with chosen orientation (e.g., outward-pointing normal)</li>
-            <li>\\([T^2]\\) is the torus with coherent orientation on the surface</li>
-            <li>The Möbius band has <em>no</em> fundamental class (non-orientable)</li>
-          </ul>
-          <p>The fundamental class represents "integrating over the whole manifold."</p>
+          <p><strong>The Central Idea:</strong> Poincar\u00e9 duality is the remarkable fact that on a closed oriented \\(n\\)-manifold, homology in degree \\(k\\) is isomorphic to cohomology in degree \\(n-k\\). Before stating this precisely, we need two prerequisites: <em>orientation</em> (a global coherence condition) and the <em>fundamental class</em> (the homological "identity" of the manifold).</p>
         </div>
 
-        <div class="env-block example">
-          <p><strong>Example (Sphere):</strong> For \\(S^n\\), we have \\(H_n(S^n; \\mathbb{Z}) = \\mathbb{Z}\\).</p>
-          <p>The fundamental class \\([S^n]\\) can be represented by the \\(n\\)-cell of the standard CW structure, with the standard orientation.</p>
-          <p>Choosing the "outward normal" orientation gives a specific generator.</p>
+        <div class="env-block definition">
+          <p><strong>Definition (Local Orientation):</strong> Let \\(M\\) be a connected \\(n\\)-manifold. For each \\(x \\in M\\), the local homology group</p>
+          \\[ H_n(M, M \\setminus \\{x\\}; \\mathbb{Z}) \\cong \\mathbb{Z} \\]
+          <p>A <em>local orientation at \\(x\\)</em> is a choice of generator \\(\\mu_x\\) of this group. There are exactly two choices: \\(\\mu_x\\) and \\(-\\mu_x\\).</p>
         </div>
 
-        <div class="env-block example">
-          <p><strong>Example (Torus):</strong> For \\(T^2\\), we have \\(H_2(T^2; \\mathbb{Z}) = \\mathbb{Z}\\).</p>
-          <p>The fundamental class \\([T^2]\\) corresponds to a coherent orientation of the surface. If we visualize \\(T^2\\) embedded in \\(\\mathbb{R}^3\\), the outward-pointing normal gives the orientation.</p>
-        </div>
-
-        <div class="env-block example">
-          <p><strong>Example (Non-Orientable: Möbius Band):</strong> The Möbius band \\(M\\) is a 2-manifold with boundary, and it's non-orientable.</p>
-          <p>We have \\(H_2(M, \\partial M; \\mathbb{Z}) \\cong \\mathbb{Z}/2\\), not \\(\\mathbb{Z}\\)! There's no fundamental class in the usual sense.</p>
-          <p>Geometrically: if you try to orient the surface consistently, you get a contradiction when you go around the twist.</p>
+        <div class="env-block definition">
+          <p><strong>Definition (Orientation):</strong> An <em>orientation</em> of \\(M\\) is a function \\(x \\mapsto \\mu_x\\) assigning a local orientation at each point, such that these choices are <em>locally consistent</em>: for each \\(x \\in M\\), there exists a neighborhood \\(U \\ni x\\) homeomorphic to \\(\\mathbb{R}^n\\) and a class \\(\\mu_U \\in H_n(M, M \\setminus U)\\) restricting to \\(\\mu_y\\) for all \\(y \\in U\\).</p>
+          <p>A manifold admitting an orientation is <em>orientable</em>.</p>
         </div>
 
         <div class="env-block theorem">
-          <p><strong>Theorem (Characterization of Orientability):</strong> For a connected \\(n\\)-manifold \\(M\\) (closed or with boundary), the following are equivalent:</p>
+          <p><strong>Theorem (Fundamental Class \u2014 Hatcher 3.26):</strong> Let \\(M\\) be a closed connected \\(n\\)-manifold.</p>
+          <ul>
+            <li>If \\(M\\) is orientable, then \\(H_n(M; \\mathbb{Z}) \\cong \\mathbb{Z}\\). An orientation determines a generator \\([M] \\in H_n(M; \\mathbb{Z})\\) called the <em>fundamental class</em>, characterized by the property that \\([M]\\) restricts to \\(\\mu_x\\) in \\(H_n(M, M \\setminus \\{x\\})\\) for every \\(x\\).</li>
+            <li>If \\(M\\) is not orientable, then \\(H_n(M; \\mathbb{Z}) = 0\\), but \\(H_n(M; \\mathbb{Z}/2) \\cong \\mathbb{Z}/2\\), so a \\(\\mathbb{Z}/2\\)-fundamental class always exists.</li>
+          </ul>
+        </div>
+
+        <div class="env-block proof">
+          <p><strong>Proof idea:</strong> Consider the <em>orientation double cover</em> \\(\\widetilde{M} \\to M\\). If \\(M\\) is orientable, \\(\\widetilde{M}\\) is disconnected (two copies of \\(M\\)), and the fundamental class on each copy descends to \\(M\\). If \\(M\\) is non-orientable, the two local orientations swap as we traverse a loop reversing orientation, preventing a global \\(\\mathbb{Z}\\)-class. Over \\(\\mathbb{Z}/2\\), signs don't matter, so a fundamental class exists for all closed manifolds. \\(\\square\\)</p>
+        </div>
+
+        <div class="env-block theorem">
+          <p><strong>Theorem (Characterization of Orientability):</strong> For a closed connected \\(n\\)-manifold \\(M\\), the following are equivalent:</p>
           <ol>
             <li>\\(M\\) is orientable</li>
-            <li>\\(H_n(M, \\partial M; \\mathbb{Z}) \\cong \\mathbb{Z}\\)</li>
-            <li>The transition functions in any atlas can be chosen to have positive determinant</li>
-            <li>\\(M\\) has a nowhere-zero \\(n\\)-form (smooth manifolds)</li>
+            <li>\\(H_n(M; \\mathbb{Z}) \\cong \\mathbb{Z}\\)</li>
+            <li>The orientation double cover \\(\\widetilde{M} \\to M\\) is disconnected (i.e., trivial)</li>
+            <li>Every loop in \\(M\\) preserves local orientation</li>
           </ol>
         </div>
 
-        <div class="env-block remark">
-          <p><strong>Remark (Relative Fundamental Class):</strong> For a compact orientable \\(n\\)-manifold \\(M\\) with boundary, the fundamental class lives in <em>relative homology</em>: \\([M, \\partial M] \\in H_n(M, \\partial M; \\mathbb{Z})\\).</p>
-          <p>This is because the boundary "cancels out" when we sum all \\(n\\)-cells, giving a relative cycle.</p>
+        <div class="env-block example">
+          <p><strong>Example (Surfaces):</strong></p>
+          <ul>
+            <li>\\(S^2\\): \\(H_2(S^2) = \\mathbb{Z}\\), \\([S^2]\\) = the CW 2-cell with standard orientation.</li>
+            <li>\\(\\Sigma_g\\) (genus-\\(g\\) surface): \\(H_2(\\Sigma_g) = \\mathbb{Z}\\), \\([\\Sigma_g]\\) exists.</li>
+            <li>\\(\\mathbb{R}P^2\\): Non-orientable, \\(H_2(\\mathbb{R}P^2; \\mathbb{Z}) = 0\\). But \\(H_2(\\mathbb{R}P^2; \\mathbb{Z}/2) = \\mathbb{Z}/2\\).</li>
+            <li>Klein bottle \\(K\\): Non-orientable, \\(H_2(K; \\mathbb{Z}) = 0\\).</li>
+          </ul>
         </div>
 
         <div class="env-block example">
-          <p><strong>Example (Disk):</strong> For the disk \\(D^2\\), we have:</p>
+          <p><strong>Example (Higher-dimensional):</strong></p>
           <ul>
-            <li>\\(H_2(D^2; \\mathbb{Z}) = 0\\) (no 2-cycles in the absolute sense)</li>
-            <li>\\(H_2(D^2, \\partial D^2; \\mathbb{Z}) = \\mathbb{Z}\\) with fundamental class \\([D^2, \\partial D^2]\\)</li>
+            <li>\\(\\mathbb{C}P^n\\): Always orientable (complex manifolds are), \\(H_{2n}(\\mathbb{C}P^n) = \\mathbb{Z}\\).</li>
+            <li>\\(S^n\\): Orientable for all \\(n\\), \\([S^n]\\) generates \\(H_n(S^n) = \\mathbb{Z}\\).</li>
+            <li>\\(\\mathbb{R}P^n\\): Orientable iff \\(n\\) is odd. So \\(\\mathbb{R}P^3\\) is orientable but \\(\\mathbb{R}P^4\\) is not.</li>
           </ul>
-          <p>The relative fundamental class represents "the interior of the disk, ignoring the boundary."</p>
+        </div>
+
+        <div class="env-block example">
+          <p><strong>Example (Klein Bottle CW computation):</strong> The Klein bottle \\(K\\) has CW structure with one 0-cell, two 1-cells \\(a, b\\), and one 2-cell with attaching map \\(aba^{-1}b\\). The boundary map gives \\(\\partial(e^2) = 2b \\neq 0\\), so \\(H_2(K; \\mathbb{Z}) = 0\\). No fundamental class exists over \\(\\mathbb{Z}\\), but \\(H_2(K; \\mathbb{Z}/2) = \\mathbb{Z}/2\\).</p>
+        </div>
+
+        <div class="env-block remark">
+          <p><strong>Relative Fundamental Class:</strong> For a compact orientable \\(n\\)-manifold \\(M\\) with boundary \\(\\partial M\\), the fundamental class lives in <em>relative</em> homology: \\([M, \\partial M] \\in H_n(M, \\partial M; \\mathbb{Z})\\).</p>
         </div>
       `,
       visualizations: [
         {
           id: 'orientation-visualizer',
           title: 'Orientation Visualizer',
-          description: 'See consistent normal vectors on oriented manifolds',
+          description: 'See consistent normal vectors on oriented manifolds vs. contradictions on non-orientable ones',
           canvas: {
             setup: (viz) => {
               viz.state = {
-                manifold: 'sphere', // 'sphere', 'torus', 'mobius'
+                manifold: 'sphere',
                 showNormals: true,
-                animationAngle: 0
+                animationAngle: 0,
+                numVectors: 16
               };
             },
             draw: (viz, ctx, width, height) => {
               ctx.clearRect(0, 0, width, height);
-              const centerX = width / 2;
-              const centerY = height / 2;
+              const cx = width / 2;
+              const cy = height / 2 + 10;
 
-              // Title
               ctx.fillStyle = '#2c3e50';
               ctx.font = 'bold 20px serif';
               const titles = {
-                'sphere': 'S² with Outward Orientation',
-                'torus': 'T² with Consistent Orientation',
-                'mobius': 'Möbius Band (Non-Orientable)'
+                sphere: 'S\u00B2: Outward Orientation',
+                torus: 'T\u00B2: Consistent Orientation',
+                mobius: 'M\u00f6bius Band: NON-Orientable'
               };
               ctx.fillText(titles[viz.state.manifold], 20, 30);
 
-              viz.state.animationAngle += 0.01;
+              viz.state.animationAngle += 0.012;
+              const t = viz.state.animationAngle;
 
               if (viz.state.manifold === 'sphere') {
-                // Draw sphere
-                const radius = 100;
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-                ctx.stroke();
+                const R = Math.min(width, height) * 0.22;
+                const grad = ctx.createRadialGradient(cx - R*0.3, cy - R*0.3, R*0.1, cx, cy, R);
+                grad.addColorStop(0, 'rgba(52,152,219,0.35)');
+                grad.addColorStop(1, 'rgba(52,152,219,0.1)');
+                ctx.fillStyle = grad;
+                ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.stroke();
+                ctx.strokeStyle = 'rgba(52,152,219,0.4)'; ctx.lineWidth = 1;
+                ctx.setLineDash([4,4]);
+                ctx.beginPath(); ctx.ellipse(cx, cy, R, R*0.25, 0, 0, Math.PI*2); ctx.stroke();
+                ctx.setLineDash([]);
 
-                // Draw normal vectors (outward)
                 if (viz.state.showNormals) {
-                  const numVectors = 12;
-                  for (let i = 0; i < numVectors; i++) {
-                    const angle = (i / numVectors) * Math.PI * 2;
-                    const px = centerX + radius * Math.cos(angle);
-                    const py = centerY + radius * Math.sin(angle);
-                    const nx = Math.cos(angle);
-                    const ny = Math.sin(angle);
-
-                    // Normal vector
-                    ctx.strokeStyle = '#e74c3c';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.moveTo(px, py);
-                    ctx.lineTo(px + nx * 40, py + ny * 40);
-                    ctx.stroke();
-
-                    // Arrowhead
-                    const arrowAngle = Math.atan2(ny, nx);
-                    ctx.fillStyle = '#e74c3c';
-                    ctx.beginPath();
-                    ctx.moveTo(px + nx * 40, py + ny * 40);
-                    ctx.lineTo(px + nx * 40 - 10 * Math.cos(arrowAngle - 0.3),
-                              py + ny * 40 - 10 * Math.sin(arrowAngle - 0.3));
-                    ctx.lineTo(px + nx * 40 - 10 * Math.cos(arrowAngle + 0.3),
-                              py + ny * 40 - 10 * Math.sin(arrowAngle + 0.3));
-                    ctx.closePath();
-                    ctx.fill();
+                  const N = viz.state.numVectors;
+                  for (let i = 0; i < N; i++) {
+                    const angle = (i/N)*Math.PI*2 + t*0.3;
+                    const px = cx + R*Math.cos(angle), py = cy + R*Math.sin(angle);
+                    const nx = Math.cos(angle), ny = Math.sin(angle);
+                    const len = 32;
+                    ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px+nx*len, py+ny*len); ctx.stroke();
+                    const a = Math.atan2(ny, nx);
+                    ctx.fillStyle = '#e74c3c'; ctx.beginPath();
+                    ctx.moveTo(px+nx*len, py+ny*len);
+                    ctx.lineTo(px+nx*len - 9*Math.cos(a-0.35), py+ny*len - 9*Math.sin(a-0.35));
+                    ctx.lineTo(px+nx*len - 9*Math.cos(a+0.35), py+ny*len - 9*Math.sin(a+0.35));
+                    ctx.closePath(); ctx.fill();
                   }
                 }
-
-                // Label
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '16px serif';
-                ctx.fillText('All normals point outward', 20, height - 40);
-                ctx.fillText('→ Consistent orientation', 20, height - 20);
+                ctx.fillStyle = '#27ae60'; ctx.font = 'bold 16px serif';
+                ctx.fillText('All normals point consistently outward', 20, height - 45);
+                ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+                ctx.fillText('[S\u00B2] \u2208 H\u2082(S\u00B2) = \u2124 exists', 20, height - 22);
 
               } else if (viz.state.manifold === 'torus') {
-                // Draw torus (cross-section)
-                const majorR = 100;
-                const minorR = 40;
-
-                // Outer circle
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, majorR + minorR, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // Inner circle
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, majorR - minorR, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // Normal vectors
+                const majorR = Math.min(width, height)*0.24, minorR = majorR*0.38;
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(cx, cy, majorR+minorR, 0, Math.PI*2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(cx, cy, majorR-minorR, 0, Math.PI*2); ctx.stroke();
+                ctx.fillStyle = 'rgba(52,152,219,0.12)';
+                ctx.beginPath(); ctx.arc(cx, cy, majorR+minorR, 0, Math.PI*2);
+                ctx.arc(cx, cy, majorR-minorR, Math.PI*2, 0, true); ctx.closePath(); ctx.fill();
                 if (viz.state.showNormals) {
-                  const angles = [0, Math.PI/3, 2*Math.PI/3, Math.PI, 4*Math.PI/3, 5*Math.PI/3];
-                  angles.forEach(angle => {
-                    const r = majorR + minorR * 0.5 * Math.sin(viz.state.animationAngle + angle);
-                    const px = centerX + r * Math.cos(angle);
-                    const py = centerY + r * Math.sin(angle);
-                    const nx = Math.cos(angle);
-                    const ny = Math.sin(angle);
-
-                    // Normal vector
-                    ctx.strokeStyle = '#e74c3c';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.moveTo(px, py);
-                    ctx.lineTo(px + nx * 35, py + ny * 35);
-                    ctx.stroke();
-
-                    // Arrowhead
-                    const arrowAngle = Math.atan2(ny, nx);
-                    ctx.fillStyle = '#e74c3c';
-                    ctx.beginPath();
-                    ctx.moveTo(px + nx * 35, py + ny * 35);
-                    ctx.lineTo(px + nx * 35 - 8 * Math.cos(arrowAngle - 0.3),
-                              py + ny * 35 - 8 * Math.sin(arrowAngle - 0.3));
-                    ctx.lineTo(px + nx * 35 - 8 * Math.cos(arrowAngle + 0.3),
-                              py + ny * 35 - 8 * Math.sin(arrowAngle + 0.3));
-                    ctx.closePath();
-                    ctx.fill();
-                  });
+                  for (let i = 0; i < 10; i++) {
+                    const angle = (i/10)*Math.PI*2, r = majorR+minorR;
+                    const px = cx+r*Math.cos(angle), py = cy+r*Math.sin(angle);
+                    const nx = Math.cos(angle), ny = Math.sin(angle), len = 28;
+                    ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px+nx*len, py+ny*len); ctx.stroke();
+                    const a = Math.atan2(ny, nx);
+                    ctx.fillStyle = '#e74c3c'; ctx.beginPath();
+                    ctx.moveTo(px+nx*len, py+ny*len);
+                    ctx.lineTo(px+nx*len-8*Math.cos(a-0.35), py+ny*len-8*Math.sin(a-0.35));
+                    ctx.lineTo(px+nx*len-8*Math.cos(a+0.35), py+ny*len-8*Math.sin(a+0.35));
+                    ctx.closePath(); ctx.fill();
+                  }
                 }
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '16px serif';
-                ctx.fillText('Normals point outward everywhere', 20, height - 40);
-                ctx.fillText('→ T² is orientable', 20, height - 20);
+                ctx.fillStyle = '#27ae60'; ctx.font = 'bold 16px serif';
+                ctx.fillText('T\u00B2 is orientable: normals point outward everywhere', 20, height - 45);
+                ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+                ctx.fillText('[T\u00B2] \u2208 H\u2082(T\u00B2) = \u2124 exists', 20, height - 22);
 
               } else if (viz.state.manifold === 'mobius') {
-                // Draw Möbius band (schematic)
-                const w = 250;
-                const h = 80;
-                const x0 = centerX - w/2;
-                const y0 = centerY;
-
-                // Band outline
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
+                const w = Math.min(width*0.6, 300), h = 70, x0 = cx - w/2;
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.moveTo(x0, y0 - h/2);
-                ctx.bezierCurveTo(x0 + w/3, y0 - h/2 - 20, x0 + 2*w/3, y0 - h/2 + 20, x0 + w, y0 + h/2);
-                ctx.lineTo(x0 + w, y0 + h/2);
-                ctx.bezierCurveTo(x0 + 2*w/3, y0 + h/2 + 20, x0 + w/3, y0 + h/2 - 20, x0, y0 - h/2);
+                ctx.moveTo(x0, cy-h/2);
+                ctx.bezierCurveTo(x0+w*0.33, cy-h/2-25, x0+w*0.67, cy-h/2+25, x0+w, cy+h/2);
                 ctx.stroke();
-
-                // Center line
-                ctx.strokeStyle = '#95a5a6';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([5, 5]);
                 ctx.beginPath();
-                ctx.moveTo(x0, y0);
-                ctx.bezierCurveTo(x0 + w/3, y0 - 10, x0 + 2*w/3, y0 + 10, x0 + w, y0);
+                ctx.moveTo(x0, cy+h/2);
+                ctx.bezierCurveTo(x0+w*0.33, cy+h/2+25, x0+w*0.67, cy+h/2-25, x0+w, cy-h/2);
                 ctx.stroke();
+                ctx.strokeStyle = '#9b59b6'; ctx.lineWidth = 2; ctx.setLineDash([4,4]);
+                ctx.beginPath(); ctx.arc(cx, cy, 35, 0, Math.PI*2); ctx.stroke();
                 ctx.setLineDash([]);
-
-                // Normal vectors that flip!
+                ctx.fillStyle = '#9b59b6'; ctx.font = 'bold 15px serif'; ctx.fillText('twist', cx-18, cy-42);
                 if (viz.state.showNormals) {
-                  for (let i = 0; i <= 6; i++) {
-                    const t = i / 6;
-                    const px = x0 + t * w;
-                    const py = y0 + 10 * Math.sin(Math.PI * t);
-
-                    // Normal flips sign halfway
-                    const flip = t < 0.5 ? 1 : -1;
-                    const ny = flip * 30;
-
-                    ctx.strokeStyle = i === 0 || i === 6 ? '#9b59b6' : '#e74c3c';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.moveTo(px, py);
-                    ctx.lineTo(px, py - ny);
-                    ctx.stroke();
-
-                    // Arrowhead
-                    ctx.fillStyle = i === 0 || i === 6 ? '#9b59b6' : '#e74c3c';
-                    ctx.beginPath();
-                    ctx.moveTo(px, py - ny);
-                    ctx.lineTo(px - 5, py - ny + flip * 8);
-                    ctx.lineTo(px + 5, py - ny + flip * 8);
-                    ctx.closePath();
-                    ctx.fill();
+                  for (let i = 0; i <= 8; i++) {
+                    const frac = i/8, px = x0+frac*w, py = cy+12*Math.sin(Math.PI*frac);
+                    const sign = frac < 0.5 ? 1 : -1, len = 30*sign;
+                    const isEnd = (i===0||i===8);
+                    ctx.strokeStyle = isEnd ? '#9b59b6' : '#e74c3c'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py-len); ctx.stroke();
+                    ctx.fillStyle = isEnd ? '#9b59b6' : '#e74c3c'; ctx.beginPath();
+                    ctx.moveTo(px, py-len); ctx.lineTo(px-5, py-len+sign*8); ctx.lineTo(px+5, py-len+sign*8);
+                    ctx.closePath(); ctx.fill();
                   }
                 }
-
-                // Highlight contradiction
-                ctx.strokeStyle = '#9b59b6';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(x0, y0, 20, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '16px serif';
-                ctx.fillText('Normals flip sign after going around!', 20, height - 60);
-                ctx.fillText('→ Impossible to orient consistently', 20, height - 40);
-                ctx.fillText('→ Möbius band is NON-ORIENTABLE', 20, height - 20);
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.arc(x0, cy, 18, 0, Math.PI*2); ctx.stroke();
+                ctx.beginPath(); ctx.arc(x0+w, cy, 18, 0, Math.PI*2); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.font = '13px serif';
+                ctx.fillText('\u2191', x0-4, cy-25); ctx.fillText('\u2193', x0+w-4, cy-25);
+                ctx.fillText('Opposite!', cx-30, cy+h/2+40);
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 16px serif';
+                ctx.fillText('Normal flips after going around the twist!', 20, height - 45);
+                ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+                ctx.fillText('No fundamental class over \u2124', 20, height - 22);
               }
             },
             controls: [
-              {
-                type: 'select',
-                label: 'Manifold',
-                options: [
-                  { value: 'sphere', label: 'Sphere S²' },
-                  { value: 'torus', label: 'Torus T²' },
-                  { value: 'mobius', label: 'Möbius Band' }
-                ],
-                action: (viz, value) => {
-                  viz.state.manifold = value;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Normals',
-                action: (viz) => {
-                  viz.state.showNormals = !viz.state.showNormals;
-                }
-              }
+              { type: 'select', label: 'Manifold', options: [
+                { value: 'sphere', label: 'Sphere S\u00B2' },
+                { value: 'torus', label: 'Torus T\u00B2' },
+                { value: 'mobius', label: 'M\u00f6bius Band' }
+              ], action: (viz, value) => { viz.state.manifold = value; } },
+              { type: 'button', label: 'Toggle Normals', action: (viz) => { viz.state.showNormals = !viz.state.showNormals; } }
             ]
           }
         },
         {
-          id: 'fundamental-class-builder',
-          title: 'Fundamental Class Builder',
-          description: 'Build [M] ∈ Hₙ(M) for oriented closed manifold',
+          id: 'local-orientation-explorer',
+          title: 'Local Orientation Explorer',
+          description: 'Explore local orientations and consistency around loops',
           canvas: {
             setup: (viz) => {
-              viz.state = {
-                manifold: 's2',
-                dimension: 2
-              };
+              viz.state = { surface: 'cylinder', pathProgress: 0, animating: false, showLocalFrames: true };
             },
             draw: (viz, ctx, width, height) => {
               ctx.clearRect(0, 0, width, height);
+              const cx = width/2, cy = height/2, surface = viz.state.surface;
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 20px serif';
+              const labels = { 'cylinder': 'Cylinder (Orientable)', 'mobius': 'M\u00f6bius Band (Non-Orientable)', 'torus': 'Torus T\u00B2 (Orientable)' };
+              ctx.fillText(labels[surface], 20, 30);
 
-              // Title
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = 'bold 22px serif';
-              ctx.fillText('Fundamental Class Construction', 20, 30);
-
-              const centerX = width / 2;
-              const centerY = height / 2 + 20;
-
-              if (viz.state.manifold === 's2') {
-                ctx.font = '18px serif';
-                ctx.fillText('M = S²', 20, 65);
-                ctx.fillText('H₂(S²; ℤ) = ℤ', 20, 90);
-
-                // Draw S² with CW structure
-                const radius = 80;
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // Top hemisphere (2-cell)
-                ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Equator
-                ctx.strokeStyle = '#2c3e50';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
-                ctx.beginPath();
-                ctx.ellipse(centerX, centerY, radius, radius * 0.3, 0, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-
-                // Label
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('e² (2-cell)', centerX - 30, centerY - 30);
-
-                // Arrow showing [S²]
-                ctx.strokeStyle = '#27ae60';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(centerX + radius + 40, centerY - 40);
-                ctx.lineTo(centerX + radius + 40, centerY + 40);
-                ctx.stroke();
-
-                // Label
-                ctx.fillStyle = '#27ae60';
-                ctx.font = 'bold 18px serif';
-                ctx.fillText('[S²] = e²', centerX + radius + 60, centerY);
-                ctx.font = '14px serif';
-                ctx.fillText('generator of H₂(S²)', centerX + radius + 60, centerY + 20);
-
-              } else if (viz.state.manifold === 't2') {
-                ctx.font = '18px serif';
-                ctx.fillText('M = T²', 20, 65);
-                ctx.fillText('H₂(T²; ℤ) = ℤ', 20, 90);
-
-                // Draw torus (stylized square with identifications)
-                const size = 120;
-                const x0 = centerX - size/2;
-                const y0 = centerY - size/2;
-
-                // Square
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.strokeRect(x0, y0, size, size);
-
-                // Fill
-                ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
-                ctx.fillRect(x0, y0, size, size);
-
-                // Arrows showing identifications
-                ctx.strokeStyle = '#2c3e50';
-                ctx.lineWidth = 2;
-                // Bottom edge
-                ctx.beginPath();
-                ctx.moveTo(x0 + 20, y0 + size + 15);
-                ctx.lineTo(x0 + size - 20, y0 + size + 15);
-                ctx.stroke();
-                ctx.fillStyle = '#2c3e50';
-                ctx.beginPath();
-                ctx.moveTo(x0 + size - 20, y0 + size + 15);
-                ctx.lineTo(x0 + size - 30, y0 + size + 10);
-                ctx.lineTo(x0 + size - 30, y0 + size + 20);
-                ctx.fill();
-
-                // Top edge
-                ctx.beginPath();
-                ctx.moveTo(x0 + size - 20, y0 - 15);
-                ctx.lineTo(x0 + 20, y0 - 15);
-                ctx.stroke();
-                ctx.fillStyle = '#2c3e50';
-                ctx.beginPath();
-                ctx.moveTo(x0 + 20, y0 - 15);
-                ctx.lineTo(x0 + 30, y0 - 10);
-                ctx.lineTo(x0 + 30, y0 - 20);
-                ctx.fill();
-
-                // Label
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('[T²]', centerX - 20, centerY);
-
-                ctx.fillStyle = '#27ae60';
-                ctx.font = '14px serif';
-                ctx.fillText('Fundamental class = whole torus', 20, height - 40);
-                ctx.fillText('with consistent orientation', 20, height - 20);
-
-              } else if (viz.state.manifold === 'rp2') {
-                ctx.font = '18px serif';
-                ctx.fillText('M = ℝP²', 20, 65);
-                ctx.fillText('H₂(ℝP²; ℤ) = 0', 20, 90);
-                ctx.fillText('(non-orientable!)', 20, 115);
-
-                // Cross symbol
+              if (surface === 'cylinder' || surface === 'mobius') {
+                const stripW = width*0.6, stripH = 80, x0 = cx-stripW/2, y0 = cy-stripH/2;
+                ctx.fillStyle = 'rgba(52,152,219,0.15)'; ctx.fillRect(x0, y0, stripW, stripH);
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2; ctx.strokeRect(x0, y0, stripW, stripH);
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(x0, y0+stripH*0.75); ctx.lineTo(x0, y0+stripH*0.25); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.beginPath();
+                ctx.moveTo(x0, y0+stripH*0.25); ctx.lineTo(x0-6, y0+stripH*0.25+10); ctx.lineTo(x0+6, y0+stripH*0.25+10); ctx.fill();
+                const rightDir = surface === 'cylinder' ? -1 : 1;
+                ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 3;
+                const startY = rightDir===-1 ? y0+stripH*0.75 : y0+stripH*0.25;
+                const endY = rightDir===-1 ? y0+stripH*0.25 : y0+stripH*0.75;
+                ctx.beginPath(); ctx.moveTo(x0+stripW, startY); ctx.lineTo(x0+stripW, endY); ctx.stroke();
+                ctx.fillStyle = '#27ae60'; ctx.beginPath();
+                ctx.moveTo(x0+stripW, endY); ctx.lineTo(x0+stripW-6, endY-rightDir*10); ctx.lineTo(x0+stripW+6, endY-rightDir*10); ctx.fill();
+                if (viz.state.showLocalFrames) {
+                  for (let i = 0; i <= 8; i++) {
+                    const t = i/8, fx = x0+t*stripW, fy = y0+stripH/2;
+                    let normalDir = surface === 'mobius' ? Math.cos(Math.PI*t) : 1;
+                    const arrowLen = 25;
+                    ctx.strokeStyle = normalDir > 0 ? '#e74c3c' : '#9b59b6'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy-normalDir*arrowLen); ctx.stroke();
+                    ctx.fillStyle = normalDir > 0 ? '#e74c3c' : '#9b59b6'; ctx.beginPath();
+                    ctx.moveTo(fx, fy-normalDir*arrowLen);
+                    ctx.lineTo(fx-4, fy-normalDir*(arrowLen-8)); ctx.lineTo(fx+4, fy-normalDir*(arrowLen-8)); ctx.fill();
+                    ctx.fillStyle = '#2c3e50'; ctx.beginPath(); ctx.arc(fx, fy, 3, 0, Math.PI*2); ctx.fill();
+                  }
+                }
+                if (viz.state.animating) {
+                  viz.state.pathProgress += 0.005;
+                  if (viz.state.pathProgress > 1) { viz.state.pathProgress = 0; viz.state.animating = false; }
+                  ctx.fillStyle = '#f39c12'; ctx.beginPath();
+                  ctx.arc(x0+viz.state.pathProgress*stripW, y0+stripH/2, 8, 0, Math.PI*2); ctx.fill();
+                }
+                ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+                if (surface === 'cylinder') {
+                  ctx.fillText('Edges identified SAME direction -> orientable', 20, height-60);
+                  ctx.fillText('Normal vectors stay consistent around the loop', 20, height-40);
+                  ctx.fillText('Fundamental class [M] exists over Z', 20, height-20);
+                } else {
+                  ctx.fillText('Edges identified OPPOSITE direction -> twist!', 20, height-60);
+                  ctx.fillText('Normal flips after traversing: CONTRADICTION', 20, height-40);
+                  ctx.fillText('No Z-fundamental class; only Z/2 class exists', 20, height-20);
+                }
+              } else if (surface === 'torus') {
+                const size = Math.min(width,height)*0.35, x0 = cx-size/2, y0 = cy-size/2-10;
+                ctx.fillStyle = 'rgba(46,204,113,0.15)'; ctx.fillRect(x0, y0, size, size);
+                ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 2; ctx.strokeRect(x0, y0, size, size);
+                // Edge arrows
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(x0+size*0.3, y0+size+10); ctx.lineTo(x0+size*0.7, y0+size+10); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.beginPath();
+                ctx.moveTo(x0+size*0.7, y0+size+10); ctx.lineTo(x0+size*0.7-8, y0+size+5); ctx.lineTo(x0+size*0.7-8, y0+size+15); ctx.fill();
+                ctx.font = '14px serif'; ctx.fillText('a', x0+size*0.5-4, y0+size+28);
                 ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 5;
-                ctx.beginPath();
-                ctx.moveTo(centerX - 50, centerY - 50);
-                ctx.lineTo(centerX + 50, centerY + 50);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(centerX + 50, centerY - 50);
-                ctx.lineTo(centerX - 50, centerY + 50);
-                ctx.stroke();
-
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = 'bold 20px serif';
-                ctx.fillText('NO fundamental class!', centerX - 100, centerY + 80);
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '14px serif';
-                ctx.fillText('ℝP² is non-orientable, so [ℝP²] does not exist', 20, height - 40);
-                ctx.fillText('H₂(ℝP²; ℤ/2) = ℤ/2 has a mod 2 class', 20, height - 20);
-              }
-
-              // Info box
-              ctx.strokeStyle = '#3498db';
-              ctx.lineWidth = 2;
-              ctx.strokeRect(20, height - 140, width - 40, 80);
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = 'bold 15px serif';
-              ctx.fillText('Key Fact:', 30, height - 115);
-              ctx.font = '14px serif';
-              ctx.fillText('For closed oriented n-manifold M:', 30, height - 93);
-              ctx.fillText('Hₙ(M; ℤ) = ℤ with generator [M] (fundamental class)', 30, height - 73);
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Manifold',
-                options: [
-                  { value: 's2', label: 'S² (orientable)' },
-                  { value: 't2', label: 'T² (orientable)' },
-                  { value: 'rp2', label: 'ℝP² (non-orientable)' }
-                ],
-                action: (viz, value) => {
-                  viz.state.manifold = value;
-                }
-              }
-            ]
-          }
-        }
-      ],
-      exercises: [
-        {
-          id: 'orientation-ex1',
-          question: 'Show that the Klein bottle \\(K\\) is non-orientable by proving \\(H_2(K; \\mathbb{Z}) = 0\\).',
-          hint: 'Use the standard CW structure of the Klein bottle and compute the cellular boundary map.',
-          solution: `The Klein bottle has CW structure: one 0-cell, two 1-cells \\(a, b\\), and one 2-cell \\(e\\).
-
-The attaching map for \\(e\\) is \\(aba^{-1}b\\) (note: \\(a^{-1}\\), not \\(a\\)).
-
-Boundary map: \\(\\partial(e) = a + b - a + b = 2b\\) in \\(C_1\\).
-
-Thus \\(\\partial_2 : C_2 \\to C_1\\) is multiplication by \\(2b\\), which is injective over \\(\\mathbb{Z}\\).
-
-Therefore, \\(H_2(K; \\mathbb{Z}) = \\ker(\\partial_2) / \\text{im}(\\partial_3) = 0\\).
-
-Since \\(H_2(K; \\mathbb{Z}) \\neq \\mathbb{Z}\\), the Klein bottle is non-orientable.`
-        }
-      ]
-    },
-    {
-      id: 'poincare-duality-theorem',
-      title: 'Poincaré Duality Theorem',
-      content: `
-        <div class="env-block theorem">
-          <p><strong>Theorem (Poincaré Duality):</strong> Let \\(M\\) be a closed, connected, orientable \\(n\\)-manifold. Then for all \\(0 \\leq k \\leq n\\), there is a natural isomorphism</p>
-          \\[ H_k(M; \\mathbb{Z}) \\cong H^{n-k}(M; \\mathbb{Z}) \\]
-          <p>This isomorphism is given by "capping with the fundamental class" (see next section).</p>
-        </div>
-
-        <div class="env-block intuition">
-          <p><strong>Intuitive Meaning:</strong> Poincaré duality says that homology and cohomology of a closed orientable manifold are "mirror images" of each other:</p>
-          <ul>
-            <li>\\(k\\)-dimensional holes (homology) correspond to \\((n-k)\\)-dimensional "obstructions" (cohomology)</li>
-            <li>For example, on \\(S^2\\): a 0-cycle (point) is dual to a 2-cocycle (the whole sphere)</li>
-            <li>On \\(T^2\\): 1-cycles (loops) are dual to 1-cocycles (also loops, but measured differently)</li>
-          </ul>
-        </div>
-
-        <div class="env-block example">
-          <p><strong>Example (Sphere):</strong> For \\(S^n\\):</p>
-          <ul>
-            <li>\\(H_0(S^n) = \\mathbb{Z} \\cong H^n(S^n) = \\mathbb{Z}\\)</li>
-            <li>\\(H_k(S^n) = 0 \\cong H^{n-k}(S^n) = 0\\) for \\(0 < k < n\\)</li>
-            <li>\\(H_n(S^n) = \\mathbb{Z} \\cong H^0(S^n) = \\mathbb{Z}\\)</li>
-          </ul>
-          <p>The duality pairs: \\(k = 0 \\leftrightarrow n-k = n\\) and vice versa.</p>
-        </div>
-
-        <div class="env-block example">
-          <p><strong>Example (Torus):</strong> For \\(T^2\\) (\\(n = 2\\)):</p>
-          <ul>
-            <li>\\(H_0(T^2) = \\mathbb{Z} \\cong H^2(T^2) = \\mathbb{Z}\\)</li>
-            <li>\\(H_1(T^2) = \\mathbb{Z}^2 \\cong H^1(T^2) = \\mathbb{Z}^2\\)</li>
-            <li>\\(H_2(T^2) = \\mathbb{Z} \\cong H^0(T^2) = \\mathbb{Z}\\)</li>
-          </ul>
-          <p>Note: The middle dimension \\(k = n/2 = 1\\) is "self-dual."</p>
-        </div>
-
-        <div class="env-block example">
-          <p><strong>Example (Surface of Genus \\(g\\)):</strong> For \\(\\Sigma_g\\) (\\(n = 2\\)):</p>
-          <ul>
-            <li>\\(H_0(\\Sigma_g) = \\mathbb{Z} \\cong H^2(\\Sigma_g) = \\mathbb{Z}\\)</li>
-            <li>\\(H_1(\\Sigma_g) = \\mathbb{Z}^{2g} \\cong H^1(\\Sigma_g) = \\mathbb{Z}^{2g}\\)</li>
-            <li>\\(H_2(\\Sigma_g) = \\mathbb{Z} \\cong H^0(\\Sigma_g) = \\mathbb{Z}\\)</li>
-          </ul>
-        </div>
-
-        <div class="env-block theorem">
-          <p><strong>Theorem (Poincaré Duality with Coefficients):</strong> For any coefficient group \\(G\\), if \\(M\\) is a closed oriented \\(n\\)-manifold, then</p>
-          \\[ H_k(M; G) \\cong H^{n-k}(M; G) \\]
-          <p>This follows from the version with \\(\\mathbb{Z}\\) coefficients plus the Universal Coefficient Theorem.</p>
-        </div>
-
-        <div class="env-block remark">
-          <p><strong>Remark (Euler Characteristic):</strong> Poincaré duality has a beautiful consequence for the Euler characteristic:</p>
-          \\[ \\chi(M) = \\sum_{k=0}^n (-1)^k \\dim H_k(M) = \\sum_{k=0}^n (-1)^k \\dim H^{n-k}(M) \\]
-          <p>By duality, this equals \\(\\sum_{k=0}^n (-1)^{n-k} \\dim H^k(M)\\). For even \\(n\\), pairing \\(k\\) with \\(n-k\\) shows contributions cancel in pairs (except middle dimension), giving constraints on \\(\\chi(M)\\).</p>
-        </div>
-
-        <div class="env-block theorem">
-          <p><strong>Theorem (Poincaré-Lefschetz Duality):</strong> For a compact orientable \\(n\\)-manifold \\(M\\) with boundary \\(\\partial M\\), there is an isomorphism</p>
-          \\[ H_k(M, \\partial M) \\cong H^{n-k}(M) \\]
-          <p>This generalizes Poincaré duality to manifolds with boundary.</p>
-        </div>
-
-        <div class="env-block example">
-          <p><strong>Example (Disk):</strong> For \\(D^2\\):</p>
-          <ul>
-            <li>\\(H_2(D^2, \\partial D^2) = \\mathbb{Z} \\cong H^0(D^2) = \\mathbb{Z}\\)</li>
-            <li>\\(H_1(D^2, \\partial D^2) = 0 \\cong H^1(D^2) = 0\\)</li>
-            <li>\\(H_0(D^2, \\partial D^2) = 0 \\cong H^2(D^2) = 0\\)</li>
-          </ul>
-        </div>
-      `,
-      visualizations: [
-        {
-          id: 'duality-isomorphism',
-          title: 'Duality Isomorphism Visualizer',
-          description: 'See Hₖ ↔ Hⁿ⁻ᵏ correspondence with interactive slider',
-          canvas: {
-            setup: (viz) => {
-              viz.state = {
-                manifold: 't2',
-                n: 2,
-                k: 0,
-                showArrows: true
-              };
-            },
-            draw: (viz, ctx, width, height) => {
-              ctx.clearRect(0, 0, width, height);
-
-              // Title
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = 'bold 22px serif';
-              ctx.fillText('Poincaré Duality: Hₖ ↔ Hⁿ⁻ᵏ', 20, 30);
-
-              const n = viz.state.n;
-              const k = viz.state.k;
-              const dual_k = n - k;
-
-              // Display manifold info
-              let manifoldName = '';
-              let homology = {};
-              if (viz.state.manifold === 't2') {
-                manifoldName = 'T²';
-                homology = { 0: 'ℤ', 1: 'ℤ²', 2: 'ℤ' };
-              } else if (viz.state.manifold === 's2') {
-                manifoldName = 'S²';
-                homology = { 0: 'ℤ', 1: '0', 2: 'ℤ' };
-              } else if (viz.state.manifold === 's3') {
-                manifoldName = 'S³';
-                viz.state.n = 3;
-                homology = { 0: 'ℤ', 1: '0', 2: '0', 3: 'ℤ' };
-              }
-
-              ctx.font = '18px serif';
-              ctx.fillText(`M = ${manifoldName}, dim = ${n}`, 20, 65);
-              ctx.fillText(`k = ${k}, n-k = ${dual_k}`, 20, 90);
-
-              // Left side: Homology
-              const leftX = width / 4;
-              const centerY = height / 2;
-
-              ctx.fillStyle = '#e74c3c';
-              ctx.font = 'bold 20px serif';
-              ctx.fillText('Homology', leftX - 50, centerY - 120);
-
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = '18px serif';
-              ctx.fillText(`Hₖ(M) = H${k}(${manifoldName})`, leftX - 80, centerY - 90);
-
-              // Homology group box
-              ctx.fillStyle = '#e74c3c';
-              ctx.beginPath();
-              ctx.arc(leftX, centerY, 60, 0, Math.PI * 2);
-              ctx.fill();
-
-              ctx.fillStyle = '#fff';
-              ctx.font = 'bold 22px serif';
-              const hk_text = `H${k}`;
-              ctx.fillText(hk_text, leftX - 20, centerY - 5);
-              ctx.font = '18px serif';
-              ctx.fillText(homology[k] || '0', leftX - 15, centerY + 20);
-
-              // Right side: Cohomology
-              const rightX = 3 * width / 4;
-
-              ctx.fillStyle = '#3498db';
-              ctx.font = 'bold 20px serif';
-              ctx.fillText('Cohomology', rightX - 60, centerY - 120);
-
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = '18px serif';
-              ctx.fillText(`Hⁿ⁻ᵏ(M) = H${dual_k}(${manifoldName})`, rightX - 90, centerY - 90);
-
-              // Cohomology group box
-              ctx.fillStyle = '#3498db';
-              ctx.beginPath();
-              ctx.arc(rightX, centerY, 60, 0, Math.PI * 2);
-              ctx.fill();
-
-              ctx.fillStyle = '#fff';
-              ctx.font = 'bold 22px serif';
-              const hnk_text = `H${dual_k}`;
-              ctx.fillText(hnk_text, rightX - 20, centerY - 5);
-              ctx.font = '18px serif';
-              ctx.fillText(homology[dual_k] || '0', rightX - 15, centerY + 20);
-
-              // Duality arrow
-              if (viz.state.showArrows) {
-                ctx.strokeStyle = '#27ae60';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.moveTo(leftX + 70, centerY);
-                ctx.lineTo(rightX - 70, centerY);
-                ctx.stroke();
-
-                // Arrowhead (both directions)
-                ctx.fillStyle = '#27ae60';
-                // Right arrow
-                ctx.beginPath();
-                ctx.moveTo(rightX - 70, centerY);
-                ctx.lineTo(rightX - 85, centerY - 10);
-                ctx.lineTo(rightX - 85, centerY + 10);
-                ctx.closePath();
-                ctx.fill();
-
-                // Left arrow
-                ctx.beginPath();
-                ctx.moveTo(leftX + 70, centerY);
-                ctx.lineTo(leftX + 85, centerY - 10);
-                ctx.lineTo(leftX + 85, centerY + 10);
-                ctx.closePath();
-                ctx.fill();
-
-                // Label
-                ctx.fillStyle = '#27ae60';
-                ctx.font = 'bold 18px serif';
-                ctx.fillText('≅', width / 2 - 10, centerY - 10);
-                ctx.font = '14px serif';
-                ctx.fillText('Poincaré', width / 2 - 35, centerY + 35);
-                ctx.fillText('Duality', width / 2 - 30, centerY + 52);
-              }
-
-              // Info box
-              ctx.strokeStyle = '#27ae60';
-              ctx.lineWidth = 2;
-              ctx.strokeRect(20, height - 100, width - 40, 80);
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = 'bold 15px serif';
-              ctx.fillText('Poincaré Duality Isomorphism:', 30, height - 73);
-              ctx.font = '16px serif';
-              ctx.fillText(`H${k}(${manifoldName}; ℤ) ≅ H${dual_k}(${manifoldName}; ℤ)`, 30, height - 48);
-              ctx.font = '14px serif';
-              ctx.fillText(`Both are isomorphic to ${homology[k] || '0'}`, 30, height - 28);
-            },
-            controls: [
-              {
-                type: 'select',
-                label: 'Manifold',
-                options: [
-                  { value: 's2', label: 'S² (2-sphere)' },
-                  { value: 't2', label: 'T² (torus)' },
-                  { value: 's3', label: 'S³ (3-sphere)' }
-                ],
-                action: (viz, value) => {
-                  viz.state.manifold = value;
-                  if (value === 's3') {
-                    viz.state.n = 3;
-                    viz.state.k = Math.min(viz.state.k, 3);
-                  } else {
-                    viz.state.n = 2;
-                    viz.state.k = Math.min(viz.state.k, 2);
+                ctx.beginPath(); ctx.moveTo(x0+size*0.3, y0-10); ctx.lineTo(x0+size*0.7, y0-10); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.beginPath();
+                ctx.moveTo(x0+size*0.7, y0-10); ctx.lineTo(x0+size*0.7-8, y0-15); ctx.lineTo(x0+size*0.7-8, y0-5); ctx.fill();
+                ctx.fillText('a', x0+size*0.5-4, y0-18);
+                ctx.strokeStyle = '#3498db';
+                ctx.beginPath(); ctx.moveTo(x0-10, y0+size*0.7); ctx.lineTo(x0-10, y0+size*0.3); ctx.stroke();
+                ctx.fillStyle = '#3498db'; ctx.beginPath();
+                ctx.moveTo(x0-10, y0+size*0.3); ctx.lineTo(x0-15, y0+size*0.3+8); ctx.lineTo(x0-5, y0+size*0.3+8); ctx.fill();
+                ctx.fillText('b', x0-25, y0+size*0.5+4);
+                ctx.strokeStyle = '#3498db';
+                ctx.beginPath(); ctx.moveTo(x0+size+10, y0+size*0.7); ctx.lineTo(x0+size+10, y0+size*0.3); ctx.stroke();
+                ctx.fillStyle = '#3498db'; ctx.beginPath();
+                ctx.moveTo(x0+size+10, y0+size*0.3); ctx.lineTo(x0+size+5, y0+size*0.3+8); ctx.lineTo(x0+size+15, y0+size*0.3+8); ctx.fill();
+                ctx.fillText('b', x0+size+18, y0+size*0.5+4);
+                if (viz.state.showLocalFrames) {
+                  for (let i = 1; i <= 3; i++) for (let j = 1; j <= 3; j++) {
+                    const fx = x0+(i/4)*size, fy = y0+(j/4)*size;
+                    ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(fx, fy); ctx.lineTo(fx, fy-18); ctx.stroke();
+                    ctx.fillStyle = '#e74c3c'; ctx.beginPath();
+                    ctx.moveTo(fx, fy-18); ctx.lineTo(fx-3, fy-12); ctx.lineTo(fx+3, fy-12); ctx.fill();
                   }
                 }
-              },
-              {
-                type: 'slider',
-                label: 'Dimension k',
-                min: 0,
-                max: 2,
-                step: 1,
-                initial: 0,
-                action: (viz, value) => {
-                  const maxK = viz.state.n;
-                  viz.state.k = Math.min(value, maxK);
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Arrows',
-                action: (viz) => {
-                  viz.state.showArrows = !viz.state.showArrows;
-                }
+                ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+                ctx.fillText('Both pairs identified same direction -> orientable', 20, height-40);
+                ctx.fillText('[T\u00B2] generates H\u2082(T\u00B2; Z) = Z', 20, height-20);
               }
+            },
+            controls: [
+              { type: 'select', label: 'Surface', options: [
+                { value: 'cylinder', label: 'Cylinder (orientable)' },
+                { value: 'mobius', label: 'M\u00f6bius Band (non-orientable)' },
+                { value: 'torus', label: 'Torus T\u00B2 (orientable)' }
+              ], action: (viz, value) => { viz.state.surface = value; viz.state.pathProgress = 0; viz.state.animating = false; } },
+              { type: 'button', label: 'Animate Path', action: (viz) => { viz.state.animating = true; viz.state.pathProgress = 0; } },
+              { type: 'button', label: 'Toggle Frames', action: (viz) => { viz.state.showLocalFrames = !viz.state.showLocalFrames; } }
             ]
           }
         }
       ],
       exercises: [
         {
-          id: 'duality-ex1',
-          question: 'Use Poincaré duality to compute \\(H^k(\\mathbb{C}P^2; \\mathbb{Z})\\) for all \\(k\\).',
-          hint: 'First compute \\(H_k(\\mathbb{C}P^2)\\) using cell structure, then apply duality.',
-          solution: `\\(\\mathbb{C}P^2\\) has cells in dimensions 0, 2, 4, so:
-- \\(H_0(\\mathbb{C}P^2) = \\mathbb{Z}\\)
-- \\(H_1(\\mathbb{C}P^2) = 0\\)
-- \\(H_2(\\mathbb{C}P^2) = \\mathbb{Z}\\)
-- \\(H_3(\\mathbb{C}P^2) = 0\\)
-- \\(H_4(\\mathbb{C}P^2) = \\mathbb{Z}\\)
+          id: 'orientation-rpn',
+          question: 'Prove that \\(\\mathbb{R}P^n\\) is orientable if and only if \\(n\\) is odd. (Hint: The antipodal map \\(a: S^n \\to S^n\\) has degree \\((-1)^{n+1}\\).)',
+          hint: 'The orientation double cover of \\(\\mathbb{R}P^n\\) is \\(S^n\\). An orientation requires the deck transformation (antipodal map) to preserve orientation.',
+          solution: `The orientation double cover of \\(\\mathbb{R}P^n\\) is \\(S^n \\to \\mathbb{R}P^n\\) with deck transformation the antipodal map \\(a(x) = -x\\).
 
-By Poincaré duality (\\(n = 4\\)):
-- \\(H^0(\\mathbb{C}P^2) \\cong H_4(\\mathbb{C}P^2) = \\mathbb{Z}\\)
-- \\(H^1(\\mathbb{C}P^2) \\cong H_3(\\mathbb{C}P^2) = 0\\)
-- \\(H^2(\\mathbb{C}P^2) \\cong H_2(\\mathbb{C}P^2) = \\mathbb{Z}\\)
-- \\(H^3(\\mathbb{C}P^2) \\cong H_1(\\mathbb{C}P^2) = 0\\)
-- \\(H^4(\\mathbb{C}P^2) \\cong H_0(\\mathbb{C}P^2) = \\mathbb{Z}\\)
+The antipodal map has degree \\((-1)^{n+1}\\) (composition of \\(n+1\\) reflections).
 
-This matches what we know from the cup product structure!`
+For \\(\\mathbb{R}P^n\\) to be orientable, \\(\\deg(a) = +1\\):
+\\[ (-1)^{n+1} = +1 \\iff n \\text{ is odd.} \\]
+
+So \\(\\mathbb{R}P^1 \\cong S^1\\) and \\(\\mathbb{R}P^3\\) are orientable, while \\(\\mathbb{R}P^2\\) and \\(\\mathbb{R}P^4\\) are not.`
         },
         {
-          id: 'duality-ex2',
-          question: 'For a closed orientable surface \\(\\Sigma_g\\) of genus \\(g\\), show that the Euler characteristic \\(\\chi(\\Sigma_g) = 2 - 2g\\) is consistent with Poincaré duality.',
-          hint: 'Count dimensions using duality and verify the alternating sum.',
-          solution: `For \\(\\Sigma_g\\) (\\(n = 2\\)):
-- \\(H_0 = \\mathbb{Z}\\), dimension 1
-- \\(H_1 = \\mathbb{Z}^{2g}\\), dimension \\(2g\\)
-- \\(H_2 = \\mathbb{Z}\\), dimension 1
+          id: 'orientation-klein',
+          question: 'Show that the Klein bottle \\(K\\) is non-orientable by computing \\(H_2(K; \\mathbb{Z})\\) from its CW structure.',
+          hint: 'CW structure: one 0-cell, two 1-cells \\(a, b\\), one 2-cell with attaching map \\(aba^{-1}b\\). Compute \\(\\partial_2\\).',
+          solution: `CW structure: one 0-cell \\(v\\), two 1-cells \\(a, b\\), one 2-cell \\(e\\) with attaching map \\(aba^{-1}b\\).
 
-Euler characteristic:
-\\[ \\chi(\\Sigma_g) = \\dim H_0 - \\dim H_1 + \\dim H_2 = 1 - 2g + 1 = 2 - 2g \\]
+\\(\\partial_2(e) = a + b - a + b = 2b \\neq 0\\), so \\(\\ker(\\partial_2) = 0\\).
 
-By Poincaré duality:
-- \\(H^0 \\cong H_2 = \\mathbb{Z}\\)
-- \\(H^1 \\cong H_1 = \\mathbb{Z}^{2g}\\)
-- \\(H^2 \\cong H_0 = \\mathbb{Z}\\)
-
-Computing via cohomology:
-\\[ \\chi = \\dim H^0 - \\dim H^1 + \\dim H^2 = 1 - 2g + 1 = 2 - 2g \\]
-
-Same result! ✓`
+Therefore \\(H_2(K; \\mathbb{Z}) = 0 \\neq \\mathbb{Z}\\), confirming non-orientability. \\(\\square\\)`
         }
       ]
     },
+
+    // ============================================================
+    // Section 2: The Cap Product
+    // ============================================================
     {
       id: 'cap-product',
-      title: 'Cap Product and Proof Sketch',
+      title: 'The Cap Product',
       content: `
-        <div class="env-block definition">
-          <p><strong>Definition (Cap Product):</strong> The <em>cap product</em> is a bilinear pairing</p>
-          \\[ \\frown : H^k(X) \\otimes H_n(X) \\to H_{n-k}(X) \\]
-          <p>defined on the chain/cochain level as follows: for \\(\\varphi \\in C^k(X)\\) and \\(\\sigma : \\Delta^n \\to X\\),</p>
-          \\[ \\varphi \\frown \\sigma = \\varphi(\\sigma|_{[v_0, \\ldots, v_k]}) \\cdot \\sigma|_{[v_k, \\ldots, v_n]} \\]
-          <p>where the right side is the "back face" of \\(\\sigma\\), weighted by the value of \\(\\varphi\\) on the "front face."</p>
+        <div class="env-block intuition">
+          <p><strong>Motivation:</strong> The cup product gives cohomology a ring structure. The <em>cap product</em> is the companion operation that pairs cohomology with homology, producing a homology class of lower degree. It is the key mechanism behind Poincar\u00e9 duality: capping with the fundamental class \\([M]\\) gives the duality isomorphism.</p>
         </div>
 
-        <div class="env-block intuition">
-          <p><strong>Geometric Picture:</strong> The cap product "removes" a \\(k\\)-dimensional piece from an \\(n\\)-chain, leaving an \\((n-k)\\)-chain:</p>
-          <ul>
-            <li>\\(\\varphi\\) measures a \\(k\\)-dimensional aspect of \\(\\sigma\\)</li>
-            <li>\\(\\varphi \\frown \\sigma\\) is what remains after "using up" that \\(k\\)-dimensional part</li>
-            <li>Think: cup product "multiplies" dimensions, cap product "divides" them</li>
-          </ul>
+        <div class="env-block definition">
+          <p><strong>Definition (Cap Product):</strong> The <em>cap product</em> is a bilinear map</p>
+          \\[ \\frown : H_n(X; R) \\times H^k(X; R) \\to H_{n-k}(X; R) \\]
+          <p>defined at the chain level: for a singular \\(n\\)-simplex \\(\\sigma: \\Delta^n \\to X\\) and a cochain \\(\\varphi \\in C^k(X; R)\\):</p>
+          \\[ \\sigma \\frown \\varphi = \\varphi(\\sigma|_{[v_0, \\ldots, v_k]}) \\cdot \\sigma|_{[v_k, \\ldots, v_n]} \\]
+          <p>Evaluate \\(\\varphi\\) on the <em>front \\(k\\)-face</em>, then take the <em>back \\((n-k)\\)-face</em> weighted by that evaluation.</p>
         </div>
 
         <div class="env-block theorem">
           <p><strong>Theorem (Cap Product Properties):</strong></p>
           <ol>
-            <li>The cap product descends to (co)homology: \\(\\frown : H^k(X) \\otimes H_n(X) \\to H_{n-k}(X)\\)</li>
-            <li>\\((\\varphi \\cup \\psi) \\frown \\sigma = \\varphi \\frown (\\psi \\frown \\sigma)\\) (associativity)</li>
-            <li>For the unit \\(1 \\in H^0(X)\\), we have \\(1 \\frown \\sigma = \\sigma\\)</li>
+            <li><strong>Well-defined:</strong> \\(\\partial(\\sigma \\frown \\varphi) = (-1)^k(\\partial\\sigma \\frown \\varphi - \\sigma \\frown \\delta\\varphi)\\), so the cap product descends to \\(H_n \\times H^k \\to H_{n-k}\\).</li>
+            <li><strong>Associativity:</strong> \\((\\varphi \\cup \\psi) \\frown \\sigma = \\varphi \\frown (\\psi \\frown \\sigma)\\)</li>
+            <li><strong>Unit:</strong> \\(1 \\frown \\sigma = \\sigma\\) where \\(1 \\in H^0\\)</li>
+            <li><strong>Cup-Cap Adjunction:</strong> \\(\\langle \\alpha \\cup \\beta, \\sigma \\rangle = \\langle \\alpha, \\sigma \\frown \\beta \\rangle\\)</li>
+            <li><strong>Naturality:</strong> \\(f_*(\\sigma \\frown f^*\\varphi) = f_*(\\sigma) \\frown \\varphi\\)</li>
           </ol>
-        </div>
-
-        <div class="env-block theorem">
-          <p><strong>Theorem (Poincaré Duality via Cap Product):</strong> Let \\(M\\) be a closed oriented \\(n\\)-manifold with fundamental class \\([M] \\in H_n(M)\\). The map</p>
-          \\[ D : H^k(M) \\to H_{n-k}(M), \\quad \\varphi \\mapsto \\varphi \\frown [M] \\]
-          <p>is an isomorphism for all \\(k\\).</p>
         </div>
 
         <div class="env-block proof">
-          <p><strong>Proof Sketch:</strong> The proof has several steps:</p>
-          <ol>
-            <li><strong>Local computation:</strong> On \\(\\mathbb{R}^n\\), use singular homology/cohomology with compact support to show the cap product with the fundamental class of \\(\\mathbb{R}^n\\) gives an isomorphism.</li>
-            <li><strong>Mayer-Vietoris:</strong> Cover \\(M\\) by open sets \\(U, V\\) homeomorphic to \\(\\mathbb{R}^n\\). Use the five-lemma on the Mayer-Vietoris sequence to show that if the cap product is an isomorphism on \\(U, V, U \\cap V\\), then it's an isomorphism on \\(M\\).</li>
-            <li><strong>Induction:</strong> By induction on the number of cells in a good cover, extend to all closed manifolds.</li>
-          </ol>
-          <p>The key idea: cap product with \\([M]\\) is "dual" to cup product, and it provides the explicit isomorphism in Poincaré duality. ∎</p>
+          <p><strong>Proof of adjunction (4):</strong> On the chain level, for an \\(n\\)-simplex \\(\\sigma\\):</p>
+          \\[ \\langle \\alpha \\cup \\beta, \\sigma \\rangle = \\alpha(\\sigma|_{\\text{front}}) \\cdot \\beta(\\sigma|_{\\text{back}}) \\]
+          \\[ \\langle \\alpha, \\sigma \\frown \\beta \\rangle = \\beta(\\sigma|_{\\text{front}}) \\cdot \\alpha(\\sigma|_{\\text{back}}) \\]
+          <p>These agree after tracking front/back face conventions. \\(\\square\\)</p>
         </div>
 
         <div class="env-block example">
-          <p><strong>Example (Cap Product on Torus):</strong> For \\(T^2\\) with fundamental class \\([T^2] \\in H_2(T^2)\\):</p>
+          <p><strong>Example (\\(S^2\\)):</strong> Let \\(\\mu \\in H^2(S^2) \\cong \\mathbb{Z}\\). Then \\([S^2] \\frown \\mu = \\mu([S^2]) \\cdot [\\text{pt}] = 1 \\cdot [\\text{pt}] \\in H_0(S^2)\\). The duality map sends \\(H^2 \\to H_0\\).</p>
+        </div>
+
+        <div class="env-block example">
+          <p><strong>Example (\\(T^2\\)):</strong> Let \\(\\alpha, \\beta \\in H^1(T^2)\\) be dual to the meridian and longitude.</p>
           <ul>
-            <li>\\(1 \\frown [T^2] = [T^2]\\) (the whole torus)</li>
-            <li>For \\(\\alpha \\in H^1(T^2)\\) (dual to meridian), \\(\\alpha \\frown [T^2]\\) is the longitude (a 1-cycle)</li>
-            <li>For \\(\\beta \\in H^1(T^2)\\) (dual to longitude), \\(\\beta \\frown [T^2]\\) is the meridian</li>
-            <li>For \\(\\alpha \\cup \\beta \\in H^2(T^2)\\), \\((\\alpha \\cup \\beta) \\frown [T^2]\\) is a point (0-cycle)</li>
+            <li>\\([T^2] \\frown \\alpha\\) = (up to sign) the longitude cycle in \\(H_1\\)</li>
+            <li>\\([T^2] \\frown \\beta\\) = (up to sign) the meridian cycle in \\(H_1\\)</li>
+            <li>\\([T^2] \\frown (\\alpha \\cup \\beta) = \\pm [\\text{pt}] \\in H_0\\)</li>
           </ul>
         </div>
 
         <div class="env-block remark">
-          <p><strong>Relation to Cup Product:</strong> The cap and cup products are related by the formula</p>
-          \\[ \\langle \\varphi \\cup \\psi, \\sigma \\rangle = \\langle \\psi, \\varphi \\frown \\sigma \\rangle \\]
-          <p>where \\(\\langle -, - \\rangle\\) denotes the natural pairing \\(H^k \\otimes H_k \\to \\mathbb{Z}\\). This shows cap product is the "adjoint" of cup product.</p>
-        </div>
-
-        <div class="env-block theorem">
-          <p><strong>Theorem (Intersection Form):</strong> On a closed oriented \\(n\\)-manifold \\(M\\), the cup product and cap product together define the <em>intersection form</em></p>
-          \\[ \\cdot : H_k(M) \\times H_{n-k}(M) \\to \\mathbb{Z} \\]
-          <p>given by \\(\\alpha \\cdot \\beta = \\langle \\alpha^* \\cup \\beta^*, [M] \\rangle\\), where \\(\\alpha^*, \\beta^*\\) are Poincaré duals.</p>
-          <p>This measures the "intersection number" of cycles.</p>
-        </div>
-
-        <div class="env-block example">
-          <p><strong>Example (Intersection on \\(T^2\\)):</strong> For \\(T^2\\), the intersection form on \\(H_1(T^2) \\times H_1(T^2)\\) is given by the algebraic intersection number:</p>
-          <ul>
-            <li>Meridian ∙ Longitude = +1 (they intersect transversely once, positively)</li>
-            <li>Meridian ∙ Meridian = 0 (parallel, don't intersect)</li>
-            <li>Longitude ∙ Longitude = 0</li>
-          </ul>
-          <p>This corresponds to the cup product structure we computed earlier!</p>
+          <p><strong>Cap vs Cup:</strong> The cup product \\(\\cup: H^p \\otimes H^q \\to H^{p+q}\\) multiplies cochains. The cap product \\(\\frown: H_n \\otimes H^k \\to H_{n-k}\\) "divides" a chain by a cochain. Together, they form the algebraic backbone of duality.</p>
         </div>
       `,
       visualizations: [
         {
-          id: 'cap-product-visualizer',
-          title: 'Cap Product Visualizer',
-          description: 'See ⌢: Hᵏ(M) ⊗ Hₙ(M) → Hₙ₋ₖ(M)',
+          id: 'cap-product-machine',
+          title: 'Cap Product Machine',
+          description: 'Visualize how capping splits a simplex into evaluation and residual parts',
           canvas: {
             setup: (viz) => {
-              viz.state = {
-                k: 1,
-                n: 2,
-                step: 0 // 0: show inputs, 1: show cap product, 2: show result
-              };
+              viz.state = { n: 3, k: 1, step: 0 };
             },
             draw: (viz, ctx, width, height) => {
               ctx.clearRect(0, 0, width, height);
-
-              // Title
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = 'bold 22px serif';
-              ctx.fillText('Cap Product: φ ⌢ σ', 20, 30);
-
-              const k = viz.state.k;
-              const n = viz.state.n;
-              const result_dim = n - k;
-
+              const n = viz.state.n, k = viz.state.k, step = viz.state.step;
+              const subs = ['\u2080','\u2081','\u2082','\u2083','\u2084','\u2085'];
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 20px serif';
+              ctx.fillText('Cap Product: \u03C3 \u2322 \u03C6', 20, 30);
               ctx.font = '16px serif';
-              ctx.fillText(`φ ∈ Hᵏ(M), k = ${k}`, 20, 60);
-              ctx.fillText(`σ ∈ Hₙ(M), n = ${n}`, 20, 85);
-              ctx.fillText(`φ ⌢ σ ∈ Hₙ₋ₖ(M), n-k = ${result_dim}`, 20, 110);
+              ctx.fillText(`\u03C3 \u2208 C_${n}(X),  \u03C6 \u2208 C^${k}(X),  result \u2208 C_${n-k}(X)`, 20, 55);
 
-              const centerX = width / 2;
-              const centerY = height / 2 + 20;
+              const cx = width/2, baseY = height/2+20;
+              const spacing = Math.min(80, (width-100)/n), startX = cx-(n*spacing)/2;
+              const vertices = [];
+              for (let i = 0; i <= n; i++) vertices.push({ x: startX+i*spacing, y: baseY+(i%2===0?-30:30) });
 
-              if (viz.state.step === 0) {
-                // Show cochain and chain
-                // Cochain
-                ctx.fillStyle = '#e74c3c';
-                ctx.beginPath();
-                ctx.arc(centerX - 120, centerY, 50, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 20px serif';
-                ctx.fillText('φ', centerX - 130, centerY + 5);
-                ctx.font = '14px serif';
-                ctx.fillText(`${k}-cochain`, centerX - 148, centerY + 25);
-
-                // Chain
-                ctx.fillStyle = '#3498db';
-                ctx.beginPath();
-                ctx.arc(centerX + 120, centerY, 50, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 20px serif';
-                ctx.fillText('σ', centerX + 110, centerY + 5);
-                ctx.font = '14px serif';
-                ctx.fillText(`${n}-chain`, centerX + 95, centerY + 25);
-
-                // Operation symbol
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = 'bold 28px serif';
-                ctx.fillText('⌢', centerX - 15, centerY + 10);
-
-              } else if (viz.state.step === 1) {
-                // Show the cap product operation
-                // Simplex
-                const size = 120;
-                const x0 = centerX - size / 2;
-                const y0 = centerY - 30;
-
-                // Draw simplex (triangle for n=2)
-                if (n === 2) {
-                  const v0 = { x: centerX, y: y0 };
-                  const v1 = { x: x0, y: y0 + size };
-                  const v2 = { x: x0 + size, y: y0 + size };
-
-                  // Full simplex
-                  ctx.strokeStyle = '#95a5a6';
-                  ctx.lineWidth = 2;
-                  ctx.beginPath();
-                  ctx.moveTo(v0.x, v0.y);
-                  ctx.lineTo(v1.x, v1.y);
-                  ctx.lineTo(v2.x, v2.y);
-                  ctx.closePath();
-                  ctx.stroke();
-
-                  // Front face (where φ evaluates)
-                  ctx.strokeStyle = '#e74c3c';
-                  ctx.lineWidth = 4;
-                  ctx.beginPath();
-                  ctx.moveTo(v0.x, v0.y);
-                  ctx.lineTo(v1.x, v1.y);
-                  ctx.stroke();
-
-                  ctx.fillStyle = '#e74c3c';
-                  ctx.font = '16px serif';
-                  ctx.fillText('φ evaluates here', x0 - 80, y0 + 60);
-
-                  // Back face (result)
-                  ctx.strokeStyle = '#27ae60';
-                  ctx.lineWidth = 4;
-                  ctx.beginPath();
-                  ctx.moveTo(v1.x, v1.y);
-                  ctx.lineTo(v2.x, v2.y);
-                  ctx.stroke();
-
-                  ctx.fillStyle = '#27ae60';
-                  ctx.font = '16px serif';
-                  ctx.fillText('Result: φ⌢σ', x0 + size + 10, y0 + size + 5);
-
-                  // Vertices
-                  [v0, v1, v2].forEach((v, i) => {
-                    ctx.fillStyle = '#2c3e50';
-                    ctx.beginPath();
-                    ctx.arc(v.x, v.y, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.font = '14px serif';
-                    ctx.fillText(`v${i}`, v.x + 8, v.y - 8);
-                  });
-                }
-
-                // Formula
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '16px serif';
-                ctx.fillText('φ ⌢ σ = φ(σ|[v₀,v₁]) · σ|[v₁,v₂]', 20, height - 40);
-
-              } else if (viz.state.step === 2) {
-                // Show result
-                ctx.fillStyle = '#27ae60';
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, 60, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 22px serif';
-                ctx.fillText('φ ⌢ σ', centerX - 30, centerY - 5);
-                ctx.font = '16px serif';
-                ctx.fillText(`${result_dim}-chain`, centerX - 35, centerY + 20);
-
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '16px serif';
-                ctx.fillText(`Cap product reduces dimension: ${n} → ${result_dim}`, 20, height - 60);
-                ctx.fillText('(Cochain "eats up" k dimensions)', 20, height - 35);
+              ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1;
+              for (let i = 0; i <= n; i++) for (let j = i+1; j <= n; j++) {
+                ctx.beginPath(); ctx.moveTo(vertices[i].x, vertices[i].y); ctx.lineTo(vertices[j].x, vertices[j].y); ctx.stroke();
               }
 
-              // Step indicator
-              ctx.fillStyle = '#7f8c8d';
-              ctx.font = '14px serif';
-              ctx.fillText(`Step ${viz.state.step + 1} of 3`, width - 100, height - 20);
+              if (step >= 1) {
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                for (let i = 0; i <= k; i++) for (let j = i+1; j <= k; j++) {
+                  ctx.beginPath(); ctx.moveTo(vertices[i].x, vertices[i].y); ctx.lineTo(vertices[j].x, vertices[j].y); ctx.stroke();
+                }
+                ctx.fillStyle = '#e74c3c'; ctx.font = '14px serif';
+                ctx.fillText(`Front ${k}-face: [v${subs[0]},...,v${subs[k]}]  \u2190 \u03C6 evaluates here`, 20, height-90);
+              }
+              if (step >= 2) {
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3;
+                for (let i = k; i <= n; i++) for (let j = i+1; j <= n; j++) {
+                  ctx.beginPath(); ctx.moveTo(vertices[i].x, vertices[i].y); ctx.lineTo(vertices[j].x, vertices[j].y); ctx.stroke();
+                }
+                ctx.fillStyle = '#3498db'; ctx.font = '14px serif';
+                ctx.fillText(`Back ${n-k}-face: [v${subs[k]},...,v${subs[n]}]  \u2190 resulting chain`, 20, height-65);
+              }
+              if (step >= 3) {
+                ctx.fillStyle = '#27ae60'; ctx.font = 'bold 16px serif';
+                ctx.fillText(`Result: \u03C6(front) \u00b7 back_face  \u2208  C_${n-k}(X)`, 20, height-35);
+              }
+
+              for (let i = 0; i <= n; i++) {
+                let color = '#95a5a6';
+                if (step >= 1 && i <= k) color = '#e74c3c';
+                if (step >= 2 && i >= k) color = i <= k ? '#9b59b6' : '#3498db';
+                ctx.fillStyle = color; ctx.beginPath(); ctx.arc(vertices[i].x, vertices[i].y, 12, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 13px serif';
+                ctx.fillText(`v${subs[i]}`, vertices[i].x-7, vertices[i].y+4);
+              }
             },
             controls: [
-              {
-                type: 'button',
-                label: 'Next Step',
-                action: (viz) => {
-                  viz.state.step = (viz.state.step + 1) % 3;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Reset',
-                action: (viz) => {
-                  viz.state.step = 0;
-                }
-              }
+              { type: 'slider', label: 'Simplex dim n', min: 2, max: 5, step: 1, initial: 3, action: (viz, v) => { viz.state.n = v; if (viz.state.k >= v) viz.state.k = v-1; } },
+              { type: 'slider', label: 'Cochain deg k', min: 1, max: 4, step: 1, initial: 1, action: (viz, v) => { if (v < viz.state.n) viz.state.k = v; } },
+              { type: 'slider', label: 'Step', min: 0, max: 3, step: 1, initial: 0, action: (viz, v) => { viz.state.step = v; } }
             ]
           }
         },
         {
-          id: 'non-orientable-examples',
-          title: 'Non-Orientable Examples',
-          description: 'Möbius band, Klein bottle - why duality fails',
+          id: 'cap-cup-adjunction',
+          title: 'Cap-Cup Adjunction',
+          description: 'See the adjunction: <alpha cup beta, sigma> = <alpha, sigma cap beta>',
           canvas: {
-            setup: (viz) => {
-              viz.state = {
-                space: 'mobius' // 'mobius' or 'klein'
-              };
-            },
+            setup: (viz) => { viz.state = { showCup: true, showCap: true }; },
             draw: (viz, ctx, width, height) => {
               ctx.clearRect(0, 0, width, height);
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 20px serif';
+              ctx.fillText('Cap-Cup Adjunction Identity', 20, 30);
+              ctx.font = '16px serif';
+              ctx.fillText('\u27E8 \u03B1 \u222A \u03B2, \u03C3 \u27E9  =  \u27E8 \u03B1, \u03C3 \u2322 \u03B2 \u27E9', 20, 65);
+              const cy = height/2;
 
-              // Title
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = 'bold 22px serif';
-              const title = viz.state.space === 'mobius' ? 'Möbius Band' : 'Klein Bottle';
-              ctx.fillText(title + ' (Non-Orientable)', 20, 30);
-
-              const centerX = width / 2;
-              const centerY = height / 2 - 20;
-
-              if (viz.state.space === 'mobius') {
-                // Draw Möbius band
-                ctx.font = '16px serif';
-                ctx.fillText('H₂(M, ∂M; ℤ) = ℤ/2 ≠ ℤ', 20, 65);
-                ctx.fillText('No fundamental class!', 20, 90);
-
-                // Band
-                const w = 300;
-                const h = 80;
-                const x0 = centerX - w / 2;
-                const y0 = centerY;
-
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.moveTo(x0, y0 - h / 2);
-                ctx.bezierCurveTo(x0 + w / 3, y0 - h / 2 - 20, x0 + 2 * w / 3, y0 - h / 2 + 20, x0 + w, y0 + h / 2);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(x0, y0 + h / 2);
-                ctx.bezierCurveTo(x0 + w / 3, y0 + h / 2 + 20, x0 + 2 * w / 3, y0 + h / 2 - 20, x0 + w, y0 - h / 2);
-                ctx.stroke();
-
-                // Twist annotation
-                ctx.strokeStyle = '#9b59b6';
-                ctx.lineWidth = 3;
-                ctx.setLineDash([5, 5]);
-                ctx.beginPath();
-                ctx.arc(x0 + w / 2, y0, 40, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-
-                ctx.fillStyle = '#9b59b6';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('Twist!', x0 + w / 2 - 25, y0 - 50);
-
-                // Why duality fails
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(20, height - 140, width - 40, 120);
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('Why Poincaré Duality Fails:', 30, height - 112);
-                ctx.font = '14px serif';
-                ctx.fillText('• H₂(M, ∂M; ℤ) = ℤ/2, not ℤ (no fundamental class)', 35, height - 88);
-                ctx.fillText('• Cannot orient consistently (twist causes sign change)', 35, height - 66);
-                ctx.fillText('• Duality H₂(M,∂M) ≅ H⁰(M) fails: ℤ/2 ≇ ℤ', 35, height - 44);
-                ctx.fillText('• Over ℤ/2: duality DOES work! H₂(M,∂M;ℤ/2) ≅ H⁰(M;ℤ/2)', 35, height - 22);
-
-              } else {
-                // Klein bottle
-                ctx.font = '16px serif';
-                ctx.fillText('H₂(K; ℤ) = 0 ≠ ℤ', 20, 65);
-                ctx.fillText('No fundamental class!', 20, 90);
-
-                // Stylized Klein bottle (square with identifications)
-                const size = 140;
-                const x0 = centerX - size / 2;
-                const y0 = centerY - size / 2;
-
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(x0, y0, size, size);
-
-                // Arrows
-                // Bottom to top (same direction)
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(x0 + 20, y0 + size + 15);
-                ctx.lineTo(x0 + size - 20, y0 + size + 15);
-                ctx.stroke();
-                ctx.fillStyle = '#3498db';
-                ctx.beginPath();
-                ctx.moveTo(x0 + size - 20, y0 + size + 15);
-                ctx.lineTo(x0 + size - 30, y0 + size + 10);
-                ctx.lineTo(x0 + size - 30, y0 + size + 20);
-                ctx.fill();
-
-                // Top (same direction)
-                ctx.strokeStyle = '#3498db';
-                ctx.beginPath();
-                ctx.moveTo(x0 + 20, y0 - 15);
-                ctx.lineTo(x0 + size - 20, y0 - 15);
-                ctx.stroke();
-                ctx.fillStyle = '#3498db';
-                ctx.beginPath();
-                ctx.moveTo(x0 + size - 20, y0 - 15);
-                ctx.lineTo(x0 + size - 30, y0 - 10);
-                ctx.lineTo(x0 + size - 30, y0 - 20);
-                ctx.fill();
-
-                // Left to right (opposite directions - KEY!)
-                ctx.strokeStyle = '#9b59b6';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(x0 - 15, y0 + 20);
-                ctx.lineTo(x0 - 15, y0 + size / 2);
-                ctx.stroke();
-                ctx.fillStyle = '#9b59b6';
-                ctx.beginPath();
-                ctx.moveTo(x0 - 15, y0 + size / 2);
-                ctx.lineTo(x0 - 10, y0 + size / 2 - 10);
-                ctx.lineTo(x0 - 20, y0 + size / 2 - 10);
-                ctx.fill();
-
-                // Right (opposite)
-                ctx.strokeStyle = '#9b59b6';
-                ctx.beginPath();
-                ctx.moveTo(x0 + size + 15, y0 + size - 20);
-                ctx.lineTo(x0 + size + 15, y0 + size / 2);
-                ctx.stroke();
-                ctx.fillStyle = '#9b59b6';
-                ctx.beginPath();
-                ctx.moveTo(x0 + size + 15, y0 + size / 2);
-                ctx.lineTo(x0 + size + 10, y0 + size / 2 + 10);
-                ctx.lineTo(x0 + size + 20, y0 + size / 2 + 10);
-                ctx.fill();
-
-                ctx.fillStyle = '#9b59b6';
-                ctx.font = 'bold 14px serif';
-                ctx.fillText('Opposite!', x0 - 70, y0 + size / 2 + 5);
-
-                // Why duality fails
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(20, height - 120, width - 40, 100);
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('Why Poincaré Duality Fails:', 30, height - 92);
-                ctx.font = '14px serif';
-                ctx.fillText('• H₂(K; ℤ) = 0, not ℤ (no fundamental class)', 35, height - 68);
-                ctx.fillText('• Klein bottle is non-orientable', 35, height - 48);
-                ctx.fillText('• H₀(K) = ℤ but H²(K) = 0, so no duality H₂ ≅ H⁰', 35, height - 28);
+              if (viz.state.showCup) {
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2;
+                ctx.fillStyle = 'rgba(231,76,60,0.2)'; ctx.fillRect(40, cy-80, 80, 40); ctx.strokeRect(40, cy-80, 80, 40);
+                ctx.fillStyle = '#e74c3c'; ctx.font = '15px serif'; ctx.fillText('\u03B1 (H^p)', 45, cy-55);
+                ctx.fillStyle = 'rgba(231,76,60,0.2)'; ctx.fillRect(40, cy-30, 80, 40); ctx.strokeRect(40, cy-30, 80, 40);
+                ctx.fillStyle = '#e74c3c'; ctx.fillText('\u03B2 (H^q)', 48, cy-5);
+                ctx.beginPath(); ctx.moveTo(80, cy+10); ctx.lineTo(80, cy+40); ctx.stroke();
+                ctx.font = '13px serif'; ctx.fillText('\u222A', 90, cy+30);
+                ctx.fillStyle = 'rgba(231,76,60,0.3)'; ctx.fillRect(30, cy+40, 100, 40);
+                ctx.strokeStyle = '#e74c3c'; ctx.strokeRect(30, cy+40, 100, 40);
+                ctx.fillStyle = '#e74c3c'; ctx.font = '14px serif'; ctx.fillText('\u03B1\u222A\u03B2 (H^n)', 35, cy+65);
+                ctx.fillStyle = 'rgba(52,152,219,0.2)'; ctx.fillRect(40, cy+100, 80, 40);
+                ctx.strokeStyle = '#3498db'; ctx.strokeRect(40, cy+100, 80, 40);
+                ctx.fillStyle = '#3498db'; ctx.font = '15px serif'; ctx.fillText('\u03C3 (H_n)', 45, cy+125);
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 18px serif'; ctx.fillText('\u27E8,\u27E9 \u2192 \u2124', width/2-25, cy+75);
               }
+              if (viz.state.showCap) {
+                const rx = width/2+40;
+                ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 2;
+                ctx.fillStyle = 'rgba(46,204,113,0.2)'; ctx.fillRect(rx, cy-80, 90, 40); ctx.strokeRect(rx, cy-80, 90, 40);
+                ctx.fillStyle = '#27ae60'; ctx.font = '15px serif'; ctx.fillText('\u03C3 (H_n)', rx+5, cy-55);
+                ctx.fillStyle = 'rgba(46,204,113,0.2)'; ctx.fillRect(rx, cy-30, 90, 40); ctx.strokeRect(rx, cy-30, 90, 40);
+                ctx.fillStyle = '#27ae60'; ctx.fillText('\u03B2 (H^q)', rx+8, cy-5);
+                ctx.beginPath(); ctx.moveTo(rx+45, cy+10); ctx.lineTo(rx+45, cy+40); ctx.stroke();
+                ctx.font = '13px serif'; ctx.fillText('\u2322', rx+55, cy+30);
+                ctx.fillStyle = 'rgba(46,204,113,0.3)'; ctx.fillRect(rx-10, cy+40, 110, 40);
+                ctx.strokeStyle = '#27ae60'; ctx.strokeRect(rx-10, cy+40, 110, 40);
+                ctx.fillStyle = '#27ae60'; ctx.font = '14px serif'; ctx.fillText('\u03C3\u2322\u03B2 (H_p)', rx-5, cy+65);
+                ctx.fillStyle = 'rgba(231,76,60,0.2)'; ctx.fillRect(rx, cy+100, 90, 40);
+                ctx.strokeStyle = '#e74c3c'; ctx.strokeRect(rx, cy+100, 90, 40);
+                ctx.fillStyle = '#e74c3c'; ctx.font = '15px serif'; ctx.fillText('\u03B1 (H^p)', rx+5, cy+125);
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 18px serif'; ctx.fillText('\u27E8,\u27E9 \u2192 \u2124', rx+110, cy+75);
+              }
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 30px serif'; ctx.fillText('=', width/2-10, cy+160);
+              ctx.font = '14px serif'; ctx.fillText('Both evaluate to the same integer!', width/2-100, cy+185);
             },
             controls: [
-              {
-                type: 'select',
-                label: 'Space',
-                options: [
-                  { value: 'mobius', label: 'Möbius Band' },
-                  { value: 'klein', label: 'Klein Bottle' }
-                ],
-                action: (viz, value) => {
-                  viz.state.space = value;
-                }
-              }
+              { type: 'button', label: 'Toggle Cup Path', action: (viz) => { viz.state.showCup = !viz.state.showCup; } },
+              { type: 'button', label: 'Toggle Cap Path', action: (viz) => { viz.state.showCap = !viz.state.showCap; } }
             ]
           }
         }
@@ -1223,297 +535,421 @@ Same result! ✓`
       exercises: [
         {
           id: 'cap-product-ex1',
-          question: 'Verify that \\((\\varphi \\cup \\psi) \\frown \\sigma = \\varphi \\frown (\\psi \\frown \\sigma)\\) on a 3-simplex for \\(\\varphi, \\psi \\in C^1\\).',
-          hint: 'Write out both sides using the definitions and show they equal the same 1-chain.',
-          solution: `For \\(\\sigma = [v_0, v_1, v_2, v_3]\\):
+          question: 'Verify associativity \\((\\varphi \\cup \\psi) \\frown \\sigma = \\varphi \\frown (\\psi \\frown \\sigma)\\) for \\(\\varphi, \\psi \\in C^1\\) and \\(\\sigma = [v_0,v_1,v_2,v_3]\\).',
+          hint: 'Compute both sides. LHS: cup on front 2-face, then back. RHS: cap \\(\\psi\\) first, then cap \\(\\varphi\\).',
+          solution: `LHS: \\((\\varphi\\cup\\psi)\\frown\\sigma = \\varphi(\\sigma|_{[v_0,v_1]})\\psi(\\sigma|_{[v_1,v_2]})\\cdot\\sigma|_{[v_2,v_3]}\\)
 
-LHS: \\((\\varphi \\cup \\psi) \\frown \\sigma = (\\varphi \\cup \\psi)(\\sigma|_{[v_0,v_1,v_2]}) \\cdot \\sigma|_{[v_2,v_3]}\\)
+RHS: \\(\\psi\\frown\\sigma = \\psi(\\sigma|_{[v_0,v_1]})\\cdot\\sigma|_{[v_1,v_2,v_3]}\\), then \\(\\varphi\\frown(\\cdots) = \\psi(\\sigma|_{[v_0,v_1]})\\varphi(\\sigma|_{[v_1,v_2]})\\cdot\\sigma|_{[v_2,v_3]}\\)
 
-\\(= \\varphi(\\sigma|_{[v_0,v_1]}) \\psi(\\sigma|_{[v_1,v_2]}) \\cdot [v_2, v_3]\\)
-
-RHS: \\(\\varphi \\frown (\\psi \\frown \\sigma) = \\varphi \\frown (\\psi(\\sigma|_{[v_0,v_1]}) \\cdot \\sigma|_{[v_1,v_2,v_3]})\\)
-
-\\(= \\varphi(\\psi(\\sigma|_{[v_0,v_1]}) \\cdot \\sigma|_{[v_1,v_2]}) \\cdot \\sigma|_{[v_2,v_3]}\\)
-
-Wait, this needs more care. Actually, the correct formula uses iterated cap products with proper indexing. The key is that both give \\(\\varphi(\\sigma|_{[v_0,v_1]}) \\psi(\\sigma|_{[v_1,v_2]}) \\cdot [v_2, v_3]\\). ✓`
+Both equal \\(\\varphi(\\sigma|_{[v_0,v_1]})\\psi(\\sigma|_{[v_1,v_2]})\\cdot\\sigma|_{[v_2,v_3]}\\). \\(\\checkmark\\)`
         },
         {
-          id: 'cap-product-ex2',
-          question: 'For \\(M = S^2\\), describe explicitly the Poincaré duality isomorphism \\(H^0(S^2) \\to H_2(S^2)\\) via cap product.',
-          hint: 'The generator of \\(H^0\\) is \\(1\\), and \\(1 \\frown [S^2] = [S^2]\\).',
-          solution: `Poincaré duality map: \\(D : H^0(S^2; \\mathbb{Z}) \\to H_2(S^2; \\mathbb{Z})\\) given by \\(\\varphi \\mapsto \\varphi \\frown [S^2]\\).
+          id: 'cap-torus',
+          question: 'Compute \\([T^2] \\frown \\alpha\\) and \\([T^2] \\frown (\\alpha \\cup \\beta)\\) where \\(\\alpha, \\beta \\in H^1(T^2)\\).',
+          hint: 'Use \\(\\langle \\gamma, [T^2] \\frown \\alpha \\rangle = \\langle \\gamma \\cup \\alpha, [T^2] \\rangle\\) and the cup product structure.',
+          solution: `\\(\\langle\\beta, [T^2]\\frown\\alpha\\rangle = \\langle\\beta\\cup\\alpha, [T^2]\\rangle = -1\\) and \\(\\langle\\alpha, [T^2]\\frown\\alpha\\rangle = 0\\).
 
-For the unit \\(1 \\in H^0(S^2)\\):
-\\[ D(1) = 1 \\frown [S^2] = [S^2] \\]
+So \\([T^2]\\frown\\alpha\\) is the meridian cycle (Poincar\u00e9 dual of \\(\\beta\\)).
 
-This is the fundamental class!
-
-Since \\(H^0(S^2) = \\mathbb{Z} \\langle 1 \\rangle\\) and \\(H_2(S^2) = \\mathbb{Z} \\langle [S^2] \\rangle\\), the map \\(1 \\mapsto [S^2]\\) is an isomorphism \\(\\mathbb{Z} \\to \\mathbb{Z}\\). ✓`
+\\([T^2]\\frown(\\alpha\\cup\\beta) = \\langle\\alpha\\cup\\beta,[T^2]\\rangle\\cdot[\\text{pt}] = [\\text{pt}]\\), the generator of \\(H_0\\).`
         }
       ]
     },
+
+    // ============================================================
+    // Section 3: The Poincare Duality Theorem
+    // ============================================================
     {
-      id: 'intersection-theory-preview',
-      title: 'Applications: Intersection Theory Preview',
+      id: 'poincare-duality-theorem',
+      title: 'The Poincar\u00e9 Duality Theorem',
       content: `
-        <div class="env-block definition">
-          <p><strong>Definition (Intersection Number):</strong> For a closed oriented \\(n\\)-manifold \\(M\\), and two cycles \\(\\alpha \\in H_k(M)\\), \\(\\beta \\in H_{n-k}(M)\\) that intersect transversely, the <em>intersection number</em> is</p>
-          \\[ \\alpha \\cdot \\beta = \\langle \\alpha^* \\cup \\beta^*, [M] \\rangle \\in \\mathbb{Z} \\]
-          <p>where \\(\\alpha^* \\in H^k(M)\\), \\(\\beta^* \\in H^{n-k}(M)\\) are the Poincaré duals.</p>
+        <div class="env-block theorem">
+          <p><strong>Theorem (Poincar\u00e9 Duality \u2014 Hatcher 3.30):</strong> Let \\(M\\) be a closed, connected, oriented \\(n\\)-manifold. Then</p>
+          \\[ D_M : H^k(M; \\mathbb{Z}) \\xrightarrow{\\;\\cong\\;} H_{n-k}(M; \\mathbb{Z}), \\quad \\varphi \\mapsto [M] \\frown \\varphi \\]
+          <p>is an isomorphism for all \\(k\\). More generally, this holds with any coefficient ring \\(R\\).</p>
         </div>
 
         <div class="env-block intuition">
-          <p><strong>Geometric Picture:</strong> The intersection number counts (with signs) how many times \\(\\alpha\\) and \\(\\beta\\) intersect in \\(M\\):</p>
+          <p><strong>Geometric Meaning:</strong> Every \\(k\\)-cocycle on a closed oriented \\(n\\)-manifold has a Poincar\u00e9 dual \\((n-k)\\)-cycle. Informally:</p>
           <ul>
-            <li>For transverse intersections, count +1 if orientations agree, -1 if they oppose</li>
-            <li>Sum over all intersection points</li>
-            <li>Result is independent of choices (only depends on homology classes)</li>
+            <li>A 1-cocycle is dual to an \\((n-1)\\)-cycle (a "hypersurface")</li>
+            <li>On a surface: curves are dual to curves</li>
+            <li>In dimension 4: surfaces are dual to surfaces</li>
           </ul>
+          <p>This is the topological Riesz representation theorem.</p>
+        </div>
+
+        <div class="env-block proof">
+          <p><strong>Proof sketch (Hatcher 3.3):</strong></p>
+          <ol>
+            <li><strong>Local duality:</strong> On \\(\\mathbb{R}^n\\), capping with the generator of \\(H_n(\\mathbb{R}^n, \\mathbb{R}^n \\setminus 0)\\) gives \\(H^k_c(\\mathbb{R}^n) \\cong H_{n-k}(\\mathbb{R}^n)\\).</li>
+            <li><strong>Mayer-Vietoris:</strong> If duality holds for \\(U, V, U \\cap V\\), the five lemma gives duality for \\(U \\cup V\\).</li>
+            <li><strong>Induction:</strong> Cover \\(M\\) by finitely many \\(\\mathbb{R}^n\\)-charts and induct. \\(\\square\\)</li>
+          </ol>
         </div>
 
         <div class="env-block example">
-          <p><strong>Example (Circles on Torus):</strong> On \\(T^2\\), let \\(\\alpha\\) be the meridian (horizontal circle) and \\(\\beta\\) the longitude (vertical circle).</p>
-          <ul>
-            <li>They intersect transversely at one point</li>
-            <li>Intersection number: \\(\\alpha \\cdot \\beta = 1\\)</li>
-            <li>Using Poincaré duality: \\(\\alpha^* \\cup \\beta^* = [T^2]^*\\), and \\(\\langle [T^2]^*, [T^2] \\rangle = 1\\)</li>
-          </ul>
+          <p><strong>Example (\\(T^2\\)):</strong></p>
+          \\[ \\begin{array}{c|c|c} k & H^k(T^2) & H_{2-k}(T^2) \\\\ \\hline 0 & \\mathbb{Z} & H_2 = \\mathbb{Z} \\\\ 1 & \\mathbb{Z}^2 & H_1 = \\mathbb{Z}^2 \\\\ 2 & \\mathbb{Z} & H_0 = \\mathbb{Z} \\end{array} \\]
         </div>
 
         <div class="env-block example">
-          <p><strong>Example (Vanishing Intersections):</strong> On \\(T^2\\), two parallel meridians \\(\\alpha_1, \\alpha_2\\) have intersection number 0:</p>
-          <ul>
-            <li>Geometrically: they don't intersect</li>
-            <li>Algebraically: \\(\\alpha_1^* \\cup \\alpha_2^* = 0\\) (both in \\(H^1\\), cup product goes to \\(H^2\\))</li>
-          </ul>
+          <p><strong>Example (\\(\\mathbb{C}P^2\\), dim 4):</strong></p>
+          \\[ \\begin{array}{c|c|c} k & H^k & H_{4-k} \\\\ \\hline 0 & \\mathbb{Z} & \\mathbb{Z} \\\\ 1 & 0 & 0 \\\\ 2 & \\mathbb{Z} & \\mathbb{Z} \\\\ 3 & 0 & 0 \\\\ 4 & \\mathbb{Z} & \\mathbb{Z} \\end{array} \\]
+          <p>\\(D_M\\) sends \\(\\alpha \\in H^2\\) to \\([\\mathbb{C}P^1] \\in H_2\\).</p>
         </div>
 
         <div class="env-block theorem">
-          <p><strong>Theorem (Intersection Form on 4-Manifolds):</strong> For a closed oriented 4-manifold \\(M\\), the intersection form</p>
-          \\[ Q : H_2(M; \\mathbb{Z}) \\times H_2(M; \\mathbb{Z}) \\to \\mathbb{Z}, \\quad Q(\\alpha, \\beta) = \\alpha \\cdot \\beta \\]
-          <p>is a symmetric bilinear form. Its signature and determinant are important invariants of \\(M\\).</p>
-        </div>
-
-        <div class="env-block example">
-          <p><strong>Example (\\(\\mathbb{C}P^2\\)):</strong> For \\(\\mathbb{C}P^2\\), we have \\(H_2(\\mathbb{C}P^2; \\mathbb{Z}) = \\mathbb{Z}\\) generated by a line \\(L\\).</p>
-          <p>The self-intersection number: \\(L \\cdot L = 1\\).</p>
-          <p>Using cup product: \\(\\alpha \\cup \\alpha = \\alpha^2\\) generates \\(H^4(\\mathbb{C}P^2)\\), and \\(\\langle \\alpha^2, [\\mathbb{C}P^2] \\rangle = 1\\).</p>
+          <p><strong>Corollary (Betti Number Symmetry):</strong> \\(b_k = b_{n-k}\\). Hence \\(\\chi(M) = 0\\) when \\(n\\) is odd.</p>
         </div>
 
         <div class="env-block remark">
-          <p><strong>Applications to Differential Topology:</strong> Intersection theory connects to:</p>
-          <ul>
-            <li><strong>Signature theorem:</strong> The signature of the intersection form is a diffeomorphism invariant</li>
-            <li><strong>Exotic structures:</strong> Different smooth structures on \\(\\mathbb{R}^4\\) can be distinguished by intersection forms of compactifications</li>
-            <li><strong>Gauge theory:</strong> Donaldson invariants use intersection theory on moduli spaces</li>
-          </ul>
-        </div>
-
-        <div class="env-block definition">
-          <p><strong>Definition (Self-Intersection):</strong> For \\(\\alpha \\in H_k(M)\\) with \\(2k = n\\), the <em>self-intersection</em> \\(\\alpha \\cdot \\alpha\\) measures how \\(\\alpha\\) "twists" in \\(M\\).</p>
-          <p>This is well-defined even when \\(\\alpha\\) doesn't intersect itself transversely (use perturbations).</p>
+          <p><strong>Non-Orientable Version:</strong> Over \\(\\mathbb{Z}/2\\), duality holds for all closed manifolds: \\(H^k(M; \\mathbb{Z}/2) \\cong H_{n-k}(M; \\mathbb{Z}/2)\\).</p>
         </div>
 
         <div class="env-block example">
-          <p><strong>Example (Sphere in \\(S^2 \\times S^2\\)):</strong> In \\(M = S^2 \\times S^2\\), let \\(\\alpha = S^2 \\times \\{pt\\}\\) and \\(\\beta = \\{pt\\} \\times S^2\\).</p>
-          <ul>
-            <li>\\(\\alpha \\cdot \\alpha = 0\\) (can't self-intersect in a transverse way)</li>
-            <li>\\(\\beta \\cdot \\beta = 0\\)</li>
-            <li>\\(\\alpha \\cdot \\beta = 1\\) (intersect at one point)</li>
-          </ul>
-          <p>Intersection form: \\(Q = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}\\) (hyperbolic form).</p>
+          <p><strong>Example (\\(\\mathbb{R}P^2\\) over \\(\\mathbb{Z}/2\\)):</strong> All groups \\(H^k(\\mathbb{R}P^2; \\mathbb{Z}/2) \\cong H_{2-k}(\\mathbb{R}P^2; \\mathbb{Z}/2) \\cong \\mathbb{Z}/2\\).</p>
+        </div>
+
+        <div class="env-block theorem">
+          <p><strong>Poincar\u00e9-Lefschetz Duality:</strong> For compact oriented \\(M\\) with boundary:</p>
+          \\[ H^k(M, \\partial M) \\cong H_{n-k}(M), \\quad H^k(M) \\cong H_{n-k}(M, \\partial M) \\]
         </div>
       `,
       visualizations: [
         {
-          id: 'intersection-number-animator',
-          title: 'Intersection Number Animator',
-          description: 'See cycles intersecting in manifolds with count',
+          id: 'duality-table-explorer',
+          title: 'Duality Table Explorer',
+          description: 'See H^k \u2245 H_{n-k} for various manifolds',
           canvas: {
-            setup: (viz) => {
-              viz.state = {
-                manifold: 'torus',
-                showIntersection: true,
-                animationPhase: 0
-              };
-            },
+            setup: (viz) => { viz.state = { manifold: 'T2' }; },
             draw: (viz, ctx, width, height) => {
               ctx.clearRect(0, 0, width, height);
-
-              // Title
-              ctx.fillStyle = '#2c3e50';
-              ctx.font = 'bold 22px serif';
-              ctx.fillText('Intersection Number', 20, 30);
-
-              viz.state.animationPhase += 0.02;
-
-              const centerX = width / 2;
-              const centerY = height / 2;
-
-              if (viz.state.manifold === 'torus') {
-                ctx.font = '16px serif';
-                ctx.fillText('M = T², α = meridian, β = longitude', 20, 65);
-                ctx.fillText('Intersection: α · β = 1', 20, 90);
-
-                // Draw torus (as a square with identifications)
-                const size = 200;
-                const x0 = centerX - size / 2;
-                const y0 = centerY - size / 2;
-
-                // Square
-                ctx.strokeStyle = '#95a5a6';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(x0, y0, size, size);
-
-                // Meridian (horizontal)
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 4;
-                const my = y0 + size / 2;
-                ctx.beginPath();
-                ctx.moveTo(x0, my);
-                ctx.lineTo(x0 + size, my);
-                ctx.stroke();
-
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('α (meridian)', x0 + size + 15, my + 5);
-
-                // Longitude (vertical)
-                ctx.strokeStyle = '#3498db';
-                ctx.lineWidth = 4;
-                const lx = x0 + size / 2;
-                ctx.beginPath();
-                ctx.moveTo(lx, y0);
-                ctx.lineTo(lx, y0 + size);
-                ctx.stroke();
-
-                ctx.fillStyle = '#3498db';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('β', lx + 10, y0 - 10);
-                ctx.fillText('(longitude)', lx - 45, y0 - 10);
-
-                // Intersection point
-                if (viz.state.showIntersection) {
-                  const pulse = Math.abs(Math.sin(viz.state.animationPhase));
-                  const radius = 8 + pulse * 5;
-                  ctx.fillStyle = '#27ae60';
-                  ctx.beginPath();
-                  ctx.arc(lx, my, radius, 0, Math.PI * 2);
-                  ctx.fill();
-
-                  ctx.fillStyle = '#27ae60';
-                  ctx.font = 'bold 18px serif';
-                  ctx.fillText('Intersection!', lx + 20, my - 20);
-                  ctx.fillText('Count: +1', lx + 20, my);
-                }
-
-                // Result box
-                ctx.strokeStyle = '#27ae60';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(20, height - 100, width - 40, 80);
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('Intersection Number:', 30, height - 70);
-                ctx.font = '18px serif';
-                ctx.fillText('α · β = ⟨α* ∪ β*, [T²]⟩ = 1', 30, height - 45);
-                ctx.font = '14px serif';
-                ctx.fillText('(One transverse intersection with positive orientation)', 30, height - 25);
-
-              } else if (viz.state.manifold === 's2') {
-                ctx.font = '16px serif';
-                ctx.fillText('M = S², α = equator, β = point', 20, 65);
-                ctx.fillText('Poincaré dual pairing', 20, 90);
-
-                // Draw sphere
-                const radius = 100;
-                ctx.strokeStyle = '#95a5a6';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // Equator (1-cycle)
-                ctx.strokeStyle = '#e74c3c';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.ellipse(centerX, centerY, radius, radius * 0.3, 0, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.fillStyle = '#e74c3c';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('α (equator, H₁)', centerX + radius + 15, centerY + 5);
-
-                // Point (0-cycle)
-                const pulse = Math.abs(Math.sin(viz.state.animationPhase));
-                const pRadius = 8 + pulse * 5;
-                ctx.fillStyle = '#3498db';
-                ctx.beginPath();
-                ctx.arc(centerX, centerY - radius, pRadius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#3498db';
-                ctx.font = 'bold 16px serif';
-                ctx.fillText('β (north pole, H₀)', centerX + 15, centerY - radius - 15);
-
-                // Note
-                ctx.fillStyle = '#2c3e50';
-                ctx.font = '14px serif';
-                ctx.fillText('For S²: H₁ = 0, so α = 0 (no actual pairing)', 20, height - 60);
-                ctx.fillText('Non-trivial example: H₀(S²) × H₂(S²) → ℤ', 20, height - 40);
-                ctx.fillText('point · [S²] = degree = 1', 20, height - 20);
+              const data = {
+                'S2': { name: 'S\u00B2', dim: 2, groups: ['Z','0','Z'] },
+                'T2': { name: 'T\u00B2', dim: 2, groups: ['Z','Z\u00B2','Z'] },
+                'CP2': { name: 'CP\u00B2', dim: 4, groups: ['Z','0','Z','0','Z'] },
+                'T3': { name: 'T\u00B3', dim: 3, groups: ['Z','Z\u00B3','Z\u00B3','Z'] },
+                'genus2': { name: '\u03A3\u2082', dim: 2, groups: ['Z','Z\u2074','Z'] }
+              };
+              const d = data[viz.state.manifold], n = d.dim;
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 22px serif';
+              ctx.fillText(`Poincar\u00e9 Duality: ${d.name}  (n=${n})`, 20, 35);
+              const tX = 40, tY = 70, cW = Math.min(140,(width-100)/3), rH = 35;
+              ctx.fillStyle = '#34495e'; ctx.fillRect(tX, tY, cW*3, rH);
+              ctx.fillStyle = '#fff'; ctx.font = 'bold 15px serif';
+              ctx.fillText('k', tX+cW/2-5, tY+23);
+              ctx.fillText('H^k(M)', tX+cW+cW/2-25, tY+23);
+              ctx.fillText('H_{n-k}(M)', tX+2*cW+cW/2-35, tY+23);
+              for (let k = 0; k <= n; k++) {
+                const y = tY+rH*(k+1);
+                ctx.fillStyle = k%2===0 ? 'rgba(52,152,219,0.08)' : 'rgba(52,152,219,0.02)';
+                ctx.fillRect(tX, y, cW*3, rH);
+                ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 0.5;
+                ctx.beginPath(); ctx.moveTo(tX, y); ctx.lineTo(tX+cW*3, y); ctx.stroke();
+                ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif'; ctx.fillText(String(k), tX+cW/2-5, y+23);
+                ctx.fillStyle = '#e74c3c'; ctx.fillText(d.groups[k], tX+cW+cW/2-15, y+23);
+                ctx.fillStyle = '#3498db'; ctx.fillText(d.groups[n-k], tX+2*cW+cW/2-15, y+23);
+                ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(tX+cW*1.75+15, y+18); ctx.lineTo(tX+cW*1.75+40, y+18); ctx.stroke();
+                ctx.fillStyle = '#27ae60'; ctx.font = '12px serif'; ctx.fillText('\u2245', tX+cW*1.75+24, y+14);
               }
+              ctx.strokeStyle = '#34495e'; ctx.lineWidth = 2; ctx.strokeRect(tX, tY, cW*3, rH*(n+2));
+              for (let c = 1; c < 3; c++) { ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(tX+c*cW, tY); ctx.lineTo(tX+c*cW, tY+rH*(n+2)); ctx.stroke(); }
+              const nY = tY+rH*(n+2)+30;
+              ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+              ctx.fillText('b_k = b_{n-k}  (Betti number palindrome)', 20, nY);
+              let chi = 0;
+              const betti = d.groups.map(s => s==='0'?0:s==='Z'?1:(s.match(/(\d+)/)?parseInt(s.match(/(\d+)/)[1]):1));
+              for (let k = 0; k <= n; k++) chi += (k%2===0?1:-1)*betti[k];
+              ctx.fillText(`\u03C7(${d.name}) = ${chi}` + (n%2===1?' = 0 (odd dim)':''), 20, nY+25);
             },
             controls: [
-              {
-                type: 'select',
-                label: 'Example',
-                options: [
-                  { value: 'torus', label: 'Torus (α·β = 1)' },
-                  { value: 's2', label: 'Sphere (Poincaré pairing)' }
-                ],
-                action: (viz, value) => {
-                  viz.state.manifold = value;
-                }
-              },
-              {
-                type: 'button',
-                label: 'Toggle Intersection',
-                action: (viz) => {
-                  viz.state.showIntersection = !viz.state.showIntersection;
+              { type: 'select', label: 'Manifold', options: [
+                { value: 'S2', label: 'S\u00B2' }, { value: 'T2', label: 'T\u00B2' },
+                { value: 'genus2', label: '\u03A3\u2082' }, { value: 'T3', label: 'T\u00B3' },
+                { value: 'CP2', label: 'CP\u00B2 (dim 4)' }
+              ], action: (viz, v) => { viz.state.manifold = v; } }
+            ]
+          }
+        },
+        {
+          id: 'betti-number-mirror',
+          title: 'Betti Number Mirror',
+          description: 'Visualize palindromic symmetry of Betti numbers',
+          canvas: {
+            setup: (viz) => { viz.state = { manifold: 'T2' }; },
+            draw: (viz, ctx, width, height) => {
+              ctx.clearRect(0, 0, width, height);
+              const bd = {
+                'S2': { name: 'S\u00B2', b: [1,0,1] }, 'T2': { name: 'T\u00B2', b: [1,2,1] },
+                'CP2': { name: 'CP\u00B2', b: [1,0,1,0,1] }, 'T3': { name: 'T\u00B3', b: [1,3,3,1] },
+                'genus3': { name: '\u03A3\u2083', b: [1,6,1] }
+              };
+              const d = bd[viz.state.manifold], n = d.b.length-1, maxB = Math.max(...d.b);
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 20px serif';
+              ctx.fillText(`Betti Numbers of ${d.name} (Palindromic!)`, 20, 30);
+              const barW = Math.min(60,(width-100)/(n+1)), maxBarH = height*0.45, baseY = height*0.75;
+              const startX = (width-(n+1)*barW*1.5)/2;
+              const colors = ['#e74c3c','#3498db','#27ae60','#f39c12','#9b59b6'];
+              for (let k = 0; k <= n; k++) {
+                const x = startX+k*barW*1.5, barH = maxB>0?(d.b[k]/maxB)*maxBarH:0;
+                const hue = k<=n-k?k:n-k;
+                ctx.fillStyle = colors[hue%colors.length];
+                ctx.fillRect(x, baseY-barH, barW, barH);
+                ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 1; ctx.strokeRect(x, baseY-barH, barW, barH);
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 16px serif';
+                ctx.fillText(String(d.b[k]), x+barW/2-5, baseY-barH-8);
+                ctx.font = '14px serif'; ctx.fillText(`b${k}`, x+barW/2-8, baseY+20);
+                if (k < n-k) {
+                  ctx.setLineDash([3,3]); ctx.strokeStyle = colors[hue%colors.length]; ctx.lineWidth = 1;
+                  const pX = startX+(n-k)*barW*1.5;
+                  ctx.beginPath(); ctx.moveTo(x+barW/2, baseY-barH-25);
+                  ctx.bezierCurveTo(x+barW/2, baseY-maxBarH-40, pX+barW/2, baseY-maxBarH-40, pX+barW/2, baseY-barH-25);
+                  ctx.stroke(); ctx.setLineDash([]);
                 }
               }
+              const mirX = startX+(n*barW*1.5)/2+barW/2;
+              ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2; ctx.setLineDash([8,4]);
+              ctx.beginPath(); ctx.moveTo(mirX, baseY-maxBarH-50); ctx.lineTo(mirX, baseY+5); ctx.stroke();
+              ctx.setLineDash([]); ctx.fillStyle = '#95a5a6'; ctx.font = '13px serif'; ctx.fillText('mirror', mirX-18, baseY-maxBarH-55);
+              let chi = 0; for (let k = 0; k <= n; k++) chi += (k%2===0?1:-1)*d.b[k];
+              ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+              ctx.fillText(`\u03C7 = ${chi}` + (n%2===1?' = 0 (odd dim!)':''), 20, height-10);
+            },
+            controls: [
+              { type: 'select', label: 'Manifold', options: [
+                { value: 'S2', label: 'S\u00B2' }, { value: 'T2', label: 'T\u00B2' },
+                { value: 'genus3', label: '\u03A3\u2083' }, { value: 'T3', label: 'T\u00B3' },
+                { value: 'CP2', label: 'CP\u00B2' }
+              ], action: (viz, v) => { viz.state.manifold = v; } }
             ]
           }
         }
       ],
       exercises: [
         {
-          id: 'intersection-ex1',
-          question: 'On \\(T^2\\), compute the intersection form matrix for the basis \\(\\{\\alpha, \\beta\\}\\) of \\(H_1(T^2; \\mathbb{Z})\\) (meridian and longitude).',
-          hint: 'Compute \\(\\alpha \\cdot \\alpha\\), \\(\\alpha \\cdot \\beta\\), \\(\\beta \\cdot \\alpha\\), \\(\\beta \\cdot \\beta\\).',
-          solution: `Using the cup product structure on \\(T^2\\):
-- \\(\\alpha \\cdot \\alpha = \\langle \\alpha^* \\cup \\alpha^*, [T^2] \\rangle = \\langle 0, [T^2] \\rangle = 0\\)
-- \\(\\alpha \\cdot \\beta = \\langle \\alpha^* \\cup \\beta^*, [T^2] \\rangle = \\langle [T^2]^*, [T^2] \\rangle = 1\\)
-- \\(\\beta \\cdot \\alpha = \\langle \\beta^* \\cup \\alpha^*, [T^2] \\rangle = \\langle -[T^2]^*, [T^2] \\rangle = -1\\)
-- \\(\\beta \\cdot \\beta = 0\\)
-
-Intersection form matrix:
-\\[ Q = \\begin{pmatrix} 0 & 1 \\\\ -1 & 0 \\end{pmatrix} \\]
-
-This is antisymmetric! (Expected for a surface in dimension 2.)`
+          id: 'duality-3manifold',
+          question: 'Show that any closed oriented 3-manifold has \\(\\chi(M) = 0\\).',
+          hint: 'Duality: \\(b_0 = b_3\\), \\(b_1 = b_2\\). Compute the alternating sum.',
+          solution: `By duality: \\(b_0 = b_3 = 1\\), \\(b_1 = b_2\\). Then \\(\\chi = 1 - b_1 + b_1 - 1 = 0\\).`
         },
         {
-          id: 'intersection-ex2',
-          question: 'Show that on \\(\\mathbb{C}P^2\\), the generator \\(L \\in H_2(\\mathbb{C}P^2)\\) (line) has self-intersection \\(L \\cdot L = 1\\).',
-          hint: 'Use the cup product structure \\(H^*(\\mathbb{C}P^2) = \\mathbb{Z}[\\alpha]/(\\alpha^3)\\) with \\(\\deg(\\alpha) = 2\\).',
-          solution: `Let \\(\\alpha \\in H^2(\\mathbb{C}P^2)\\) be the Poincaré dual of \\(L\\), so \\(L^* = \\alpha\\).
+          id: 'duality-cp3',
+          question: 'Compute all Betti numbers of \\(\\mathbb{C}P^3\\) and verify \\(b_k = b_{6-k}\\).',
+          hint: '\\(\\mathbb{C}P^3\\) has cells in dimensions 0, 2, 4, 6.',
+          solution: `\\(b_0=b_2=b_4=b_6=1\\), others 0. Palindrome: (1,0,1,0,1,0,1). \\(\\chi = 4\\).`
+        }
+      ]
+    },
 
-Self-intersection:
-\\[ L \\cdot L = \\langle L^* \\cup L^*, [\\mathbb{C}P^2] \\rangle = \\langle \\alpha \\cup \\alpha, [\\mathbb{C}P^2] \\rangle = \\langle \\alpha^2, [\\mathbb{C}P^2] \\rangle \\]
+    // ============================================================
+    // Section 4: Applications - Intersection Form and Beyond
+    // ============================================================
+    {
+      id: 'applications-intersection-theory',
+      title: 'Applications: Intersection Form and Beyond',
+      content: `
+        <div class="env-block intuition">
+          <p><strong>The Big Picture:</strong> Poincar\u00e9 duality connects topology to geometry through <em>intersection theory</em>. The algebraic count of intersections is encoded in the <em>intersection form</em>, which carries deep information, especially in dimension 4.</p>
+        </div>
 
-We know \\(\\alpha^2\\) generates \\(H^4(\\mathbb{C}P^2; \\mathbb{Z}) = \\mathbb{Z}\\), and it pairs with \\([\\mathbb{C}P^2] \\in H_4\\) to give 1.
+        <div class="env-block definition">
+          <p><strong>Definition (Intersection Number):</strong> For \\(a \\in H_k(M)\\), \\(b \\in H_{n-k}(M)\\) on a closed oriented \\(n\\)-manifold:</p>
+          \\[ a \\cdot b = \\langle D^{-1}(a) \\cup D^{-1}(b),\\; [M] \\rangle \\in \\mathbb{Z} \\]
+          <p>If \\(a, b\\) are represented by transverse submanifolds, this equals the signed count of intersection points.</p>
+        </div>
 
-Therefore, \\(L \\cdot L = 1\\). ✓`
+        <div class="env-block theorem">
+          <p><strong>Properties:</strong></p>
+          <ol>
+            <li><strong>Bilinear</strong></li>
+            <li><strong>Graded symmetry:</strong> \\(a \\cdot b = (-1)^{k(n-k)} b \\cdot a\\)</li>
+            <li><strong>Non-degenerate</strong> modulo torsion</li>
+            <li><strong>Topological invariant</strong></li>
+          </ol>
+        </div>
+
+        <div class="env-block example">
+          <p><strong>Torus:</strong> \\(Q = \\begin{pmatrix} 0 & 1 \\\\ -1 & 0 \\end{pmatrix}\\) (symplectic). Genus \\(g\\): \\(Q = \\begin{pmatrix} 0 & I_g \\\\ -I_g & 0 \\end{pmatrix}\\).</p>
+        </div>
+
+        <div class="env-block theorem">
+          <p><strong>4-Manifolds:</strong> For closed simply-connected oriented 4-manifolds, \\(Q_M: H_2 \\times H_2 \\to \\mathbb{Z}\\) is symmetric and unimodular.</p>
+          <ul>
+            <li><strong>Freedman (1982):</strong> Homeomorphism type determined by \\(Q_M\\)</li>
+            <li><strong>Donaldson (1983):</strong> If smooth and definite, then \\(Q_M \\cong \\pm I\\)</li>
+          </ul>
+        </div>
+
+        <div class="env-block example">
+          <p><strong>\\(\\mathbb{C}P^2\\):</strong> \\(Q = (1)\\), \\(L \\cdot L = 1\\). <strong>\\(S^2 \\times S^2\\):</strong> \\(Q = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}\\) (hyperbolic).</p>
+        </div>
+
+        <div class="env-block theorem">
+          <p><strong>Lefschetz Fixed-Point Theorem:</strong> If \\(\\Lambda(f) = \\sum (-1)^k \\text{tr}(f_*|_{H_k}) \\neq 0\\), then \\(f\\) has a fixed point. For \\(f = \\text{id}\\), \\(\\Lambda = \\chi(M)\\).</p>
+        </div>
+
+        <div class="env-block remark">
+          <p><strong>Further Applications:</strong></p>
+          <ol>
+            <li><strong>Alexander duality:</strong> \\(\\widetilde{H}_k(S^n \\setminus K) \\cong \\widetilde{H}^{n-k-1}(K)\\)</li>
+            <li><strong>Signature:</strong> \\(\\sigma(M) = b^+ - b^-\\) for \\(4k\\)-manifolds is a bordism invariant</li>
+            <li><strong>Lefschetz duality:</strong> \\(H^k(M, \\partial M) \\cong H_{n-k}(M)\\) for manifolds with boundary</li>
+          </ol>
+        </div>
+      `,
+      visualizations: [
+        {
+          id: 'intersection-number-animator',
+          title: 'Intersection Number Animator',
+          description: 'Watch cycles intersect and count algebraic intersection numbers',
+          canvas: {
+            setup: (viz) => { viz.state = { example: 'torus-ab', showCount: true, anim: 0 }; },
+            draw: (viz, ctx, width, height) => {
+              ctx.clearRect(0, 0, width, height);
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 22px serif';
+              ctx.fillText('Intersection Numbers', 20, 30);
+              viz.state.anim += 0.025;
+              const cx = width/2, cy = height/2;
+
+              if (viz.state.example === 'torus-ab') {
+                ctx.font = '16px serif'; ctx.fillText('T\u00B2: meridian \u03B1 \u2229 longitude \u03B2', 20, 60);
+                const size = Math.min(width*0.4, 200), x0 = cx-size/2, y0 = cy-size/2;
+                ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2; ctx.strokeRect(x0, y0, size, size);
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(x0, cy); ctx.lineTo(x0+size, cy); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 16px serif'; ctx.fillText('\u03B1', x0+size+8, cy+5);
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(cx, y0); ctx.lineTo(cx, y0+size); ctx.stroke();
+                ctx.fillStyle = '#3498db'; ctx.fillText('\u03B2', cx+8, y0-8);
+                if (viz.state.showCount) {
+                  const pulse = Math.abs(Math.sin(viz.state.anim*2));
+                  ctx.fillStyle = '#27ae60'; ctx.beginPath(); ctx.arc(cx, cy, 6+pulse*5, 0, Math.PI*2); ctx.fill();
+                  ctx.font = 'bold 18px serif'; ctx.fillText('+1', cx+15, cy-15);
+                }
+                ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 2; ctx.strokeRect(20, height-80, width-40, 60);
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 16px serif'; ctx.fillText('\u03B1 \u00B7 \u03B2 = +1', 30, height-52);
+                ctx.font = '14px serif'; ctx.fillText('One transverse intersection, positive orientation', 30, height-30);
+              } else if (viz.state.example === 'torus-aa') {
+                ctx.font = '16px serif'; ctx.fillText('T\u00B2: parallel meridians', 20, 60);
+                const size = Math.min(width*0.4, 200), x0 = cx-size/2, y0 = cy-size/2;
+                ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2; ctx.strokeRect(x0, y0, size, size);
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(x0, cy-25); ctx.lineTo(x0+size, cy-25); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 16px serif'; ctx.fillText('\u03B1\u2081', x0+size+8, cy-20);
+                ctx.strokeStyle = '#9b59b6';
+                ctx.beginPath(); ctx.moveTo(x0, cy+25); ctx.lineTo(x0+size, cy+25); ctx.stroke();
+                ctx.fillStyle = '#9b59b6'; ctx.fillText('\u03B1\u2082', x0+size+8, cy+30);
+                ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2; ctx.strokeRect(20, height-80, width-40, 60);
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 16px serif'; ctx.fillText('\u03B1\u2081 \u00B7 \u03B1\u2082 = 0', 30, height-52);
+                ctx.font = '14px serif'; ctx.fillText('Parallel cycles: no intersection', 30, height-30);
+              } else if (viz.state.example === 'cp2') {
+                ctx.font = '16px serif'; ctx.fillText('\u2102P\u00B2: line L self-intersection', 20, 60);
+                const R = 80;
+                ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(cx, cy, R+30, 0, Math.PI*2); ctx.stroke();
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(cx-R-10, cy+R*0.3); ctx.quadraticCurveTo(cx, cy-R*0.8, cx+R+10, cy+R*0.3); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 16px serif'; ctx.fillText('L', cx+R+15, cy+R*0.3-10);
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(cx-R*0.3, cy-R-10); ctx.quadraticCurveTo(cx+R*0.5, cy, cx-R*0.3, cy+R+10); ctx.stroke();
+                ctx.fillStyle = '#3498db'; ctx.fillText("L'", cx-R*0.3-25, cy+R+15);
+                if (viz.state.showCount) {
+                  const pulse = Math.abs(Math.sin(viz.state.anim*2));
+                  ctx.fillStyle = '#27ae60'; ctx.beginPath(); ctx.arc(cx+10, cy-15, 6+pulse*4, 0, Math.PI*2); ctx.fill();
+                  ctx.font = 'bold 16px serif'; ctx.fillText('+1', cx+22, cy-23);
+                }
+                ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 2; ctx.strokeRect(20, height-80, width-40, 60);
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 16px serif'; ctx.fillText('L \u00B7 L = 1', 30, height-52);
+                ctx.font = '14px serif'; ctx.fillText("B\u00e9zout: two lines meet in exactly one point", 30, height-30);
+              }
+            },
+            controls: [
+              { type: 'select', label: 'Example', options: [
+                { value: 'torus-ab', label: 'T\u00B2: \u03B1\u00B7\u03B2 = 1' },
+                { value: 'torus-aa', label: 'T\u00B2: \u03B1\u00B7\u03B1 = 0' },
+                { value: 'cp2', label: '\u2102P\u00B2: L\u00B7L = 1' }
+              ], action: (viz, v) => { viz.state.example = v; } },
+              { type: 'button', label: 'Toggle Count', action: (viz) => { viz.state.showCount = !viz.state.showCount; } }
+            ]
+          }
+        },
+        {
+          id: 'intersection-form-calculator',
+          title: 'Intersection Form Calculator',
+          description: 'Compute intersection matrices for surfaces',
+          canvas: {
+            setup: (viz) => { viz.state = { surface: 'torus', showIntersection: true }; },
+            draw: (viz, ctx, width, height) => {
+              ctx.clearRect(0, 0, width, height);
+              ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 20px serif';
+              if (viz.state.surface === 'torus') {
+                ctx.fillText('Intersection Form on T\u00B2', 20, 30);
+                const cx = width/2, cy = height/2-20, size = Math.min(width*0.35, height*0.35);
+                ctx.fillStyle = 'rgba(52,152,219,0.1)'; ctx.fillRect(cx-size, cy-size, size*2, size*2);
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2; ctx.strokeRect(cx-size, cy-size, size*2, size*2);
+                ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(cx, cy-size); ctx.lineTo(cx, cy+size); ctx.stroke();
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 16px serif'; ctx.fillText('a', cx+10, cy);
+                ctx.strokeStyle = '#3498db'; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.moveTo(cx-size, cy); ctx.lineTo(cx+size, cy); ctx.stroke();
+                ctx.fillStyle = '#3498db'; ctx.fillText('b', cx-size+10, cy-15);
+                if (viz.state.showIntersection) {
+                  ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2); ctx.fill();
+                  ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2); ctx.stroke();
+                  ctx.fillStyle = '#f39c12'; ctx.font = 'bold 14px serif'; ctx.fillText('+1', cx+12, cy+20);
+                }
+                const mX = 30, mY = height-110;
+                ctx.fillStyle = '#2c3e50'; ctx.font = 'bold 16px serif'; ctx.fillText('Intersection Matrix Q:', mX, mY);
+                ctx.font = '18px serif'; ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(mX+20,mY+10); ctx.lineTo(mX+10,mY+10); ctx.lineTo(mX+10,mY+65); ctx.lineTo(mX+20,mY+65); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(mX+110,mY+10); ctx.lineTo(mX+120,mY+10); ctx.lineTo(mX+120,mY+65); ctx.lineTo(mX+110,mY+65); ctx.stroke();
+                ctx.fillStyle = '#2c3e50'; ctx.fillText(' 0    1', mX+30, mY+33); ctx.fillText('-1    0', mX+27, mY+58);
+                ctx.fillStyle = '#7f8c8d'; ctx.font = '14px serif';
+                ctx.fillText('Symplectic form: Q^T = -Q', mX+150, mY+45);
+              } else {
+                ctx.fillText('Intersection Form on Genus-2', 20, 30);
+                const cx = width/2, cy = height/2-10, hW = width*0.18, hH = height*0.18;
+                for (let h = 0; h < 2; h++) {
+                  const hx = cx+(h===0?-hW*1.3:hW*0.3), hy = cy;
+                  ctx.strokeStyle = '#3498db'; ctx.lineWidth = 2;
+                  ctx.beginPath(); ctx.ellipse(hx+hW/2, hy, hW/2, hH, 0, 0, Math.PI*2); ctx.stroke();
+                  ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 3;
+                  ctx.beginPath(); ctx.moveTo(hx+hW/2, hy-hH); ctx.lineTo(hx+hW/2, hy+hH); ctx.stroke();
+                  ctx.strokeStyle = '#27ae60'; ctx.lineWidth = 3;
+                  ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx+hW, hy); ctx.stroke();
+                  ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(hx+hW/2, hy, 6, 0, Math.PI*2); ctx.fill();
+                  ctx.fillStyle = '#e74c3c'; ctx.font = '14px serif'; ctx.fillText(`a${h+1}`, hx+hW/2+8, hy-hH/2);
+                  ctx.fillStyle = '#27ae60'; ctx.fillText(`b${h+1}`, hx+hW*0.7, hy-12);
+                }
+                const mY = height-80;
+                ctx.fillStyle = '#2c3e50'; ctx.font = '15px serif';
+                ctx.fillText('Q = block diag of J = ((0,1),(-1,0))', 20, mY);
+                ctx.fillText('Each handle: one symplectic block', 20, mY+22);
+              }
+            },
+            controls: [
+              { type: 'select', label: 'Surface', options: [
+                { value: 'torus', label: 'Torus T\u00B2' }, { value: 'genus2', label: 'Genus-2' }
+              ], action: (viz, v) => { viz.state.surface = v; } },
+              { type: 'button', label: 'Toggle Intersection', action: (viz) => { viz.state.showIntersection = !viz.state.showIntersection; } }
+            ]
+          }
+        }
+      ],
+      exercises: [
+        {
+          id: 'intersection-cp2',
+          question: 'Show \\(L \\cdot L = 1\\) on \\(\\mathbb{C}P^2\\) using the cohomology ring \\(H^* = \\mathbb{Z}[\\alpha]/(\\alpha^3)\\).',
+          hint: 'The Poincar\u00e9 dual of \\(L\\) is \\(\\alpha \\in H^2\\). Evaluate \\(\\langle \\alpha^2, [\\mathbb{C}P^2] \\rangle\\).',
+          solution: `\\(L \\cdot L = \\langle \\alpha^2, [\\mathbb{C}P^2] \\rangle = 1\\) since \\(\\alpha^2\\) generates \\(H^4 \\cong \\mathbb{Z}\\) and pairs with the fundamental class to give 1. Geometrically: B\u00e9zout's theorem.`
+        },
+        {
+          id: 'intersection-s2xs2',
+          question: 'Show the intersection form on \\(S^2 \\times S^2\\) is the hyperbolic form \\(\\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}\\).',
+          hint: 'Use \\(a = [S^2 \\times \\{\\text{pt}\\}]\\), \\(b = [\\{\\text{pt}\\} \\times S^2]\\). Compute intersections geometrically.',
+          solution: `\\(Q(a,b) = 1\\) (one transverse point), \\(Q(a,a) = Q(b,b) = 0\\) (parallel copies are disjoint). So \\(Q = \\begin{pmatrix} 0 & 1 \\\\ 1 & 0 \\end{pmatrix}\\), symmetric (as expected for \\(n=4\\)), indefinite, unimodular.`
         }
       ]
     }
