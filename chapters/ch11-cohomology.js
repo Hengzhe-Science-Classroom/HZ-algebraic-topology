@@ -1,3 +1,4 @@
+// Updated: 2026-02-16 13:48:43
 window.CHAPTERS.push({
   id: 'ch11',
   number: 11,
